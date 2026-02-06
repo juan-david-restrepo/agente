@@ -1,0 +1,42 @@
+<app-nav></app-nav>
+
+<div class="container-todo">
+  <div class="container-login">
+    <div class="left">
+      <h1>REPÓRTELO YA!</h1>
+      <p>Accede a tu cuenta</p>
+
+      <form [formGroup]="formLogin" (ngSubmit)="onSubmit()">
+        <label for="rol">Tipo de usuario</label>
+        <select id="rol" formControlName="rol" required>
+          <option value="" disabled>Selecciona tu rol</option>
+          <option value="ciudadano">Ciudadano</option>
+          <option value="agente">Agente de Tránsito</option>
+          <option value="administrador">administrador</option>
+        </select>
+
+        <label for="emailLogin">Correo electrónico</label>
+        <input type="email" id="emailLogin" placeholder="correo@ejemplo.com" formControlName="email" required />
+
+        <label for="passwordLogin">Contraseña</label>
+        <input type="password" id="passwordLogin" placeholder="********" formControlName="password" required />
+
+        <a class="recuperar" routerLink="/recuperar">¿Olvidaste tu Contraseña?</a>
+
+        <button  type="submit" class="btn">Iniciar Sesión</button>
+      </form>
+      
+    
+
+      <div class="register-link">
+        ¿Aún no tienes cuenta? <a routerLink="/registro">Regístrate aquí</a>
+      </div>
+    </div>
+
+    <div class="right">
+      <img class="logo" src="assets/images/Gemini_Generated_Image_lwmq2ylwmq2ylwmq.webp" alt="Logo Repórtelo Ya" />
+      <h2>¡Bienvenido a Reportelo Ya!</h2>
+      <p>¡Haz parte del cambio! Reporta y ayuda a tener una ciudad más segura.</p>
+    </div>
+  </div>
+</div>

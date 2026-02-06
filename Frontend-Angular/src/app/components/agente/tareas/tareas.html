@@ -1,0 +1,56 @@
+<!-- LISTA -->
+<div *ngIf="!tareaSeleccionada" class="tareas-grid">
+
+  <div
+    class="tarea-card"
+    *ngFor="let t of tareas"
+    (click)="abrir(t)"
+  >
+
+    <h3>{{t.titulo}}</h3>
+
+    <p class="preview-msg">
+      {{t.mensaje | slice:0:60}}...
+    </p>
+
+    <span class="estado"
+      [class.ok]="t.finalizada">
+
+      {{ t.finalizada ? 'Hecho' : 'Pendiente' }}
+
+    </span>
+
+  </div>
+
+</div>
+
+<!-- DETALLE -->
+<div *ngIf="tareaSeleccionada" class="tarea-detalle">
+
+  <button class="btn-volver"
+    (click)="cerrar()">
+    ← Volver
+  </button>
+
+  <div class="card">
+
+    <h2>{{tareaSeleccionada.titulo}}</h2>
+
+    <p><b>Admin:</b> {{tareaSeleccionada.admin}}</p>
+    <p><b>Zona:</b> {{tareaSeleccionada.zona}}</p>
+    <p><b>Hora:</b> {{tareaSeleccionada.hora}}</p>
+
+    <div class="mensaje-completo">
+      {{tareaSeleccionada.mensaje}}
+    </div>
+
+    <button
+    class="btnTareas"
+    (click)="marcarTarea(tareaSeleccionada!); $event.stopPropagation()"
+    >
+      {{ tareaSeleccionada.finalizada ? 'Hecho' : 'Marcar como hecho' }}
+    </button>
+
+  </div>
+
+</div>

@@ -1,0 +1,48 @@
+<aside class="sidebar">
+
+  <div class="logo-box">
+    <img src="assets/images/logoNuevo.png" class="logo-img">
+    <span class="logo-text">ReporteloYa</span>
+  </div>
+
+  <nav class="menu">
+
+    <button
+    (click)="cambiar('dashboard')"
+    [class.active]="vistaActual==='dashboard'">
+    Dashboard
+    </button>
+
+    <button
+    (click)="cambiar('reportes')"
+    [class.active]="vistaActual==='reportes'">
+    Reportes
+    </button>
+
+    <button
+    (click)="cambiar('tareas')"
+    [class.active]="vistaActual==='tareas'">
+    Mensajes
+    </button>
+
+    <button
+    (click)="cambiar('historial')"
+    [class.active]="vistaActual==='historial'">
+    Historial
+    </button>
+
+    <button
+    (click)="cambiar('perfil')"
+    [class.active]="vistaActual==='perfil'">
+    Perfil
+    </button>
+
+    <button
+    (click)="cambiar('configuracion')"
+    [class.active]="vistaActual==='configuracion'">
+    Ajustes
+    </button>
+
+  </nav>
+
+</aside>

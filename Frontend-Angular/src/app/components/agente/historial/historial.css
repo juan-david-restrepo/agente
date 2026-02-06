@@ -1,0 +1,16 @@
+/* =========================
+   HISTORIAL
+========================= */
+
+.historial-card {
+  cursor: pointer;
+}
+
+.historial-card:hover {
+  transform: translateX(6px);
+}
+
+.hist-dir {
+  color: #64748b;
+  font-size: 14px;
+}

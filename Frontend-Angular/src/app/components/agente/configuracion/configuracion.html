@@ -1,0 +1,26 @@
+<div class="card">
+
+  <label>
+    Modo oscuro
+    <input type="checkbox"
+      [(ngModel)]="config.modoNoche"
+      (change)="update()">
+  </label>
+
+  <label>
+    Daltonismo
+    <input type="checkbox"
+      [(ngModel)]="config.daltonismo"
+      (change)="update()">
+  </label>
+
+  <label>
+    Tamaño fuente
+    <input type="range"
+      min="14"
+      max="22"
+      [(ngModel)]="config.fontSize"
+      (change)="update()">
+  </label>
+
+</div>

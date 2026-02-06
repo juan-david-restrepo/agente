@@ -1,0 +1,44 @@
+<app-nav></app-nav>
+
+<div class="padre">
+    <div class="soporte-container">
+        <h2>Centro de Soporte</h2>
+        <p class="descripcion">
+            Si tienes algún inconveniente con la plataforma, déjanos tu mensaje y te
+            responderemos lo antes posible.
+        </p>
+
+        <form (submit)="enviarSoporte()" #formSoporte="ngForm">
+            <div class="campo">
+                <label>Nombre completo</label>
+                <input type="text" name="nombre" ngModel required />
+            </div>
+
+            <div class="campo">
+                <label>Correo electrónico</label>
+                <input type="email" name="correo" ngModel required />
+            </div>
+
+            <div class="campo">
+                <label>Tipo de solicitud</label>
+                <select name="tipo" ngModel required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="problema">Reportar un problema</option>
+                    <option value="pregunta">Hacer una consulta</option>
+                    <option value="sugerencia">Enviar una sugerencia</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label>Descripción</label>
+                <textarea name="mensaje" rows="5" ngModel required placeholder="Describe tu inquietud..."></textarea>
+            </div>
+
+            <button class="btn-enviar" [disabled]="formSoporte.invalid">
+                Enviar solicitud
+            </button>
+        </form>
+    </div>
+</div>
+
+<app-footer></app-footer>

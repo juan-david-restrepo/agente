@@ -1,0 +1,15 @@
+<h2>Mi historial</h2>
+
+<div class="card historial-card"
+ *ngFor="let h of historial"
+ (click)="abrir(h)">
+
+ <b>{{h.tipo}}</b>
+
+ <p class="hist-dir">{{h.direccion}}</p>
+
+ <span class="tag ok">
+  Atendido
+ </span>
+
+</div>

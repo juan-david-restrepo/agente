@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-RecuperarPasswordApplication<recuperar-password>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.reporteloya.recuperar_password.RecuperarPasswordApplication",
+            "projectName": "recuperar-password",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

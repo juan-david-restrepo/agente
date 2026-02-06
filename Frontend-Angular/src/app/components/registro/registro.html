@@ -1,0 +1,42 @@
+<app-nav></app-nav>
+<div class="contenedor">
+  <div class="registro-wrapper">
+    <div class="registro-info">
+      <img src="assets/images/Gemini_Generated_Image_lwmq2ylwmq2ylwmq.webp" alt="Registro" />
+      <h2>¡Bienvenido a Reportelo Ya!</h2>
+      <p>Ayúdanos a mejorar tu ciudad reportando infracciones de tránsito.</p>
+    </div>
+    <div class="registro-container">
+      <h2>REGÍSTRATE</h2>
+
+      <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+        
+        <label>Tipo De Documento</label>
+        <select formControlName="tipoDocumento" required>
+          <option value="">Escoge Una Opción</option>
+          <option value="CC">Cédula De Ciudadanía</option>
+          <option value="PASAPORTE">Pasaporte</option>
+        </select>
+
+        <label>Número De Documento</label>
+        <input type="text" formControlName="numeroDocumento" placeholder="123456789" required />
+
+        <label>Nombre completo</label>
+        <input type="text" formControlName="nombre" required />
+
+        <label>Correo electrónico</label>
+        <input type="email" formControlName="correo" placeholder="correo@ejemplo.com" required />
+
+        <label>Contraseña</label>
+        <input type="password" formControlName="contrasena" placeholder="********" required />
+        <button type="submit" class="btn-secundary">Crear cuenta</button>
+      </form>
+
+
+
+      <div class="login-link">
+        ¿Ya tienes una cuenta? <a routerLink="/login">Iniciar sesión</a>
+      </div>
+    </div>
+  </div>
+</div>

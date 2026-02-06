@@ -1,0 +1,85 @@
+<div class="admin-layout">
+  <!-- 🔹 Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Panel Admin</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/admin" class="active">📊 Dashboard</a>
+      <a routerLink="/usuarios">👥 Gestión de Usuarios</a>
+      <a routerLink="/agentes">🧑‍✈️ Control de Agentes</a>
+      <a routerLink="/reportes">📝 Reportes del Sistema</a>
+      <a routerLink="/estadisticas">📈 Estadísticas</a>
+      <a routerLink="/calendario">📅 Calendario</a>
+      <a routerLink="/comentarios">💬 Comentarios</a>
+      <a routerLink="/configuracion">⚙️ Configuración</a>
+      <a routerLink="/login">🚪 Salir</a>
+    </nav>
+  </aside>
+
+  <!-- 🔹 Contenido principal -->
+  <main class="main-content">
+    <div class="header">
+      <h2>Dashboard General</h2>
+      <button id="themeToggle" (click)="toggleTheme()">🌞</button>
+    </div>
+
+    <!-- 🔹 Gráficos -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h4>Infracciones por Agente</h4>
+        <canvas id="mainBarChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h4>Reportes Semanales</h4>
+        <canvas id="lineChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h4>Tipos de Infracción</h4>
+        <canvas id="pieChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 🔹 Tabla de infracciones recientes -->
+    <div class="table-section">
+      <h3>📋 Infracciones Recientes</h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Agente</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>03/07/2025</td>
+            <td>Velocidad</td>
+            <td>Gómez</td>
+            <td><span class="status pending">Pendiente</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>03/07/2025</td>
+            <td>Semáforo</td>
+            <td>López</td>
+            <td><span class="status validated">Validado</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>02/07/2025</td>
+            <td>Parqueo indebido</td>
+            <td>Martínez</td>
+            <td><span class="status pending">Pendiente</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>

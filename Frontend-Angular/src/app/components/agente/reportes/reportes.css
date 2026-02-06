@@ -1,0 +1,67 @@
+/* =========================
+   REPORTES
+========================= */
+
+.card {
+  background: var(--card);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.reporte-list {
+  cursor: pointer;
+}
+
+.reporte-list:hover {
+  transform: translateX(5px);
+}
+
+/* DETALLE */
+
+.detalle-reporte-full {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.detalle-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+ gap: 25px;
+}
+
+.detalle-foto img {
+  width: 100%;
+  border-radius: 15px;
+}
+
+.desc-box {
+  background: #f8fafc;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.detalle-mapa iframe {
+  width: 100%;
+  height: 300px;
+  border-radius: 15px;
+}
+
+/* BOTONES */
+
+.btn-ok {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+}
+
+.btn-no {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+}

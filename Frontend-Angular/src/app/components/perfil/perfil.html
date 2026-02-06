@@ -1,0 +1,77 @@
+<app-nav></app-nav>
+
+<div class="perfil-container">
+
+    <!-- Columna izquierda -->
+    <div class="perfil-sidebar">
+
+        <div class="avatar-section">
+            <img [src]="avatar" alt="avatar" class="avatar-img" />
+        
+            <label class="upload-btn">
+                Cambiar foto
+                <input type="file" (change)="onFileSelected($event)">
+            </label>
+        </div>
+
+        <ul class="stats">
+            <li><span>Reportes</span><strong>37</strong></li>
+        </ul>
+
+    </div>
+
+    <!-- Columna derecha -->
+    <div class="perfil-content">
+
+        <h2>Editar perfil</h2>
+
+        <form class="perfil-form">
+
+            <div class="form-row">
+                <label>Nombre</label>
+                <input type="text" [(ngModel)]="user.name" name="name">
+            </div>
+
+            <div class="form-row">
+                <label>Apellido</label>
+                <input type="text" [(ngModel)]="user.lastname" name="lastname">
+            </div>
+
+            <div class="form-row">
+                <label>Teléfono</label>
+                <input type="text" [(ngModel)]="user.phone" name="phone">
+            </div>
+
+            <div class="form-row">
+                <label>Ciudad</label>
+                <input type="text" [(ngModel)]="user.city" name="city">
+            </div>
+
+            <div class="form-row">
+                <label>Email</label>
+                <input type="email" [(ngModel)]="user.email" name="email">
+            </div>
+
+            <div class="form-row">
+                <label>Contraseña</label>
+                <input type="password" name="password">
+            </div>
+
+            <div class="form-row">
+                <label>Confirmar contraseña</label>
+                <input type="password" name="password2">
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-save" type="button" (click)="saveProfile()">Guardar</button>
+                <button class="btn-reset" type="reset">Limpiar</button>
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+<app-footer></app-footer>

@@ -1,0 +1,34 @@
+<app-nav></app-nav>
+
+<div class="contenedor">
+  <h1 class="titulo">Parqueaderos Cercanos</h1>
+
+  <div id="map" class="mapa"></div>
+
+  <div class="boton-buscar">
+    <button id="btnBuscar">Buscar parqueaderos</button>
+  </div>
+
+  <div class="seccion">
+    <div id="info" class="caja">
+      <p>Esperando acción...</p>
+    </div>
+    <div id="lista" class="caja">
+      <h2>Lista de parqueaderos encontrados</h2>
+      <ul id="listado">
+        <li>Aún no hay parqueaderos cargados...</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="controles">
+  <button id="btnUbicacion" title="Centrar ubicación">
+    <img src="https://img.icons8.com/ios-filled/24/000000/gps-device.png" alt="Ubicación" />
+  </button>
+  <button id="btnZoomIn" title="Zoom In">➕</button>
+  <button id="btnZoomOut" title="Zoom Out">➖</button>
+  <button id="btnStreetView" title="Modo calle (visual)">
+    <img src="https://img.icons8.com/fluency/24/street-view.png" alt="Modo calle" />
+  </button>
+</div>

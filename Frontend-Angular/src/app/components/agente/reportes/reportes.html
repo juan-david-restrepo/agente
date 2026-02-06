@@ -1,0 +1,72 @@
+<!-- LISTA -->
+<div *ngIf="!reporteSeleccionado">
+
+  <h2>Reportes Entrantes</h2>
+
+  <div class="card reporte-list"
+    *ngFor="let r of reportes"
+    (click)="seleccionar(r)">
+
+    <b>{{r.tipo}}</b>
+    <p>{{r.direccion}}</p>
+    <span class="tag">{{r.etiqueta}}</span>
+
+  </div>
+
+</div>
+
+<!-- DETALLE -->
+<div *ngIf="reporteSeleccionado" class="detalle-reporte-full">
+
+  <button class="btn-volver"
+    (click)="reporteSeleccionado=null">
+    ← Volver
+  </button>
+
+  <div class="detalle-grid">
+
+    <div class="detalle-foto">
+      <img [src]="reporteSeleccionado.foto">
+      <span class="tag">{{reporteSeleccionado.etiqueta}}</span>
+    </div>
+
+    <div class="detalle-info">
+
+      <h2>{{reporteSeleccionado.tipo}}</h2>
+
+      <p><b>Dirección:</b> {{reporteSeleccionado.direccion}}</p>
+      <p><b>Hora:</b> {{reporteSeleccionado.hora}}</p>
+      <p><b>Coordenadas:</b> {{reporteSeleccionado.coordenadas}}</p>
+
+      <div class="desc-box">
+        {{reporteSeleccionado.descripcion}}
+      </div>
+
+      <div class="acciones">
+
+        <button class="btn-ok"
+          (click)="aceptarClick(reporteSeleccionado)">
+          Aceptar
+        </button>
+
+        <button class="btn-no"
+          (click)="rechazarClick(reporteSeleccionado)">
+          Rechazar
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="detalle-mapa">
+
+      <iframe
+        [src]="getMapaUrl(reporteSeleccionado)"
+        loading="lazy">
+      </iframe>
+
+    </div>
+
+  </div>
+
+</div>

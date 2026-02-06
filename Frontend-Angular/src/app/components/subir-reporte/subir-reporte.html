@@ -1,0 +1,119 @@
+<app-nav></app-nav>
+
+<div class="report-container">
+  <h2 class="title">Reporte de Infracción</h2>
+  <p class="subtitle">
+    Completa la información requerida para reportar una infracción de forma clara y precisa.
+  </p>
+
+  <form class="report-form" (ngSubmit)="enviarReporte()" #formReporte="ngForm">
+
+    <!-- Evidencia -->
+    <section class="form-section">
+      <h3>Evidencia</h3>
+
+      <label class="file-upload">
+        <input
+          type="file"
+          multiple
+          accept="image/*,video/*"
+          (change)="onFileChange($event)"
+          required
+        />
+        <span>📎 Adjuntar fotos o videos (máx. 5)</span>
+      </label>
+
+      <div id="preview" class="preview-grid"></div>
+    </section>
+
+    <!-- Descripción -->
+    <section class="form-section">
+      <h3>Descripción del incidente</h3>
+
+      <div class="textarea-group">
+        <textarea
+          [(ngModel)]="descripcion"
+          name="descripcion"
+          rows="4"
+          placeholder="Describe lo ocurrido…"
+          required
+        ></textarea>
+
+        <button
+          type="button"
+          class="btn-voice"
+          (click)="iniciarVoz()"
+          title="Dictar por voz"
+        >
+          🎙️
+        </button>
+      </div>
+    </section>
+
+    <!-- Fecha y Hora -->
+    <section class="form-section grid-2">
+      <div>
+        <label>Fecha</label>
+        <input type="date" [(ngModel)]="fecha" name="fecha" required />
+      </div>
+
+      <div>
+        <label>Hora</label>
+        <input type="time" [(ngModel)]="hora" name="hora" required />
+      </div>
+    </section>
+
+    <!-- Ubicación -->
+    <section class="form-section">
+      <h3>Ubicación</h3>
+
+      <button
+        type="button"
+        class="btn-location"
+        (click)="obtenerUbicacion()"
+      >
+        📍 Obtener mi ubicación
+      </button>
+
+      <div class="grid-2">
+        <input
+          type="text"
+          [(ngModel)]="direccion"
+          name="direccion"
+          placeholder="Dirección aproximada"
+        />
+        <input
+          type="text"
+          [(ngModel)]="coordenadas"
+          name="coordenadas"
+          placeholder="Latitud, Longitud"
+        />
+      </div>
+
+      <div id="map" class="map-box"></div>
+    </section>
+
+    <!-- Placa -->
+    <section class="form-section">
+      <label>Placa del vehículo (opcional)</label>
+      <input
+        type="text"
+        [(ngModel)]="placa"
+        name="placa"
+        placeholder="Ej: ABC123"
+      />
+    </section>
+
+    <!-- Enviar -->
+    <div class="actions">
+      <button
+        type="submit"
+        class="btn-submit"
+        [disabled]="formReporte.invalid"
+      >
+        Enviar Reporte
+      </button>
+    </div>
+
+  </form>
+</div>

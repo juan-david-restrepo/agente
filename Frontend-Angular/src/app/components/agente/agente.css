@@ -1,0 +1,92 @@
+/* =========================
+   AGENTE SHELL
+========================= */
+
+:host {
+  --blue: #3498db;
+  --card: #ffffff;
+  --text: #333;
+  --bg: #f0f2f5;
+  --border: #e5e7eb;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  background: var(--bg);
+  font-family: Segoe UI, sans-serif;
+  color: var(--text);
+  transition: background 0.25s, color 0.25s;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* HEADER */
+
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* NOTIFICACIONES */
+
+.notif-wrapper {
+  position: relative;
+}
+
+.notif-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+
+.notif-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.notif-dropdown {
+  position: absolute;
+  right: 0;
+  top: 55px;
+  width: 320px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.15);
+  overflow: hidden;
+}
+
+.notif-item {
+  padding: 15px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+/* DARK MODE */
+
+.dark {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --border: #334155;
+}

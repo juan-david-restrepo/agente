@@ -1,0 +1,110 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f3f4f6;
+  margin: 0;
+  padding: 0;
+}
+
+.contenedor {
+  width: 1200px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 20px 40px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 4%;
+}
+
+.titulo {
+  font-size: 28px;
+  text-align: center;
+  color: #1d4ed8;
+  margin-bottom: 20px;
+}
+
+.mapa {
+  width: 1100px;
+  height: 450px;
+  border-radius: 10px;
+  margin: 0 auto 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.boton-buscar {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#btnBuscar {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#btnBuscar:hover {
+  background-color: #1e40af;
+}
+
+.seccion {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.caja {
+  background: white;
+  width: 540px;
+  height: 320px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
+}
+
+.caja h2 {
+  color: #2563eb;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.caja ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.caja li {
+  padding: 6px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Botones flotantes */
+.controles {
+  position: absolute;
+  right: 40px;
+  top: 130px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.controles button {
+  background: white;
+  padding: 10px;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.controles button:hover {
+  background: #dbeafe;
+}

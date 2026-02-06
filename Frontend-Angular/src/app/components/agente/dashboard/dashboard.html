@@ -1,0 +1,59 @@
+<div class="chart-card">
+
+  <div class="chart-header">
+
+    <h3>Atenciones</h3>
+
+    <div class="chart-filtros">
+
+        <button
+            (click)="cambiarModoGrafica('SEMANA')"
+            [class.active]="modoGrafica==='SEMANA'">
+            Semana
+        </button>
+
+        <button
+            (click)="cambiarModoGrafica('ANIO')"
+            [class.active]="modoGrafica==='ANIO'">
+            Año
+        </button>
+
+        <button
+            (click)="cambiarModoGrafica('DIA')"
+            [class.active]="modoGrafica==='DIA'">
+            Día
+        </button>
+
+    </div>
+
+  </div>
+
+  <div *ngIf="modoGrafica==='DIA'" class="chart-calendar">
+
+    <input type="date"
+    [(ngModel)]="fechaSeleccionada">
+
+  </div>
+
+  <div class="chart-bars">
+
+    <div class="bar"
+    *ngFor="let v of statsActual"
+    [style.height.%]="v.valor">
+
+      <span>{{v.label}}</span>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="estado-agente"
+[class.libre]="estadoAgente==='LIBRE'"
+[class.ocupado]="estadoAgente==='OCUPADO'"
+[class.off]="estadoAgente==='FUERA_SERVICIO'">
+
+  {{estadoAgente}}
+
+</div>

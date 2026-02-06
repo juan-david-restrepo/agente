@@ -1,0 +1,79 @@
+/* =========================
+   DASHBOARD
+========================= */
+
+.chart-card {
+  background: var(--card);
+  padding: 25px;
+  border-radius: 20px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chart-filtros {
+  display: flex;
+  gap: 10px;
+}
+
+.chart-filtros button {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+}
+
+.chart-filtros button.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  height: 220px;
+  margin-top: 20px;
+}
+
+.bar {
+  flex: 1;
+  background: linear-gradient(180deg,#3b82f6,#1d4ed8);
+  border-radius: 10px 10px 0 0;
+  position: relative;
+}
+
+.bar span {
+  position: absolute;
+  bottom: -25px;
+  width: 100%;
+  text-align: center;
+}
+
+/* ESTADO AGENTE */
+
+.estado-agente {
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.estado-agente.libre {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.estado-agente.ocupado {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-agente.off {
+  background: #fee2e2;
+  color: #991b1b;
+}

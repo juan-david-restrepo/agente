@@ -1,0 +1,88 @@
+<div class="app-container"
+[class.dark]="config.modoNoche"
+[class.cb]="config.daltonismo">
+
+  <app-sidebar-agente
+  [vistaActual]="vistaActual"
+  (vistaChange)="cambiarVista($event)">
+  </app-sidebar-agente>
+
+
+
+  <main class="main-content"
+  [style.font-size.px]="config.fontSize">
+
+    <header class="top-header">
+
+      <h1>{{vistaActual | titlecase}}</h1>
+
+      <div class="notif-wrapper">
+
+        <div class="notif-icon"
+        (click)="toggleNotificaciones()">
+          🔔
+          <span class="notif-count"
+            *ngIf="notificaciones.length>0">
+            {{notificaciones.length}}
+          </span>
+        </div>
+
+        <div class="notif-dropdown"
+        *ngIf="mostrarNotificaciones">
+
+          <div class="notif-item"
+          *ngFor="let n of notificaciones"
+          (click)="abrirNotif(n)">
+
+            <strong>{{n.tipo}}</strong>
+            <p>{{n.texto}}</p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+    <hr>
+
+    <!-- VISTAS -->
+    <app-dashboard
+      *ngIf="vistaActual==='dashboard'"
+      [estadoAgente]="estadoAgente">
+    </app-dashboard>
+
+    <app-reportes
+      *ngIf="vistaActual==='reportes'"
+      [reportes]="reportesEntrantes"
+      [historial]="historialReportes"
+      (aceptar)="aceptarReporte($event)"
+      (rechazar)="rechazarReporte($event)">
+    </app-reportes>
+
+    <app-historial
+      *ngIf="vistaActual==='historial'"
+      [historial]="historialReportes"
+      (verDetalle)="verDetalleHist($event)">
+    </app-historial>
+
+    <app-tareas
+      *ngIf="vistaActual==='tareas'"
+      [tareas]="tareasAdmin"
+      (marcar)="marcarTarea($event)">
+    </app-tareas>
+
+    <app-perfil-agente
+      *ngIf="vistaActual==='perfil'"
+      [agente]="perfilAgente">
+    </app-perfil-agente>
+
+    <app-configuracion
+      *ngIf="vistaActual==='configuracion'"
+      [(config)]="config">
+    </app-configuracion>
+
+  </main>
+
+</div>
