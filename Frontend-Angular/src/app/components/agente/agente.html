@@ -16,32 +16,57 @@
 
       <h1>{{vistaActual | titlecase}}</h1>
 
-      <div class="notif-wrapper">
+      <label class="switch">
+        <input type="checkbox">
+        <span class="slider"></span>
+      </label>
 
-        <div class="notif-icon"
-        (click)="toggleNotificaciones()">
-          🔔
-          <span class="notif-count"
-            *ngIf="notificaciones.length>0">
-            {{notificaciones.length}}
-          </span>
+      <div class="notif-estado">
+        <div class="h2-estado">
+          <h3>Tu estado:</h3>
+          <div class="estado-agente"
+              [class.libre]="estadoAgente==='LIBRE'"
+              [class.ocupado]="estadoAgente==='OCUPADO'"
+              [class.off]="estadoAgente==='FUERA_SERVICIO'">
+
+                {{estadoAgente}}
+
+          </div>
         </div>
 
+
+        <div class="notif-wrapper">
+
+          <div class="notif-icon"
+          (click)="toggleNotificaciones()">
+            🔔
+            <span class="notif-count"
+              *ngIf="notificaciones.length>0">
+              {{notificaciones.length}}
+            </span>
+          </div>
+
+
+
         <div class="notif-dropdown"
-        *ngIf="mostrarNotificaciones">
+          *ngIf="mostrarNotificaciones">
 
-          <div class="notif-item"
-          *ngFor="let n of notificaciones"
-          (click)="abrirNotif(n)">
+            <div class="notif-item"
+            *ngFor="let n of notificaciones"
+            (click)="abrirNotif(n)">
 
-            <strong>{{n.tipo}}</strong>
-            <p>{{n.texto}}</p>
+              <strong>{{n.tipo}}</strong>
+              <p>{{n.texto}}</p>
+
+            </div>
 
           </div>
 
         </div>
-
       </div>
+
+        
+      
 
     </header>
 

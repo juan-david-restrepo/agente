@@ -10,6 +10,42 @@
   --border: #e5e7eb;
 }
 
+.estado-agente {
+  padding: 8px 14px;
+  border-radius: 20px;
+  text-align: center;
+  width: 100px;
+}
+
+.estado-agente.libre {
+  background: #8beeae;
+  color: #166534;
+}
+
+.estado-agente.ocupado {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-agente.off {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.notif-estado{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 90px;
+}
+
+.h2-estado{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px ;
+}
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -23,7 +59,7 @@
 .main-content {
   flex: 1;
   padding: 25px;
-  overflow-y: auto;
+  overflow: hidden;
   min-width: 0;
 }
 
@@ -80,6 +116,7 @@
   padding: 15px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
+  color: #0f172a;
 }
 
 /* DARK MODE */

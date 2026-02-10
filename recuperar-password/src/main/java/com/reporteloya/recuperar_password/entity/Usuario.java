@@ -28,13 +28,13 @@ public class Usuario implements UserDetails {
     @Column(name = "numero_documento")
     private String numeroDocumento;
 
-    @Column(name = "nombre_completo", nullable = false)
+    @Column(name = "nombre", nullable = false)
     private String nombreCompleto;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "correo",unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password",nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)

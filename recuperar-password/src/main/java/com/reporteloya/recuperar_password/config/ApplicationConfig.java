@@ -84,6 +84,23 @@ public class ApplicationConfig {
                 usuarioRepository.save(adminUser);
                 System.out.println(">>> Usuario ADMIN creado (admin@admin.com / admin123) <<<");
             }
+
+            
+            if (!usuarioRepository.existsByEmail("agente@transito.com")) {
+                 Usuario agenteUser = Usuario.builder()
+                .tipoDocumento("CC")
+                .numeroDocumento("123456789")
+                .nombreCompleto("Agente de Tránsito")
+                .email("agente@transito.com")
+                .password(passwordEncoder.encode("agente123"))
+                .role(Role.AGENTE)
+                .build();
+
+                usuarioRepository.save(agenteUser);
+                System.out.println(">>> Usuario AGENTE creado (agente@transito.com / agente123) <<<");
+            }
+
         };
+
     }
 }

@@ -1,14 +1,102 @@
 /* =========================
-   PERFIL
+   CONTENEDOR GENERAL
+========================= */
+
+.profile-container {
+  padding: 20px;
+}
+
+/* =========================
+   GRID PRINCIPAL
 ========================= */
 
 .profile-grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  margin-bottom: 25px;
+  justify-content: center;
+}
+
+/* =========================
+   TARJETAS GENERALES
+========================= */
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+}
+
+/* =========================
+   PERFIL PRINCIPAL
+========================= */
+
+.profile-main {
+  min-width: 260px;
+  text-align: center;
 }
 
 .big-avatar {
-  width: 130px;
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
   border-radius: 50%;
+  border: 5px solid #f1f1f1;
+  margin-bottom: 15px;
+}
+
+.profile-main h2 {
+  margin: 8px 0;
+  color: #666;
+}
+
+.role-badge {
+  background: linear-gradient(45deg, #2563eb, #3b82f6);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+/* =========================
+   INFO CARD
+========================= */
+
+.info-card p {
+  margin: 10px 0;
+  font-size: 15px;
+  color: #666;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: 32px;
+  margin-bottom: 5px;
+  color: #2563eb;
+}
+
+.stat-card p {
+  color: #666;
+  font-size: 14px;
 }

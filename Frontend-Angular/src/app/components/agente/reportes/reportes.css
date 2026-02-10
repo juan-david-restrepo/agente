@@ -28,18 +28,15 @@
 .detalle-grid {
  display: grid;
  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
- gap: 25px;
-}
-
-.detalle-foto img {
-  width: 100%;
-  border-radius: 15px;
+  margin-bottom: 40px;
+  align-items: start;
 }
 
 .desc-box {
-  background: #f8fafc;
+  background: #cbcccc;
   padding: 15px;
   border-radius: 10px;
+  color: black;
 }
 
 .detalle-mapa iframe {
@@ -65,3 +62,44 @@
   padding: 10px 18px;
   border-radius: 10px;
 }
+
+.btn-volver{
+  background-color: #3498db;
+  color: white;
+  border-radius: 12px;
+  width: 100px;
+  border: none;
+  height: 35px;
+}
+
+.detalle-foto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.evidencia{
+  width: 600px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+
+.acciones{
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.acciones button{
+  width: 100px;
+}
+
+.tag {
+  background: #e5e7eb;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: black;
+}
+
+
+

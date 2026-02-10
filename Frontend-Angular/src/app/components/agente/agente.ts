@@ -31,10 +31,12 @@ export interface Tarea {
  id:number;
  titulo:string;
  admin:string;
- mensaje:string;
+ descripcionTarea:string;
  zona:string;
  finalizada:boolean;
  hora:string;
+ fecha: string;
+ prioridad: 'BAJA'|'MEDIA'|'ALTA';
 }
 
 export interface Notificacion {
@@ -130,19 +132,23 @@ export class Agente {
       id:1,
       titulo:'Operativo alcoholemia',
       admin:'Admin Central',
-      mensaje:'Apoyar retén zona norte',
+      descripcionTarea:'Apoyar retén zona norte',
       zona:'Zona Norte',
       finalizada:false,
-      hora:'10:00 AM'
+      hora:'10:00 AM',
+      fecha:'2026-06-15',
+      prioridad: 'ALTA'
     },
     {
       id:2,
       titulo:'Control vehicular',
       admin:'Supervisor',
-      mensaje:'Revisión documentos vehículos pesados',
+      descripcionTarea:'Revisión documentos vehículos pesados',
       zona:'Autopista Sur',
       finalizada:true,
-      hora:'02:00 PM'
+      hora:'02:00 PM',
+      fecha:'2026-06-15',
+      prioridad: 'MEDIA'
     }
   ];
 

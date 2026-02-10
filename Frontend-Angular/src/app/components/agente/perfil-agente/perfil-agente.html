@@ -1,15 +1,48 @@
-    <div class="profile-grid">
+<div class="profile-container">
 
-      <div class="card profile-main">
-        <img [src]="agente.foto" class="big-avatar">
-        <h2>{{agente.nombre}}</h2>
-      </div>
+  <div class="profile-grid">
 
-      <div class="card">
-        <p>Cédula: {{agente.cedula}}</p>
-        <p>Placa: {{agente.placa}}</p>
-        <p>Celular: {{agente.celular}}</p>
-        <p>Correo: {{agente.correo}}</p>
-      </div>
-
+    <div class="card profile-main">
+      <img [src]="agente.foto" class="big-avatar">
+      <h2>{{agente.nombre}}</h2>
+      <span class="role-badge">Agente de Tránsito</span>
     </div>
+
+    <div class="card info-card">
+      <p><strong>Cédula:</strong> {{agente.cedula}}</p>
+      <p><strong>Placa:</strong> {{agente.placa}}</p>
+      <p><strong>Celular:</strong> {{agente.celular}}</p>
+      <p><strong>Correo:</strong> {{agente.correo}}</p>
+    </div>
+
+  </div>
+
+  <!-- ===================== -->
+  <!-- ESTADISTICAS BONITAS -->
+  <!-- ===================== -->
+
+  <div class="stats-grid">
+
+    <div class="card stat-card">
+      <h3>125</h3>
+      <p>Reportes realizados</p>
+    </div>
+
+    <div class="card stat-card">
+      <h3>4</h3>
+      <p>Años de servicio</p>
+    </div>
+
+    <div class="card stat-card">
+      <h3>98%</h3>
+      <p>Eficiencia</p>
+    </div>
+
+    <div class="card stat-card">
+      <h3>12</h3>
+      <p>Operativos apoyados</p>
+    </div>
+
+  </div>
+
+</div>

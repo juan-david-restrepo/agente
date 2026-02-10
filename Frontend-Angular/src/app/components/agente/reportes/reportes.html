@@ -26,13 +26,14 @@
   <div class="detalle-grid">
 
     <div class="detalle-foto">
-      <img [src]="reporteSeleccionado.foto">
-      <span class="tag">{{reporteSeleccionado.etiqueta}}</span>
+      <img class="evidencia" src="assets/images/ejemplo2.jpg" alt="">
     </div>
 
     <div class="detalle-info">
 
       <h2>{{reporteSeleccionado.tipo}}</h2>
+
+      <span class="tag">{{reporteSeleccionado.etiqueta}}</span>
 
       <p><b>Dirección:</b> {{reporteSeleccionado.direccion}}</p>
       <p><b>Hora:</b> {{reporteSeleccionado.hora}}</p>
@@ -58,7 +59,11 @@
 
     </div>
 
-    <div class="detalle-mapa">
+
+
+  </div>
+
+      <div class="detalle-mapa">
 
       <iframe
         [src]="getMapaUrl(reporteSeleccionado)"
@@ -66,7 +71,5 @@
       </iframe>
 
     </div>
-
-  </div>
 
 </div>
