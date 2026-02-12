@@ -1,113 +1,134 @@
-<div class="app-container"
-[class.dark]="config.modoNoche"
-[class.cb]="config.daltonismo">
+  <div class="app-container"
+  [class.dark]="config.modoNoche"
+  [class.cb]="config.daltonismo">
 
-  <app-sidebar-agente
-  [vistaActual]="vistaActual"
-  (vistaChange)="cambiarVista($event)">
-  </app-sidebar-agente>
+    <app-sidebar-agente
+    [vistaActual]="vistaActual"
+    (vistaChange)="cambiarVista($event)">
+    </app-sidebar-agente>
 
 
 
-  <main class="main-content"
-  [style.font-size.px]="config.fontSize">
+    <main class="main-content"
+    [style.font-size.px]="config.fontSize">
 
-    <header class="top-header">
+      <header class="top-header">
 
-      <h1>{{vistaActual | titlecase}}</h1>
 
-      <label class="switch">
-        <input type="checkbox">
-        <span class="slider"></span>
-      </label>
+        <div class="header-title">
+          <h1>{{vistaActual | titlecase}}</h1>
+        </div>
+      
 
-      <div class="notif-estado">
-        <div class="h2-estado">
-          <h3>Tu estado:</h3>
-          <div class="estado-agente"
+
+        <div class="notif-estado">
+          <div class="estado-wrapper">
+
+            <span class="estado-label">Estado</span>
+
+            <div class="estado-card"
               [class.libre]="estadoAgente==='LIBRE'"
               [class.ocupado]="estadoAgente==='OCUPADO'"
               [class.off]="estadoAgente==='FUERA_SERVICIO'">
 
-                {{estadoAgente}}
+              <i class="fa-solid"
+                [ngClass]="{
+                  'fa-circle-check': estadoAgente==='LIBRE',
+                  'fa-circle-pause': estadoAgente==='OCUPADO',
+                  'fa-circle-xmark': estadoAgente==='FUERA_SERVICIO'
+                }">
+              </i>
+
+              <span class="estado-text">
+                {{
+                  estadoAgente === 'FUERA_SERVICIO'
+                    ? 'Fuera de servicio'
+                    : estadoAgente === 'OCUPADO'
+                      ? 'Ocupado'
+                      : 'Disponible'
+                }}
+              </span>
 
           </div>
-        </div>
+
+</div>
 
 
-        <div class="notif-wrapper">
+          <div class="notif-wrapper">
 
-          <div class="notif-icon"
-          (click)="toggleNotificaciones()">
-            🔔
-            <span class="notif-count"
-              *ngIf="notificaciones.length>0">
-              {{notificaciones.length}}
-            </span>
-          </div>
+            <div class="notif-icon"
+                (click)="toggleNotificaciones()"
+                [class.ring]="notificaciones.length > 0">
+
+              <i class="fa-solid fa-bell"></i>
+
+              <span class="notif-count"
+                    *ngIf="notificaciones.length > 0">
+                {{notificaciones.length}}
+              </span>
+            </div>
 
 
 
-        <div class="notif-dropdown"
-          *ngIf="mostrarNotificaciones">
+          <div class="notif-dropdown"
+            *ngIf="mostrarNotificaciones">
 
-            <div class="notif-item"
-            *ngFor="let n of notificaciones"
-            (click)="abrirNotif(n)">
+              <div class="notif-item"
+              *ngFor="let n of notificaciones"
+              (click)="abrirNotif(n)">
 
-              <strong>{{n.tipo}}</strong>
-              <p>{{n.texto}}</p>
+                <strong>{{n.tipo}}</strong>
+                <p>{{n.texto}}</p>
+
+              </div>
 
             </div>
 
           </div>
-
         </div>
-      </div>
 
-        
-      
+      </header>
 
-    </header>
+      <hr>
 
-    <hr>
+      <!-- VISTAS -->
+      <app-dashboard
+        *ngIf="vistaActual==='dashboard'"
+        [estadoAgente]="estadoAgente">
+      </app-dashboard>
 
-    <!-- VISTAS -->
-    <app-dashboard
-      *ngIf="vistaActual==='dashboard'"
-      [estadoAgente]="estadoAgente">
-    </app-dashboard>
+      <app-reportes
+        *ngIf="vistaActual==='reportes'"
+        [reportes]="reportesEntrantes"
+        [historial]="historialReportes"
+        (aceptar)="aceptarReporte($event)"
+        (rechazar)="rechazarReporte($event)">
+      </app-reportes>
 
-    <app-reportes
-      *ngIf="vistaActual==='reportes'"
-      [reportes]="reportesEntrantes"
-      [historial]="historialReportes"
-      (aceptar)="aceptarReporte($event)"
-      (rechazar)="rechazarReporte($event)">
-    </app-reportes>
+      <app-historial
+        *ngIf="vistaActual==='historial'"
+        [historial]="historialReportes"
+        (verDetalle)="verDetalleHist($event)">
+      </app-historial>
 
-    <app-historial
-      *ngIf="vistaActual==='historial'"
-      [historial]="historialReportes"
-      (verDetalle)="verDetalleHist($event)">
-    </app-historial>
+      <app-tareas
+        *ngIf="vistaActual==='tareas'"
+        [tareas]="tareasAdmin"
+        (marcar)="marcarTarea($event)">
+      </app-tareas>
 
-    <app-tareas
-      *ngIf="vistaActual==='tareas'"
-      [tareas]="tareasAdmin"
-      (marcar)="marcarTarea($event)">
-    </app-tareas>
+      <app-perfil-agente
+        *ngIf="vistaActual==='perfil'"
+        [agente]="perfilAgente"
+        [estadoAgente]="estadoAgente"
+        (estadoChange)="toggleServicio($event)">
+      </app-perfil-agente>
 
-    <app-perfil-agente
-      *ngIf="vistaActual==='perfil'"
-      [agente]="perfilAgente">
-    </app-perfil-agente>
+      <app-configuracion
+        *ngIf="vistaActual==='configuracion'"
+        [(config)]="config">
+      </app-configuracion>
 
-    <app-configuracion
-      *ngIf="vistaActual==='configuracion'"
-      [(config)]="config">
-    </app-configuracion>
+    </main>
 
-  </main>
-
-</div>
+  </div>

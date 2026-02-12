@@ -56,6 +56,8 @@ public class SecurityConfig {
                                                 // CIUDADANO
                                                 .requestMatchers("/api/ciudadano/**").hasRole("CIUDADANO")
 
+                                                .requestMatchers("/api/usuarios/me").authenticated()
+
                                                 // // Ejemplo adicional:
                                                 // .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                                                 // .requestMatchers(HttpMethod.GET, "/api/products")

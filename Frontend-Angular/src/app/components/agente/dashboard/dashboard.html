@@ -2,6 +2,17 @@
 
   <div class="chart-header">
 
+    <div class="chart-calendar">
+
+      <input type="date" [(ngModel)]="fechaInicio">
+      <input type="date" [(ngModel)]="fechaFin">
+
+      <button (click)="filtrarPorRango()">
+        Aplicar
+      </button>
+
+    </div>
+
     <h3>Atenciones</h3>
 
     <div class="chart-filtros">
@@ -35,17 +46,55 @@
 
   </div>
 
+    <div class="dashboard-cards">
+
+      <div class="dash-card">
+        <span>Reportes hoy</span>
+        <h2>12</h2>
+      </div>
+
+      <div class="dash-card">
+        <span>Pendientes</span>
+        <h2>4</h2>
+      </div>
+
+      <div class="dash-card">
+        <span>Resueltos</span>
+        <h2>8</h2>
+      </div>
+
+      <div class="dash-card">
+        <span>Tiempo activo</span>
+        <h2>5h 32m</h2>
+      </div>
+
+    </div>
+
   <div class="chart-bars">
 
     <div class="bar"
-    *ngFor="let v of statsActual"
-    [style.height.%]="v.valor">
+    *ngFor="let v of statsNormalizados"
+    [style.height.%]="v.porcentaje">
 
       <span>{{v.label}}</span>
 
     </div>
 
   </div>
+
+    <div class="actividad-card">
+
+      <h3>Actividad reciente</h3>
+
+      <div class="actividad-item">
+        🚨 Reporte aceptado – Carrera 15
+      </div>
+
+      <div class="actividad-item">
+        ✅ Tarea finalizada – Control vehicular
+      </div>
+
+    </div>
 
 </div>
 

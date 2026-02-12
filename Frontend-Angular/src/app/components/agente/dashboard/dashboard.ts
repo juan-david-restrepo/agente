@@ -17,6 +17,27 @@ export class Dashboard {
 
  fechaSeleccionada='';
 
+ get maxValor() {
+  return Math.max(...this.statsActual.map(s => s.valor));
+}
+
+get statsNormalizados() {
+  const max = this.maxValor;
+  return this.statsActual.map(s => ({
+    ...s,
+    porcentaje: (s.valor / max) * 100
+  }));
+}
+
+
+fechaInicio = '';
+fechaFin = '';
+
+filtrarPorRango(){
+  console.log('Filtrar desde', this.fechaInicio, 'hasta', this.fechaFin);
+  // aquí luego puedes conectar con backend
+}
+
 statsSemana=[
  {label:'Lun',valor:40},
  {label:'Mar',valor:70},

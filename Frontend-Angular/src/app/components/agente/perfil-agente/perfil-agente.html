@@ -1,46 +1,64 @@
-<div class="profile-container">
+<div class="profile-wrapper">
 
-  <div class="profile-grid">
+  <!-- HEADER -->
+  <div class="profile-header">
+      <!-- SWITCH EN ESQUINA -->
+    <div class="perfil-switch">
 
-    <div class="card profile-main">
-      <img [src]="agente.foto" class="big-avatar">
-      <h2>{{agente.nombre}}</h2>
-      <span class="role-badge">Agente de Tránsito</span>
+      <label class="switch">
+        <input type="checkbox"
+          [checked]="estadoAgente !== 'FUERA_SERVICIO'"
+          (change)="cambiarEstado($event)">
+        
+        <span class="slider"></span>
+      </label>
+
+      <span class="switch-label">
+        {{ estadoAgente === 'FUERA_SERVICIO'
+          ? 'Fuera de servicio'
+          : 'En servicio' }}
+      </span>
+
     </div>
 
+    <div class="avatar-section">
+      <img [src]="agente.foto" class="big-avatar">
+
+      <label class="upload-btn">
+        Cambiar foto
+        <input type="file" (change)="cambiarFoto($event)" hidden>
+      </label>
+    </div>
+
+    <div class="header-info">
+      <h2>{{agente.nombre}}</h2>
+      <p class="rango">{{agente.rango}}</p>
+      <h3 class="ciudad">{{agente.placa}}</h3>
+
+      <span class="estado-badge">
+        En servicio
+      </span>
+    </div>
+
+  </div>
+
+  <!-- INFORMACIÓN -->
+  <div class="info-grid">
+
     <div class="card info-card">
+      <h3>Información Personal</h3>
       <p><strong>Cédula:</strong> {{agente.cedula}}</p>
       <p><strong>Placa:</strong> {{agente.placa}}</p>
       <p><strong>Celular:</strong> {{agente.celular}}</p>
       <p><strong>Correo:</strong> {{agente.correo}}</p>
     </div>
 
-  </div>
-
-  <!-- ===================== -->
-  <!-- ESTADISTICAS BONITAS -->
-  <!-- ===================== -->
-
-  <div class="stats-grid">
-
-    <div class="card stat-card">
-      <h3>125</h3>
-      <p>Reportes realizados</p>
-    </div>
-
-    <div class="card stat-card">
-      <h3>4</h3>
-      <p>Años de servicio</p>
-    </div>
-
-    <div class="card stat-card">
-      <h3>98%</h3>
-      <p>Eficiencia</p>
-    </div>
-
-    <div class="card stat-card">
-      <h3>12</h3>
-      <p>Operativos apoyados</p>
+    <div class="card extra-card">
+      <h3>Resumen Profesional</h3>
+      <p>✔ 4 años de servicio</p>
+      <p>✔ 125 reportes gestionados</p>
+      <p>✔ 98% efectividad</p>
+      <p>✔ Participación en 12 operativos</p>
     </div>
 
   </div>

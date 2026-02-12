@@ -8,39 +8,45 @@
   <nav class="menu">
 
     <button
-    (click)="cambiar('dashboard')"
-    [class.active]="vistaActual==='dashboard'">
-    Dashboard
+      (click)="cambiar('dashboard')"
+      [class.active]="vistaActual==='dashboard'">
+      <i class="fa-solid fa-chart-line"></i>
+      Dashboard
     </button>
 
     <button
-    (click)="cambiar('reportes')"
-    [class.active]="vistaActual==='reportes'">
-    Reportes
+      (click)="cambiar('reportes')"
+      [class.active]="vistaActual==='reportes'">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Reportes
     </button>
 
     <button
-    (click)="cambiar('tareas')"
-    [class.active]="vistaActual==='tareas'">
-    Mensajes
+      (click)="cambiar('tareas')"
+      [class.active]="vistaActual==='tareas'">
+      <i class="fa-solid fa-envelope"></i>
+      Mensajes
     </button>
 
     <button
-    (click)="cambiar('historial')"
-    [class.active]="vistaActual==='historial'">
-    Historial
+      (click)="cambiar('historial')"
+      [class.active]="vistaActual==='historial'">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      Historial
     </button>
 
     <button
-    (click)="cambiar('perfil')"
-    [class.active]="vistaActual==='perfil'">
-    Perfil
+      (click)="cambiar('perfil')"
+      [class.active]="vistaActual==='perfil'">
+      <i class="fa-solid fa-user"></i>
+      Perfil
     </button>
 
     <button
-    (click)="cambiar('configuracion')"
-    [class.active]="vistaActual==='configuracion'">
-    Ajustes
+      (click)="cambiar('configuracion')"
+      [class.active]="vistaActual==='configuracion'">
+      <i class="fa-solid fa-gear"></i>
+      Ajustes
     </button>
 
   </nav>
