@@ -1,59 +1,58 @@
-<div class="chart-card">
+<div class="container-fluid mt-4">
 
-  <div class="chart-header">
+  <div class="chart-card shadow">
 
-    <div class="chart-calendar">
+    <!-- ================= HEADER ================= -->
+    <div class="chart-header">
 
-      <input type="date" [(ngModel)]="fechaInicio">
-      <input type="date" [(ngModel)]="fechaFin">
+      <!-- FECHAS -->
+      <div class="chart-calendar">
+        <input type="date" [(ngModel)]="fechaInicio">
+        <input type="date" [(ngModel)]="fechaFin">
+        <button (click)="filtrarPorRango()">Aplicar</button>
+      </div>
 
-      <button (click)="filtrarPorRango()">
-        Aplicar
-      </button>
 
+      <!-- FILTROS -->
+      <div class="chart-filtros">
+
+        <button
+          (click)="cambiarModoGrafica('SEMANA')"
+          [class.active]="modoGrafica==='SEMANA'">
+          Semana
+        </button>
+
+        <button
+          (click)="cambiarModoGrafica('ANIO')"
+          [class.active]="modoGrafica==='ANIO'">
+          Año
+        </button>
+
+        <button
+          (click)="cambiarModoGrafica('DIA')"
+          [class.active]="modoGrafica==='DIA'">
+          Día
+        </button>
+
+      </div>
     </div>
 
-    <h3>Atenciones</h3>
-
-    <div class="chart-filtros">
-
-        <button
-            (click)="cambiarModoGrafica('SEMANA')"
-            [class.active]="modoGrafica==='SEMANA'">
-            Semana
-        </button>
-
-        <button
-            (click)="cambiarModoGrafica('ANIO')"
-            [class.active]="modoGrafica==='ANIO'">
-            Año
-        </button>
-
-        <button
-            (click)="cambiarModoGrafica('DIA')"
-            [class.active]="modoGrafica==='DIA'">
-            Día
-        </button>
-
+    <!-- ================= SOLO DIA ================= -->
+    <div *ngIf="modoGrafica==='DIA'" class="chart-calendar">
+      <input type="date" [(ngModel)]="fechaSeleccionada">
     </div>
 
-  </div>
-
-  <div *ngIf="modoGrafica==='DIA'" class="chart-calendar">
-
-    <input type="date"
-    [(ngModel)]="fechaSeleccionada">
-
-  </div>
-
-    <div class="dashboard-cards">
+    <!-- ================= TARJETAS ================= -->
+    <div class="dashboard-cards mt-4">
 
       <div class="dash-card">
+        <i class="fa-solid fa-camera"></i>
         <span>Reportes hoy</span>
         <h2>12</h2>
       </div>
 
       <div class="dash-card">
+        <i class="fa-solid fa-clock"></i>
         <span>Pendientes</span>
         <h2>4</h2>
       </div>
@@ -70,18 +69,32 @@
 
     </div>
 
-  <div class="chart-bars">
+    <!-- ================= BOTONES TIPO GRAFICA ================= -->
+    <div class="botones-grafica">
 
-    <div class="bar"
-    *ngFor="let v of statsNormalizados"
-    [style.height.%]="v.porcentaje">
+      <button class="btn btn-outline-primary"
+              (click)="cambiarTipoGrafica('bar')">
+        Barras
+      </button>
 
-      <span>{{v.label}}</span>
+      <button class="btn btn-outline-primary"
+              (click)="cambiarTipoGrafica('line')">
+        Línea
+      </button>
+
+      <button class="btn btn-outline-primary"
+              (click)="cambiarTipoGrafica('pie')">
+        Pastel
+      </button>
 
     </div>
 
-  </div>
+    <!-- ================= GRAFICA ================= -->
+    <div class="chart-container mt-4">
+      <canvas id="miGrafica"></canvas>
+    </div>
 
+    <!-- ================= ACTIVIDAD ================= -->
     <div class="actividad-card">
 
       <h3>Actividad reciente</h3>
@@ -96,6 +109,5 @@
 
     </div>
 
+  </div>
 </div>
-
-

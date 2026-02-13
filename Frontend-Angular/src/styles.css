@@ -10,6 +10,9 @@ html, body {
     margin: 0;
     padding: 0;
 }
+body {
+  font-size: var(--font-size-base);
+}
 
 
 .tag {
@@ -38,4 +41,22 @@ html, body {
   padding: 20px;
   border-radius: 8px;
   min-width: 300px;
+}
+
+:root {
+  --bg: #ffffff;
+  --card-bg: #ffffff;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #3b82f6;
+  --font-size-base: 16px;
+}
+
+.dark-mode {
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --text: #f8fafc;
+  --text-muted: #cbd5f5;
+  --border: #334155;
 }

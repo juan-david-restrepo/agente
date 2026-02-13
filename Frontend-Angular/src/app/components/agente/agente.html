@@ -126,7 +126,8 @@
 
       <app-configuracion
         *ngIf="vistaActual==='configuracion'"
-        [(config)]="config">
+        [(config)]="config"
+        (configChange)="updateConfig($event)">
       </app-configuracion>
 
     </main>

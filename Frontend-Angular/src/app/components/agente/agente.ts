@@ -259,4 +259,13 @@ export class Agente implements OnInit {
       });
     }
 
+
+    updateConfig(config: any) {
+      document.body.classList.toggle('dark-mode', config.modoNoche);
+      document.documentElement.style.setProperty(
+        '--font-size-base',
+        config.fontSize + 'px'
+      );
+    }
+
 }
