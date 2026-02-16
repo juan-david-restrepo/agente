@@ -1,104 +1,104 @@
-<!-- LISTA -->
-<div *ngIf="!tareaSeleccionada" class="tareas-grid">
+  <!-- LISTA -->
+  <div *ngIf="!tareaSeleccionada" class="tareas-grid">
 
-  <div
-    class="tarea-card"
-    *ngFor="let t of tareas"
-    (click)="abrir(t)"
-  >
+    <div
+      class="tarea-card"
+      *ngFor="let t of tareas"
+      (click)="abrir(t)"
+    >
 
-    <h3>{{t.titulo}}</h3>
+      <h3>{{t.titulo}}</h3>
 
-    <p class="preview-msg">
-      {{t.descripcionTarea | slice:0:60}}...
-    </p>
+      <p class="preview-msg">
+        {{t.descripcionTarea | slice:0:60}}...
+      </p>
 
-    <span class="estado"
-      [class.ok]="t.finalizada">
+      <span class="estado"
+        [class.ok]="t.finalizada">
 
-      {{ t.finalizada ? 'Hecho' : 'Pendiente' }}
+        {{ t.finalizada ? 'Hecho' : 'Pendiente' }}
 
-    </span>
+      </span>
+
+    </div>
 
   </div>
 
-</div>
+  <!-- DETALLE -->
 
-<!-- DETALLE -->
+  <div *ngIf="tareaSeleccionada" class="padre">
 
-<div *ngIf="tareaSeleccionada" class="padre">
+    <!-- BOTÓN VOLVER -->
+    <button
+      class="btn-volver"
+      (click)="cerrar()">
+      ← Volver
+    </button>
 
-  <!-- BOTÓN VOLVER -->
-  <button
-    class="btn-volver"
-    (click)="cerrar()">
-    ← Volver
-  </button>
+    <!-- CONTENIDO CENTRADO -->
 
-  <!-- CONTENIDO CENTRADO -->
+      <div class="card detalle-card">
 
-    <div class="card detalle-card">
+        <div class="detalle-header">
+          <h2>{{tareaSeleccionada.titulo}}</h2>
+          <span class="estado-badge">
+            {{ tareaSeleccionada.finalizada ? 'Finalizada' : 'Pendiente' }}
+          </span>
+        </div>
 
-      <div class="detalle-header">
-        <h2>{{tareaSeleccionada.titulo}}</h2>
-        <span class="estado-badge">
-          {{ tareaSeleccionada.finalizada ? 'Finalizada' : 'Pendiente' }}
-        </span>
+        <!-- resto igual -->
+
+        <div class="detalle-info">
+          <div class="info-box">
+            <span class="info-label">Admin</span>
+            <span class="info-value">{{tareaSeleccionada.admin}}</span>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Zona</span>
+            <span class="info-value">{{tareaSeleccionada.zona}}</span>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Fecha</span>
+            <span class="info-value">{{tareaSeleccionada.fecha}}</span>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Prioridad</span>
+            <span class="info-value">{{tareaSeleccionada.prioridad}}</span>
+          </div>
+
+          <div class="info-box">
+            <span class="info-label">Hora</span>
+            <span class="info-value">{{tareaSeleccionada.hora}}</span>
+          </div>
+        </div>   
+
+
+          <!-- MENSAJE TIPO ORDEN -->
+        <div class="orden-box">
+
+          <div class="orden-header">
+            Instrucción del administrador
+          </div>
+
+          <div class="mensaje-completo mensaje-admin">
+            {{tareaSeleccionada.descripcionTarea}}
+          </div>
+
+        </div>
+
+        <button
+          class="btnTareas btn-accion"
+          (click)="marcarTarea(tareaSeleccionada!); $event.stopPropagation()"
+        >
+          {{ tareaSeleccionada.finalizada ? 'Desmarcar tarea' : 'Marcar como hecha' }}
+        </button>
       </div>
 
-      <!-- resto igual -->
-
-      <div class="detalle-info">
-        <div class="info-box">
-          <span class="info-label">Admin</span>
-          <span class="info-value">{{tareaSeleccionada.admin}}</span>
-        </div>
-
-        <div class="info-box">
-          <span class="info-label">Zona</span>
-          <span class="info-value">{{tareaSeleccionada.zona}}</span>
-        </div>
-
-        <div class="info-box">
-          <span class="info-label">Fecha</span>
-          <span class="info-value">{{tareaSeleccionada.fecha}}</span>
-        </div>
-
-        <div class="info-box">
-          <span class="info-label">Prioridad</span>
-          <span class="info-value">{{tareaSeleccionada.prioridad}}</span>
-        </div>
-
-        <div class="info-box">
-          <span class="info-label">Hora</span>
-          <span class="info-value">{{tareaSeleccionada.hora}}</span>
-        </div>
-      </div>   
-
-
-        <!-- MENSAJE TIPO ORDEN -->
-      <div class="orden-box">
-
-        <div class="orden-header">
-          Instrucción del administrador
-        </div>
-
-        <div class="mensaje-completo mensaje-admin">
-          {{tareaSeleccionada.descripcionTarea}}
-        </div>
-
-      </div>
-
-      <button
-        class="btnTareas btn-accion"
-        (click)="marcarTarea(tareaSeleccionada!); $event.stopPropagation()"
-      >
-        {{ tareaSeleccionada.finalizada ? 'Desmarcar tarea' : 'Marcar como hecha' }}
-      </button>
-    </div>
-
-</div>
+  </div>
 
 
 
- 
+  

@@ -49,9 +49,9 @@
                 }}
               </span>
 
-          </div>
+            </div>
 
-</div>
+          </div>
 
 
           <div class="notif-wrapper">
@@ -101,6 +101,7 @@
         *ngIf="vistaActual==='reportes'"
         [reportes]="reportesEntrantes"
         [historial]="historialReportes"
+        [reporteInicial]="reporteDesdeHistorial"
         (aceptar)="aceptarReporte($event)"
         (rechazar)="rechazarReporte($event)">
       </app-reportes>

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Reporte } from '../agente';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
  selector: 'app-reportes',
@@ -11,6 +12,11 @@ import { Reporte } from '../agente';
 })
 export class Reportes {
 
+    @Input() reporteInicial: Reporte | null = null;
+
+    constructor(private sanitizer: DomSanitizer){}
+    mapaUrl: SafeResourceUrl | null = null;
+
  @Input() reportes!: Reporte[];
  @Input() historial!: Reporte[];
 
@@ -19,9 +25,16 @@ export class Reportes {
 
  reporteSeleccionado: Reporte | null = null;
 
- seleccionar(r: Reporte){
-  this.reporteSeleccionado = r;
- }
+    seleccionar(r: Reporte){
+        this.reporteSeleccionado = r;
+
+        if (r.lat && r.lng) {
+            const url = `https://www.google.com/maps?q=${r.lat},${r.lng}&hl=es&z=16&output=embed`;
+            this.mapaUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        } else {
+            this.mapaUrl = null;
+        }
+    }
 
  aceptarClick(r: Reporte){
   this.aceptar.emit(r);
@@ -33,9 +46,16 @@ export class Reportes {
   this.reporteSeleccionado = null;
  }
 
- getMapaUrl(r: Reporte){
-  if(!r.lat || !r.lng) return '';
-  return `https://www.google.com/maps?q=${r.lat},${r.lng}&hl=es&z=16&output=embed`;
- }
+    getMapaUrl(r: Reporte): SafeResourceUrl {
+        if(!r.lat || !r.lng) return '';
+        const url = `https://www.google.com/maps?q=${r.lat},${r.lng}&hl=es&z=16&output=embed`;
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+    }
+
+    ngOnChanges() {
+        if (this.reporteInicial) {
+            this.seleccionar(this.reporteInicial);
+        }
+    }
 
 }

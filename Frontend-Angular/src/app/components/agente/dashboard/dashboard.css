@@ -32,6 +32,7 @@
   gap: 10px;
   align-items: center;
   background: var(--bg);
+  background-color: none;
   color: var(--text);
   border: 1px solid var(--border);
 }
@@ -103,6 +104,14 @@
   font-size: 1.8em;
 }
 
+.icono-titulo{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+
 /* ---------- GRAFICA ---------- */
 .chart-container {
   height: 420px;
@@ -132,6 +141,7 @@
   padding: 20px;
   border-radius: 18px;
   background: var(--bg);
+  
   color: var(--text);
 }
 
@@ -148,4 +158,8 @@
   margin-bottom: 6px;
   opacity: 0.9;
 }
+
+
+
+
 

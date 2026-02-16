@@ -40,15 +40,32 @@
   border-radius:8px;
 }
 
-.btn-volver{
-  background-color: #3498db;
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  background: linear-gradient(135deg, #4785e7, #55b3f1);
   color: white;
-  border-radius: 12px;
-  width: 100px;
+
+  padding: 10px 18px;
+  border-radius: 14px;
   border: none;
-  height: 35px;
-  
+
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 6px 18px rgba(59,130,246,.45);
+  transition: transform .2s, box-shadow .2s;
+
+  margin-bottom: 25px;
 }
+
+.btn-volver:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(59,130,246,.55);
+}
+
 
 .btnTareas{
   background-color: #5fe671;

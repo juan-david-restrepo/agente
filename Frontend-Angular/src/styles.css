@@ -60,3 +60,7 @@ body {
   --text-muted: #cbd5f5;
   --border: #334155;
 }
+
+.cb {
+  filter: contrast(1.2) saturate(1.1);
+}

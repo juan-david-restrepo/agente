@@ -77,6 +77,10 @@ import { OnInit } from '@angular/core';
 
 export class Agente implements OnInit {
 
+    reporteDesdeHistorial: Reporte | null = null;
+
+
+
 
     constructor(private agenteService: AgenteServiceTs) {}
 
@@ -119,7 +123,7 @@ export class Agente implements OnInit {
           descripcion:'Vehículo bloqueando entrada',
           foto:'https://images.unsplash.com/photo-1590483734724-38817405119c?w=500',
           coordenadas:'4.653,-74.083',
-          etiqueta:'Urgente',
+          etiqueta:'Alta',
           lat:4.653,
           lng:-74.083,
           estado:'pendiente'
@@ -193,14 +197,21 @@ export class Agente implements OnInit {
       t.finalizada = !t.finalizada;
     }
 
-    aceptarReporte(r:Reporte){
+    aceptarReporte(r: Reporte){
+      //  Evitar duplicados
+      if (r.estado === 'aceptado') return;
+
       r.estado = 'aceptado';
-      this.historialReportes.push(r);
+
+      this.historialReportes.push({ ...r }); // copia segura
 
       this.reportesEntrantes =
-      this.reportesEntrantes.filter(x=>x.id!==r.id);
+        this.reportesEntrantes.filter(x => x.id !== r.id);
 
       this.estadoAgente = 'OCUPADO';
+
+      //  salir del detalle automáticamente
+      this.reporteDesdeHistorial = null;
     }
 
     rechazarReporte(r:Reporte){
@@ -210,11 +221,9 @@ export class Agente implements OnInit {
       this.reportesEntrantes.filter(x=>x.id!==r.id);
     }
 
-    verDetalleHist(r: Reporte){
+      verDetalleHist(r: Reporte) {
+        this.reporteDesdeHistorial = r;
         this.vistaActual = 'reportes';
-
-        // opcional si luego quieres abrir el detalle directo
-        // this.reporteHistDetalle = r;
       }
 
       cambiarVista(v: VistaAgente){

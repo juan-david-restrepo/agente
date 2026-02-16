@@ -1,7 +1,16 @@
 <!-- LISTA -->
 <div *ngIf="!reporteSeleccionado">
+  <div class="h2-filtros">
+    <h2>Reportes Entrantes</h2>
 
-  <h2>Reportes Entrantes</h2>
+    <div class="filtros">
+      <button class="btn-filtro">Todos</button>
+      <button class="btn-filtro">Baja</button>
+      <button class="btn-filtro">Media</button>
+      <button class="btn-filtro">Alta</button>
+    </div>
+  </div>
+
 
   <div class="card reporte-list"
     *ngFor="let r of reportes"
@@ -20,56 +29,78 @@
 
   <button class="btn-volver"
     (click)="reporteSeleccionado=null">
-    ← Volver
-  </button>
+    <i class="fa-solid fa-arrow-left"></i>
+    Volver
+  </button> 
 
-  <div class="detalle-grid">
+  <div class="detalle-container">
 
+    <!-- IZQUIERDA -->
     <div class="detalle-foto">
-      <img class="evidencia" src="assets/images/ejemplo2.jpg" alt="">
+      <img class="evidencia"
+           src="assets/images/ejemplo2.jpg"
+           alt="Evidencia del reporte">
     </div>
 
+    <!-- DERECHA -->
     <div class="detalle-info">
 
-      <h2>{{reporteSeleccionado.tipo}}</h2>
+      <div class="detalle-header">
+        <h2>{{reporteSeleccionado.tipo}}</h2>
+        <span class="tag">{{reporteSeleccionado.etiqueta}}</span>
+      </div>
 
-      <span class="tag">{{reporteSeleccionado.etiqueta}}</span>
+      <div class="detalle-datos">
 
-      <p><b>Dirección:</b> {{reporteSeleccionado.direccion}}</p>
-      <p><b>Hora:</b> {{reporteSeleccionado.hora}}</p>
-      <p><b>Coordenadas:</b> {{reporteSeleccionado.coordenadas}}</p>
+        <div class="dato">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>{{reporteSeleccionado.direccion}}</span>
+        </div>
 
-      <div class="desc-box">
-        {{reporteSeleccionado.descripcion}}
+        <div class="dato">
+          <i class="fa-solid fa-clock"></i>
+          <span>{{reporteSeleccionado.hora}}</span>
+        </div>
+
+        <div class="dato">
+          <i class="fa-solid fa-map-pin"></i>
+          <span>{{reporteSeleccionado.coordenadas}}</span>
+        </div>
+
+      </div>
+
+      <div class="desc-wrapper">
+        <h4><i class="fa-solid fa-align-left"></i> Descripción</h4>
+        <div class="desc-box">
+          {{reporteSeleccionado.descripcion}}
+        </div>
       </div>
 
       <div class="acciones">
-
         <button class="btn-ok"
+          [disabled]="reporteSeleccionado?.estado === 'aceptado'"
           (click)="aceptarClick(reporteSeleccionado)">
-          Aceptar
+          <i class="fa-solid fa-check"></i> Aceptar
         </button>
 
         <button class="btn-no"
+          [disabled]="reporteSeleccionado?.estado === 'rechazado'"
           (click)="rechazarClick(reporteSeleccionado)">
-          Rechazar
+          <i class="fa-solid fa-xmark"></i> Rechazar
         </button>
-
       </div>
 
     </div>
 
-
-
   </div>
 
-      <div class="detalle-mapa">
-
-      <iframe
-        [src]="getMapaUrl(reporteSeleccionado)"
-        loading="lazy">
-      </iframe>
-
-    </div>
+  <!-- MAPA -->
+  <div class="detalle-mapa">
+    <iframe
+      *ngIf="mapaUrl"
+      [src]="mapaUrl"
+      loading="lazy">
+    </iframe>
+  </div>
 
 </div>

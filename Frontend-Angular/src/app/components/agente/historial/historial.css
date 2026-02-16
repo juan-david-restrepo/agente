@@ -2,6 +2,30 @@
    HISTORIAL
 ========================= */
 
+.filtro-h2{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filtros{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.btn-filtro {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+  background: var(--primary);
+  color: white;
+  font-size: 15px;
+}
+
 .historial-card {
   cursor: pointer;
   padding: 20px;
