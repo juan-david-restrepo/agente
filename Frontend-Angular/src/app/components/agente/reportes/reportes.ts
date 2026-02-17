@@ -12,16 +12,30 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 })
 export class Reportes {
 
+    @Input() origen: 'historial' | 'reportes' = 'reportes';
+    @Output() volver = new EventEmitter<'historial' | 'reportes'>();
+
+    @Input() modoLectura: boolean = false;
+
     @Input() reporteInicial: Reporte | null = null;
 
     constructor(private sanitizer: DomSanitizer){}
     mapaUrl: SafeResourceUrl | null = null;
 
- @Input() reportes!: Reporte[];
- @Input() historial!: Reporte[];
+    @Input() reportes!: Reporte[];
+    @Input() historial!: Reporte[];
 
- @Output() aceptar = new EventEmitter<Reporte>();
- @Output() rechazar = new EventEmitter<Reporte>();
+    @Output() aceptar = new EventEmitter<Reporte>();
+    @Output() rechazar = new EventEmitter<Reporte>();
+
+    volverClick(){
+        if(this.origen === 'historial'){
+            this.volver.emit('historial');
+        } else {
+            // Si venimos desde reportes normales
+            this.reporteSeleccionado = null;
+        }
+    }
 
  reporteSeleccionado: Reporte | null = null;
 

@@ -14,8 +14,12 @@
 
  <p class="hist-dir">{{h.direccion}}</p>
 
- <span class="tag ok">
-  Atendido
+ <span class="tag"
+  [ngClass]="{
+    'ok': h.estado === 'aceptado',
+    'no': h.estado === 'rechazado'
+  }">
+  {{ h.estado === 'aceptado' ? 'Atendido' : 'Rechazado' }}
  </span>
 
 </div>

@@ -79,7 +79,7 @@ export class Agente implements OnInit {
 
     reporteDesdeHistorial: Reporte | null = null;
 
-
+    origenDetalle: 'historial' | 'reportes' = 'reportes';
 
 
     constructor(private agenteService: AgenteServiceTs) {}
@@ -215,19 +215,33 @@ export class Agente implements OnInit {
     }
 
     rechazarReporte(r:Reporte){
-      r.estado = 'rechazado';
+       if (r.estado === 'rechazado') return;
 
-      this.reportesEntrantes =
-      this.reportesEntrantes.filter(x=>x.id!==r.id);
+        r.estado = 'rechazado';
+
+        this.historialReportes.push({ ...r });
+
+        this.reportesEntrantes =
+          this.reportesEntrantes.filter(x => x.id !== r.id);
+
+        this.reporteDesdeHistorial = null;
     }
 
       verDetalleHist(r: Reporte) {
+        this.origenDetalle = 'historial';
         this.reporteDesdeHistorial = r;
         this.vistaActual = 'reportes';
-      }
+      } 
 
       cambiarVista(v: VistaAgente){
         this.vistaActual = v;
+        this.reporteDesdeHistorial = null;
+        this.origenDetalle = 'reportes'; // importante si estamos usando el sistema de origen
+      }
+
+      volverDesdeDetalle(origen: 'historial' | 'reportes'){
+        this.reporteDesdeHistorial = null;
+        this.vistaActual = origen;
       }
 
       toggleNotificaciones(){

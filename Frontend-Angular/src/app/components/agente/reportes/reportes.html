@@ -28,7 +28,7 @@
 <div *ngIf="reporteSeleccionado" class="detalle-reporte-full">
 
   <button class="btn-volver"
-    (click)="reporteSeleccionado=null">
+    (click)="volverClick()">
     <i class="fa-solid fa-arrow-left"></i>
     Volver
   </button> 
@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      <div class="acciones">
+      <div class="acciones"  *ngIf="!modoLectura">
         <button class="btn-ok"
           [disabled]="reporteSeleccionado?.estado === 'aceptado'"
           (click)="aceptarClick(reporteSeleccionado)">
@@ -88,6 +88,16 @@
           (click)="rechazarClick(reporteSeleccionado)">
           <i class="fa-solid fa-xmark"></i> Rechazar
         </button>
+      </div>
+
+      <div class="estado-final" *ngIf="modoLectura">
+        <span 
+          [ngClass]="{
+            'tag-aceptado': reporteSeleccionado?.estado === 'aceptado',
+            'tag-rechazado': reporteSeleccionado?.estado === 'rechazado'
+          }">
+          {{ reporteSeleccionado?.estado | uppercase }}
+        </span>
       </div>
 
     </div>

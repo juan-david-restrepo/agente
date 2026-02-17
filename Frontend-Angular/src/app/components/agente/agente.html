@@ -100,8 +100,10 @@
       <app-reportes
         *ngIf="vistaActual==='reportes'"
         [reportes]="reportesEntrantes"
-        [historial]="historialReportes"
         [reporteInicial]="reporteDesdeHistorial"
+        [modoLectura]="reporteDesdeHistorial !== null"
+        [origen]="origenDetalle"
+        (volver)="volverDesdeDetalle($event)"
         (aceptar)="aceptarReporte($event)"
         (rechazar)="rechazarReporte($event)">
       </app-reportes>
