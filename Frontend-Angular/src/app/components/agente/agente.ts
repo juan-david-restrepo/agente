@@ -26,7 +26,13 @@ import { OnInit } from '@angular/core';
     etiqueta:string;
     lat?:number;
     lng?:number;
-    estado?:'pendiente'|'aceptado'|'rechazado';
+    estado?:'pendiente'|'en_proceso'|'aceptado'|'rechazado'|'finalizado';
+
+
+    fechaAceptado?: Date; 
+    fechaFinalizado?: Date;
+    resumenOperativo?: string;
+
     }
 
     export interface Tarea {
@@ -199,19 +205,17 @@ export class Agente implements OnInit {
 
     aceptarReporte(r: Reporte){
       //  Evitar duplicados
-      if (r.estado === 'aceptado') return;
+      if (r.estado === 'en_proceso') return;
 
-      r.estado = 'aceptado';
+      r.estado = 'en_proceso';
 
-      this.historialReportes.push({ ...r }); // copia segura
-
-      this.reportesEntrantes =
-        this.reportesEntrantes.filter(x => x.id !== r.id);
+      r.fechaAceptado =new Date();
 
       this.estadoAgente = 'OCUPADO';
 
       //  salir del detalle automáticamente
       this.reporteDesdeHistorial = null;
+
     }
 
     rechazarReporte(r:Reporte){
@@ -227,28 +231,38 @@ export class Agente implements OnInit {
         this.reporteDesdeHistorial = null;
     }
 
-      verDetalleHist(r: Reporte) {
+    finalizarReporte(r: Reporte){
+
+      this.historialReportes.push({ ...r });
+
+      this.reportesEntrantes =
+        this.reportesEntrantes.filter(x => x.id !== r.id);
+
+      this.estadoAgente = 'LIBRE';
+    }
+
+    verDetalleHist(r: Reporte) {
         this.origenDetalle = 'historial';
         this.reporteDesdeHistorial = r;
         this.vistaActual = 'reportes';
-      } 
+    } 
 
-      cambiarVista(v: VistaAgente){
+    cambiarVista(v: VistaAgente){
         this.vistaActual = v;
         this.reporteDesdeHistorial = null;
         this.origenDetalle = 'reportes'; // importante si estamos usando el sistema de origen
-      }
+    }
 
-      volverDesdeDetalle(origen: 'historial' | 'reportes'){
+    volverDesdeDetalle(origen: 'historial' | 'reportes'){
         this.reporteDesdeHistorial = null;
         this.vistaActual = origen;
-      }
+    }
 
-      toggleNotificaciones(){
+    toggleNotificaciones(){
         this.mostrarNotificaciones = !this.mostrarNotificaciones;
-      }
+    }
 
-      abrirNotif(n:any){
+    abrirNotif(n:any){
 
         if(n.tipo === 'REPORTE'){
           this.vistaActual = 'reportes';
@@ -259,7 +273,7 @@ export class Agente implements OnInit {
         }
 
         this.mostrarNotificaciones = false;
-      }
+    }
 
     ngOnInit() {
       this.agenteService.getPerfil().subscribe({

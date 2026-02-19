@@ -1,7 +1,11 @@
-<!-- LISTA -->
+<!-- ========================= -->
+<!-- LISTA DE REPORTES -->
+<!-- ========================= -->
+
 <div *ngIf="!reporteSeleccionado">
+
   <div class="h2-filtros">
-    <h2>Reportes Entrantes</h2>
+    <h2>Reportes</h2>
 
     <div class="filtros">
       <button class="btn-filtro">Todos</button>
@@ -11,24 +15,42 @@
     </div>
   </div>
 
-
+  <!-- usamos reportesOrdenados -->
   <div class="card reporte-list"
-    *ngFor="let r of reportes"
-    (click)="seleccionar(r)">
+       *ngFor="let r of reportesOrdenados"
+       (click)="seleccionar(r)">
 
     <b>{{r.tipo}}</b>
     <p>{{r.direccion}}</p>
-    <span class="tag">{{r.etiqueta}}</span>
+
+    <!-- ESTADO VISUAL EN LISTA -->
+    <span class="tag"
+      [ngClass]="{
+        'tag-proceso': r.estado === 'en_proceso',
+        'tag-rechazado': r.estado === 'rechazado'
+      }">
+
+      {{ 
+        r.estado === 'en_proceso' ? 'EN PROCESO' :
+        r.estado === 'rechazado' ? 'RECHAZADO' :
+        r.etiqueta
+      }}
+
+    </span>
 
   </div>
 
 </div>
 
+
+<!-- ========================= -->
 <!-- DETALLE -->
+<!-- ========================= -->
+
 <div *ngIf="reporteSeleccionado" class="detalle-reporte-full">
 
   <button class="btn-volver"
-    (click)="volverClick()">
+          (click)="volverClick()">
     <i class="fa-solid fa-arrow-left"></i>
     Volver
   </button> 
@@ -53,20 +75,38 @@
       <div class="detalle-datos">
 
         <div class="dato">
+          <span class="info-label">Direccion</span>
           <i class="fa-solid fa-location-dot"></i>
           <span>{{reporteSeleccionado.direccion}}</span>
         </div>
 
         <div class="dato">
+          <span class="info-label">Hora</span>
           <i class="fa-solid fa-clock"></i>
           <span>{{reporteSeleccionado.hora}}</span>
         </div>
 
         <div class="dato">
+          <span class="info-label">Coordenadas</span>
           <i class="fa-solid fa-map-pin"></i>
           <span>{{reporteSeleccionado.coordenadas}}</span>
         </div>
+      </div>
 
+      <div *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
+
+        <p class="fecha-info">
+          <span class="info-label">Iniciado:</span>
+          <i class="fa-solid fa-stopwatch"></i>
+          {{reporteSeleccionado.fechaAceptado | date:'short'}}
+        </p>
+
+
+        <div class="informacion-finalizado">
+          <span class="tag-proceso">
+            EN PROCESO
+          </span>
+        </div>
       </div>
 
       <div class="desc-wrapper">
@@ -74,37 +114,89 @@
         <div class="desc-box">
           {{reporteSeleccionado.descripcion}}
         </div>
+
       </div>
 
-      <div class="acciones"  *ngIf="!modoLectura">
+
+      <!-- ========================= -->
+      <!-- ACCIONES SEGÚN ESTADO -->
+      <!-- ========================= -->
+
+      <!--  PENDIENTE -->
+      <div class="acciones"
+           *ngIf="reporteSeleccionado?.estado === 'pendiente'">
+
         <button class="btn-ok"
-          [disabled]="reporteSeleccionado?.estado === 'aceptado'"
-          (click)="aceptarClick(reporteSeleccionado)">
-          <i class="fa-solid fa-check"></i> Aceptar
+                (click)="aceptarClick(reporteSeleccionado)">
+          <i class="fa-solid fa-check"></i>
+          Aceptar
         </button>
 
         <button class="btn-no"
-          [disabled]="reporteSeleccionado?.estado === 'rechazado'"
-          (click)="rechazarClick(reporteSeleccionado)">
-          <i class="fa-solid fa-xmark"></i> Rechazar
+                (click)="rechazarClick(reporteSeleccionado)">
+          <i class="fa-solid fa-xmark"></i>
+          Rechazar
         </button>
+
       </div>
 
-      <div class="estado-final" *ngIf="modoLectura">
-        <span 
-          [ngClass]="{
-            'tag-aceptado': reporteSeleccionado?.estado === 'aceptado',
-            'tag-rechazado': reporteSeleccionado?.estado === 'rechazado'
-          }">
-          {{ reporteSeleccionado?.estado | uppercase }}
+
+      <!--  EN PROCESO -->
+      <div class="en-proceso"
+          *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
+
+        <button class="btn-finalizar"
+            (click)="abrirModalFinalizar()">
+          Finalizar Operativo
+        </button>
+
+      </div>
+
+
+      <!--  RECHAZADO -->
+      <div class="estado-final"
+           *ngIf="reporteSeleccionado?.estado === 'rechazado'">
+        <span class="tag-rechazado">
+          RECHAZADO
         </span>
+
+      </div>
+
+
+      <!--  FINALIZADO (si lo vuelves a abrir desde historial) -->
+      <div class="estado-final"
+           *ngIf="reporteSeleccionado?.estado === 'finalizado'">
+
+        <span class="tag-aceptado">
+          FINALIZADO
+        </span>
+
+        <p class="fecha-info">
+          Inicio:
+          {{reporteSeleccionado.fechaAceptado | date:'short'}}
+        </p>
+
+        <p class="fecha-info">
+          Finalizado:
+          {{reporteSeleccionado.fechaFinalizado | date:'short'}}
+        </p>
+
+        <div class="resumen-box"
+             *ngIf="reporteSeleccionado.resumenOperativo">
+          <h4>Resumen Operativo</h4>
+          <p>{{reporteSeleccionado.resumenOperativo}}</p>
+        </div>
+
       </div>
 
     </div>
-
   </div>
 
+
+  <!-- ========================= -->
   <!-- MAPA -->
+  <!-- ========================= -->
+
   <div class="detalle-mapa">
     <iframe
       *ngIf="mapaUrl"
@@ -113,4 +205,36 @@
     </iframe>
   </div>
 
+</div>
+
+
+<!-- ========================= -->
+<!-- MODAL FINALIZAR -->
+<!-- ========================= -->
+
+<div class="modal-backdrop"
+     *ngIf="mostrarModal">
+
+  <div class="modal-box">
+
+    <h2>Resumen Del Operativo</h2>
+
+    <textarea class="tex-area"
+      [(ngModel)]="resumenTexto"
+      placeholder="Describe lo ocurrido en el operativo...">
+    </textarea>
+
+    <div class="modal-actions">
+      <button class="btn-no"
+              (click)="mostrarModal=false">
+        Cancelar
+      </button>
+
+      <button class="btn-ok"
+              (click)="confirmarFinalizar()">
+        Confirmar
+      </button>
+    </div>
+
+  </div>
 </div>
