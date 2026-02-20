@@ -13,6 +13,14 @@ import { FormsModule } from '@angular/forms';
 })
 export class Reportes {
 
+    mostrarModalResumen = false;
+
+    abrirModalResumen(){
+        this.mostrarModalResumen = true;
+    }
+
+    fechaRechazado?: Date;
+
     @Input() origen: 'historial' | 'reportes' = 'reportes';
     @Output() volver = new EventEmitter<'historial' | 'reportes'>();
 
@@ -67,6 +75,21 @@ export class Reportes {
         return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 
+    getDuracion(r: Reporte){
+        if(!r.fechaAceptado || !r.fechaFinalizado) return '';
+
+        const diff = r.fechaFinalizado.getTime() - r.fechaAceptado.getTime();
+
+        const horas = Math.floor(diff / 3600000);
+        const minutos = Math.floor((diff % 3600000) / 60000);
+
+        if(horas > 0){
+            return `${horas}h ${minutos}min`;
+        }
+
+        return `${minutos} minutos`;
+    }
+
     ngOnChanges() {
         if (this.reporteInicial) {
             this.seleccionar(this.reporteInicial);
@@ -89,17 +112,24 @@ export class Reportes {
     }
 
     confirmarFinalizar(){
-    if(!this.reporteSeleccionado) return;
+        if(!this.reporteSeleccionado) return;
+
+        // 🚨 Validación
+        if(!this.resumenTexto || this.resumenTexto.trim().length < 10){
+            alert('Debes escribir un resumen del operativo (mínimo 10 caracteres)');
+            return;
+        }
 
         this.reporteSeleccionado.estado = 'finalizado';
         this.reporteSeleccionado.fechaFinalizado = new Date();
-        this.reporteSeleccionado.resumenOperativo = this.resumenTexto;
+        this.reporteSeleccionado.resumenOperativo = this.resumenTexto.trim();
 
         this.finalizar.emit(this.reporteSeleccionado);
 
         this.mostrarModal = false;
         this.resumenTexto = '';
         this.reporteSeleccionado = null;
+
     }
 
 }

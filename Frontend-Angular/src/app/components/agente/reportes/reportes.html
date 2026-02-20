@@ -15,7 +15,6 @@
     </div>
   </div>
 
-  <!-- usamos reportesOrdenados -->
   <div class="card reporte-list"
        *ngFor="let r of reportesOrdenados"
        (click)="seleccionar(r)">
@@ -23,216 +22,242 @@
     <b>{{r.tipo}}</b>
     <p>{{r.direccion}}</p>
 
-    <!-- ESTADO VISUAL EN LISTA -->
-    <span class="tag"
+    <!-- Prioridad -->
+    <span class="tag prioridad">
+      {{r.etiqueta}}
+    </span>
+
+    <!-- Estado -->
+    <span class="tag estado"
       [ngClass]="{
+        'tag-pendiente': r.estado === 'pendiente',
         'tag-proceso': r.estado === 'en_proceso',
-        'tag-rechazado': r.estado === 'rechazado'
+        'tag-rechazado': r.estado === 'rechazado',
+        'tag-finalizado': r.estado === 'finalizado'
       }">
 
-      {{ 
+      {{
+        r.estado === 'pendiente' ? 'PENDIENTE' :
         r.estado === 'en_proceso' ? 'EN PROCESO' :
         r.estado === 'rechazado' ? 'RECHAZADO' :
-        r.etiqueta
+        r.estado === 'finalizado' ? 'FINALIZADO' : ''
       }}
 
     </span>
 
   </div>
-
 </div>
 
-
 <!-- ========================= -->
-<!-- DETALLE -->
+<!-- DETALLE REPORTE -->
 <!-- ========================= -->
 
 <div *ngIf="reporteSeleccionado" class="detalle-reporte-full">
 
-  <button class="btn-volver"
-          (click)="volverClick()">
+  <button class="btn-volver" (click)="volverClick()">
     <i class="fa-solid fa-arrow-left"></i>
     Volver
-  </button> 
+  </button>
 
   <div class="detalle-container">
 
-    <!-- IZQUIERDA -->
+    <!-- Imagen -->
     <div class="detalle-foto">
       <img class="evidencia"
            src="assets/images/ejemplo2.jpg"
            alt="Evidencia del reporte">
     </div>
 
-    <!-- DERECHA -->
+    <!-- Información -->
     <div class="detalle-info">
 
+      <!-- Header -->
       <div class="detalle-header">
         <h2>{{reporteSeleccionado.tipo}}</h2>
-        <span class="tag">{{reporteSeleccionado.etiqueta}}</span>
-      </div>
 
-      <div class="detalle-datos">
+        <div>
+          <span class="tag prioridad">
+            {{reporteSeleccionado.etiqueta}}
+          </span>
 
-        <div class="dato">
-          <span class="info-label">Direccion</span>
-          <i class="fa-solid fa-location-dot"></i>
-          <span>{{reporteSeleccionado.direccion}}</span>
-        </div>
-
-        <div class="dato">
-          <span class="info-label">Hora</span>
-          <i class="fa-solid fa-clock"></i>
-          <span>{{reporteSeleccionado.hora}}</span>
-        </div>
-
-        <div class="dato">
-          <span class="info-label">Coordenadas</span>
-          <i class="fa-solid fa-map-pin"></i>
-          <span>{{reporteSeleccionado.coordenadas}}</span>
-        </div>
-      </div>
-
-      <div *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
-
-        <p class="fecha-info">
-          <span class="info-label">Iniciado:</span>
-          <i class="fa-solid fa-stopwatch"></i>
-          {{reporteSeleccionado.fechaAceptado | date:'short'}}
-        </p>
-
-
-        <div class="informacion-finalizado">
-          <span class="tag-proceso">
-            EN PROCESO
+          <span class="tag estado"
+            [ngClass]="{
+              'tag-pendiente': reporteSeleccionado?.estado === 'pendiente',
+              'tag-proceso': reporteSeleccionado?.estado === 'en_proceso',
+              'tag-rechazado': reporteSeleccionado?.estado === 'rechazado',
+              'tag-finalizado': reporteSeleccionado?.estado === 'finalizado'
+            }">
+            {{
+              reporteSeleccionado?.estado === 'pendiente' ? 'PENDIENTE' :
+              reporteSeleccionado?.estado === 'en_proceso' ? 'EN PROCESO' :
+              reporteSeleccionado?.estado === 'rechazado' ? 'RECHAZADO' :
+              reporteSeleccionado?.estado === 'finalizado' ? 'FINALIZADO' : ''
+            }}
           </span>
         </div>
       </div>
 
-      <div class="desc-wrapper">
-        <h4><i class="fa-solid fa-align-left"></i> Descripción</h4>
-        <div class="desc-box">
-          {{reporteSeleccionado.descripcion}}
+      <!-- Datos -->
+      <div class="detalle-datos">
+
+        <div class="dato">
+          <i class="fa-solid fa-location-dot"></i>
+          <div class="label-datos">
+            <span class="info-label">Dirección</span>
+            {{reporteSeleccionado.direccion}}
+          </div>
+        </div>
+
+        <div class="dato">
+          <i class="fa-solid fa-clock"></i>
+          <div class="label-datos">
+            <span class="info-label">Hora</span>
+            {{reporteSeleccionado.hora}}
+          </div>
+        </div>
+
+        <div class="dato">
+          <i class="fa-solid fa-map-pin"></i>
+          <div class="label-datos">
+            <span class="info-label">Coordenadas</span>
+            {{reporteSeleccionado.coordenadas}}
+          </div>
         </div>
 
       </div>
 
+      <!-- Fechas -->
+      <div *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
+        <p class="fecha-info">
+          <i class="fa-solid fa-stopwatch"></i>
+          <span class="info-label">Iniciado:</span>
+          {{reporteSeleccionado.fechaAceptado | date:'dd/MM/yyyy - HH:mm'}}
+        </p>
+      </div>
 
-      <!-- ========================= -->
-      <!-- ACCIONES SEGÚN ESTADO -->
-      <!-- ========================= -->
+      <div *ngIf="reporteSeleccionado?.estado === 'finalizado'">
 
-      <!--  PENDIENTE -->
+        <p class="fecha-info">
+          <i class="fa-solid fa-clock"></i>
+          <span class="info-label">Inicio:</span>
+          {{reporteSeleccionado.fechaAceptado | date:'dd/MM/yyyy - HH:mm'}}
+        </p>
+
+        <p class="fecha-info">
+          <i class="fa-solid fa-check"></i>
+          <span class="info-label">Finalizado:</span>
+          {{reporteSeleccionado.fechaFinalizado | date:'dd/MM/yyyy - HH:mm'}}
+        </p>
+
+        <p class="fecha-info">
+          <i class="fa-solid fa-hourglass-half"></i>
+          <span class="info-label">Duración:</span>
+          {{ getDuracion(reporteSeleccionado!) }}
+        </p>
+
+      </div>
+
+      <div *ngIf="reporteSeleccionado?.estado === 'rechazado'">
+        <p class="fecha-info">
+          Rechazado:
+          {{reporteSeleccionado.fechaRechazado | date:'dd/MM/yyyy - HH:mm'}}
+        </p>
+      </div>
+
+      <!-- Descripción -->
+      <div class="desc-wrapper">
+        <h4 class="descripcion">Descripción</h4>
+        <div class="desc-box">
+          {{reporteSeleccionado.descripcion}}
+        </div>
+      </div>
+
+      <!-- Acciones -->
       <div class="acciones"
            *ngIf="reporteSeleccionado?.estado === 'pendiente'">
 
         <button class="btn-ok"
                 (click)="aceptarClick(reporteSeleccionado)">
-          <i class="fa-solid fa-check"></i>
           Aceptar
         </button>
 
         <button class="btn-no"
                 (click)="rechazarClick(reporteSeleccionado)">
-          <i class="fa-solid fa-xmark"></i>
           Rechazar
         </button>
 
       </div>
 
-
-      <!--  EN PROCESO -->
       <div class="en-proceso"
-          *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
-
+           *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
         <button class="btn-finalizar"
-            (click)="abrirModalFinalizar()">
+                (click)="abrirModalFinalizar()">
           Finalizar Operativo
         </button>
-
       </div>
 
-
-      <!--  RECHAZADO -->
-      <div class="estado-final"
-           *ngIf="reporteSeleccionado?.estado === 'rechazado'">
-        <span class="tag-rechazado">
-          RECHAZADO
-        </span>
-
-      </div>
-
-
-      <!--  FINALIZADO (si lo vuelves a abrir desde historial) -->
       <div class="estado-final"
            *ngIf="reporteSeleccionado?.estado === 'finalizado'">
-
-        <span class="tag-aceptado">
-          FINALIZADO
-        </span>
-
-        <p class="fecha-info">
-          Inicio:
-          {{reporteSeleccionado.fechaAceptado | date:'short'}}
-        </p>
-
-        <p class="fecha-info">
-          Finalizado:
-          {{reporteSeleccionado.fechaFinalizado | date:'short'}}
-        </p>
-
-        <div class="resumen-box"
-             *ngIf="reporteSeleccionado.resumenOperativo">
-          <h4>Resumen Operativo</h4>
-          <p>{{reporteSeleccionado.resumenOperativo}}</p>
-        </div>
-
+        <button class="btn-resumen"
+                (click)="abrirModalResumen()">
+          Ver resumen del operativo
+        </button>
       </div>
 
     </div>
   </div>
 
-
-  <!-- ========================= -->
-  <!-- MAPA -->
-  <!-- ========================= -->
-
+  <!-- Mapa -->
   <div class="detalle-mapa">
-    <iframe
-      *ngIf="mapaUrl"
-      [src]="mapaUrl"
-      loading="lazy">
+    <iframe *ngIf="mapaUrl"
+            [src]="mapaUrl"
+            loading="lazy">
     </iframe>
   </div>
-
 </div>
 
-
 <!-- ========================= -->
-<!-- MODAL FINALIZAR -->
+<!-- MODALES -->
 <!-- ========================= -->
 
-<div class="modal-backdrop"
-     *ngIf="mostrarModal">
-
+<div class="modal-backdrop" *ngIf="mostrarModal">
   <div class="modal-box">
 
-    <h2>Resumen Del Operativo</h2>
+    <h2>Resumen del operativo</h2>
 
     <textarea class="tex-area"
       [(ngModel)]="resumenTexto"
-      placeholder="Describe lo ocurrido en el operativo...">
+      placeholder="Describe lo ocurrido...">
     </textarea>
 
     <div class="modal-actions">
-      <button class="btn-no"
-              (click)="mostrarModal=false">
+      <button class="btn-no" (click)="mostrarModal=false">
         Cancelar
       </button>
 
       <button class="btn-ok"
+              [disabled]="!resumenTexto || resumenTexto.trim().length < 10"
               (click)="confirmarFinalizar()">
         Confirmar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="mostrarModalResumen">
+  <div class="modal-box">
+
+    <h2>Resumen del operativo</h2>
+
+    <div class="resumen-lectura">
+      {{reporteSeleccionado?.resumenOperativo}}
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-ok"
+              (click)="mostrarModalResumen = false">
+        Cerrar
       </button>
     </div>
 

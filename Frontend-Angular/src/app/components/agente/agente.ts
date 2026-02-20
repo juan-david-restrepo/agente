@@ -26,12 +26,13 @@ import { OnInit } from '@angular/core';
     etiqueta:string;
     lat?:number;
     lng?:number;
-    estado?:'pendiente'|'en_proceso'|'aceptado'|'rechazado'|'finalizado';
+    estado?:'pendiente'|'en_proceso'|'rechazado'|'finalizado';
 
 
     fechaAceptado?: Date; 
     fechaFinalizado?: Date;
     resumenOperativo?: string;
+    fechaRechazado?: Date;
 
     }
 
@@ -82,6 +83,8 @@ import { OnInit } from '@angular/core';
 
 
 export class Agente implements OnInit {
+
+    
 
     reporteDesdeHistorial: Reporte | null = null;
 
@@ -204,31 +207,34 @@ export class Agente implements OnInit {
     }
 
     aceptarReporte(r: Reporte){
-      //  Evitar duplicados
-      if (r.estado === 'en_proceso') return;
 
+      //  Primero validar si ya hay uno en proceso
+      const yaHayEnProceso = this.reportesEntrantes.some(rep => rep.estado === 'en_proceso');
+
+      if (yaHayEnProceso) {
+        alert('Ya tienes un operativo en proceso');
+        return;
+      }
+
+      //  Ahora sí aceptar
       r.estado = 'en_proceso';
-
-      r.fechaAceptado =new Date();
+      r.fechaAceptado = new Date();
 
       this.estadoAgente = 'OCUPADO';
-
-      //  salir del detalle automáticamente
-      this.reporteDesdeHistorial = null;
-
     }
 
     rechazarReporte(r:Reporte){
-       if (r.estado === 'rechazado') return;
+      if (r.estado === 'rechazado') return;
 
-        r.estado = 'rechazado';
+      r.estado = 'rechazado';
+      r.fechaRechazado = new Date();
 
-        this.historialReportes.push({ ...r });
+      this.historialReportes.push({ ...r });
 
-        this.reportesEntrantes =
-          this.reportesEntrantes.filter(x => x.id !== r.id);
+      this.reportesEntrantes =
+        this.reportesEntrantes.filter(x => x.id !== r.id);
 
-        this.reporteDesdeHistorial = null;
+      this.reporteDesdeHistorial = null;
     }
 
     finalizarReporte(r: Reporte){
