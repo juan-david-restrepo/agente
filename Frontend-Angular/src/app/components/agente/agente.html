@@ -1,142 +1,130 @@
+<div class="admin-layout" [class.night-mode]="isNightMode">
 
-  
-  <div class="app-container"
-  [class.dark]="config.modoNoche"
-  [class.cb]="config.daltonismo">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Panel Admin</h2>
+    </div>
 
-    <app-sidebar-agente
-    [vistaActual]="vistaActual"
-    (vistaChange)="cambiarVista($event)">
-    </app-sidebar-agente>
+    <nav class="sidebar-nav">
+      <a routerLink="/admin" routerLinkActive="active">
+        <span class="icon">📊</span>
+        <span>Dashboard</span>
+      </a>
 
+      <a routerLink="/usuarios" routerLinkActive="active">
+        <span class="icon">👥</span>
+        <span>Gestión de Usuarios</span>
+      </a>
 
+      <a routerLink="/agentes" routerLinkActive="active">
+        <span class="icon">🧑‍✈️</span>
+        <span>Control de Agentes</span>
+      </a>
 
-    <main class="main-content"
-    [style.font-size.px]="config.fontSize">
+      <a routerLink="/reportes" routerLinkActive="active">
+        <span class="icon">📝</span>
+        <span>Reportes del Sistema</span>
+      </a>
 
-      <header class="top-header">
+      <a routerLink="/estadisticas" routerLinkActive="active">
+        <span class="icon">📈</span>
+        <span>Estadísticas</span>
+      </a>
 
+      <a routerLink="/calendario" routerLinkActive="active">
+        <span class="icon">📅</span>
+        <span>Calendario</span>
+      </a>
 
-        <div class="header-title">
-          <h1>{{vistaActual | titlecase}}</h1>
-        </div>
-      
+      <a routerLink="/comentarios" routerLinkActive="active">
+        <span class="icon">💬</span>
+        <span>Comentarios</span>
+      </a>
 
+      <a routerLink="/configuracion" routerLinkActive="active">
+        <span class="icon">⚙️</span>
+        <span>Configuración</span>
+      </a>
 
-        <div class="notif-estado">
-          <div class="estado-wrapper">
+      <a routerLink="/login" class="logout">
+        <span class="icon">🚪</span>
+        <span>Salir</span>
+      </a>
+    </nav>
+  </aside>
 
-            <span class="estado-label">Estado</span>
+  <!-- ===== CONTENIDO ===== -->
+  <main class="main-content">
 
-            <div class="estado-card"
-              [class.libre]="estadoAgente==='LIBRE'"
-              [class.ocupado]="estadoAgente==='OCUPADO'"
-              [class.off]="estadoAgente==='FUERA_SERVICIO'">
+    <!-- ===== HEADER ===== -->
+    <header class="header">
+      <h2>Dashboard General</h2>
 
-              <i class="fa-solid"
+      <button class="theme-toggle" (click)="toggleTheme()">
+        {{ isNightMode ? '☀️' : '🌙' }}
+      </button>
+    </header>
+
+    <!-- ===== ALERTA ===== -->
+    <div class="alerta" *ngIf="alertMessage">
+      {{ alertMessage }}
+    </div>
+
+    <!-- ===== GRÁFICOS ===== -->
+    <section class="charts-grid">
+      <div class="chart-card">
+        <h4>Infracciones por Agente</h4>
+        <canvas id="mainBarChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h4>Reportes Semanales</h4>
+        <canvas id="lineChart"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h4>Tipos de Infracción</h4>
+        <canvas id="pieChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ===== TABLA ===== -->
+    <section class="table-section">
+      <h3>📋 Infracciones Recientes</h3>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Agente</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let inf of infracciones; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ inf.fecha }}</td>
+            <td>{{ inf.tipo }}</td>
+            <td>{{ inf.agente }}</td>
+            <td>
+              <span
+                class="status"
                 [ngClass]="{
-                  'fa-circle-check': estadoAgente==='LIBRE',
-                  'fa-circle-pause': estadoAgente==='OCUPADO',
-                  'fa-circle-xmark': estadoAgente==='FUERA_SERVICIO'
-                }">
-              </i>
-
-              <span class="estado-text">
-                {{
-                  estadoAgente === 'FUERA_SERVICIO'
-                    ? 'Fuera de servicio'
-                    : estadoAgente === 'OCUPADO'
-                      ? 'Ocupado'
-                      : 'Disponible'
-                }}
+                  'pending': inf.estado === 'Pendiente',
+                  'validated': inf.estado === 'Validado'
+                }"
+              >
+                {{ inf.estado }}
               </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-            </div>
-
-          </div>
-
-
-          <div class="notif-wrapper">
-
-            <div class="notif-icon"
-                (click)="toggleNotificaciones()"
-                [class.ring]="notificaciones.length > 0">
-
-              <i class="fa-solid fa-bell"></i>
-
-              <span class="notif-count"
-                    *ngIf="notificaciones.length > 0">
-                {{notificaciones.length}}
-              </span>
-            </div>
-
-
-
-          <div class="notif-dropdown"
-            *ngIf="mostrarNotificaciones">
-
-              <div class="notif-item"
-              *ngFor="let n of notificaciones"
-              (click)="abrirNotif(n)">
-
-                <strong>{{n.tipo}}</strong>
-                <p>{{n.texto}}</p>
-
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-
-      </header>
-
-      <hr>
-
-      <!-- VISTAS -->
-      <app-dashboard
-        *ngIf="vistaActual==='dashboard'"
-        [estadoAgente]="estadoAgente">
-      </app-dashboard>
-
-      <app-reportes
-        *ngIf="vistaActual==='reportes'"
-        [reportes]="reportesEntrantes"
-        [hayEnProceso]="hayEnProceso"
-        [reporteInicial]="reporteDesdeHistorial"
-        [modoLectura]="reporteDesdeHistorial !== null"
-        [origen]="origenDetalle"
-        (volver)="volverDesdeDetalle($event)"
-        (aceptar)="aceptarReporte($event)"
-        (rechazar)="rechazarReporte($event)"
-        (finalizar)="finalizarReporte($event)">
-      </app-reportes>
-
-      <app-historial
-        *ngIf="vistaActual==='historial'"
-        [historial]="historialReportes"
-        (verDetalle)="verDetalleHist($event)">
-      </app-historial>
-
-      <app-tareas
-        *ngIf="vistaActual==='tareas'"
-        [tareas]="tareasAdmin"
-        (marcar)="marcarTarea($event)">
-      </app-tareas>
-
-      <app-perfil-agente
-        *ngIf="vistaActual==='perfil'"
-        [agente]="perfilAgente"
-        [estadoAgente]="estadoAgente"
-        (estadoChange)="toggleServicio($event)">
-      </app-perfil-agente>
-
-      <app-configuracion
-        *ngIf="vistaActual==='configuracion'"
-        [(config)]="config"
-        (configChange)="updateConfig($event)">
-      </app-configuracion>
-
-    </main>
-
-  </div>
+  </main>
+</div>

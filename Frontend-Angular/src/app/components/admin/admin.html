@@ -1,37 +1,18 @@
-<div class="admin-layout">
-  <!-- 🔹 Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
-      <h2>Panel Admin</h2>
-    </div>
 
-    <nav class="sidebar-nav">
-      <a routerLink="/admin" class="active">📊 Dashboard</a>
-      <a routerLink="/usuarios">👥 Gestión de Usuarios</a>
-      <a routerLink="/agentes">🧑‍✈️ Control de Agentes</a>
-      <a routerLink="/reportes">📝 Reportes del Sistema</a>
-      <a routerLink="/estadisticas">📈 Estadísticas</a>
-      <a routerLink="/calendario">📅 Calendario</a>
-      <a routerLink="/comentarios">💬 Comentarios</a>
-      <a routerLink="/configuracion">⚙️ Configuración</a>
-      <a routerLink="/login">🚪 Salir</a>
-    </nav>
-  </aside>
+
+<div class="admin-layout">
+  <app-sidebar-admin></app-sidebar-admin>
+
 
   <!-- 🔹 Contenido principal -->
   <main class="main-content">
     <div class="header">
+      
       <h2>Dashboard General</h2>
-      <button id="themeToggle" (click)="toggleTheme()">🌞</button>
     </div>
 
     <!-- 🔹 Gráficos -->
     <div class="charts-grid">
-      <div class="chart-card">
-        <h4>Infracciones por Agente</h4>
-        <canvas id="mainBarChart"></canvas>
-      </div>
-
       <div class="chart-card">
         <h4>Reportes Semanales</h4>
         <canvas id="lineChart"></canvas>

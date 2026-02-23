@@ -1,0 +1,142 @@
+<div class="admin-container">
+  <app-sidebar-admin></app-sidebar-admin>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="admin-content">
+
+    <!-- ================= BUSCADOR ================= -->
+    <div class="card buscador">
+      <h1 class="titulo">Gestión de Agentes de Tránsito</h1>
+      <label>Buscar agente por número de placa</label>
+
+      <div class="busqueda">
+        <input type="text" placeholder="Ej: AT-123" [(ngModel)]="placaBuscada" />
+        <button (click)="buscarAgente()">Buscar</button>
+      </div>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+      <p class="cargando" *ngIf="cargando">Buscando agente...</p>
+    </div>
+    <!-- ================= ESTADO INICIAL ================= -->
+    <div class="card estado-inicial" *ngIf="!agente && !cargando">
+      <h2>Gestión de Agentes</h2>
+      <p>
+        Ingresa el número de placa de un agente para visualizar su información,
+        historial de reportes y asignar nuevas tareas.
+      </p>
+    </div>
+
+
+    <!-- ================= INFO AGENTE ================= -->
+    <div class="card agente-info" *ngIf="agente">
+      <h2>Información del Agente</h2>
+
+      <div class="info-grid">
+        <p><strong>Nombre:</strong> {{ agente.nombre }}</p>
+        <p><strong>Placa:</strong> {{ agente.placa }}</p>
+        <p><strong>Documento:</strong> {{ agente.documento }}</p>
+
+        <p>
+          <strong>Estado actual:</strong>
+          <span class="estado" [ngClass]="agente.estado.toLowerCase()">
+            {{ agente.estado }}
+          </span>
+        </p>
+
+        <p><strong>Teléfono:</strong> {{ agente.telefono }}</p>
+        <p><strong>Promedio de reseñas:</strong> {{ agente.promedioResenas }}</p>
+      </div>
+    </div>
+
+    <!-- ================= HISTORIAL ================= -->
+    <div class="card" *ngIf="agente">
+      <h2>Historial de Reportes</h2>
+
+      <p *ngIf="cargandoReportes">Cargando reportes...</p>
+
+      <table class="tabla-reportes" *ngIf="reportes.length > 0">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Ubicación</th>
+            <th>Incidente</th>
+            <th>Reseña</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let reporte of reportes">
+            <td>{{ reporte.fecha }}</td>
+            <td>{{ reporte.hora }}</td>
+            <td>{{ reporte.ubicacion }}</td>
+            <td>{{ reporte.tipoIncidente }}</td>
+            <td>{{ reporte.resenaCiudadano }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p *ngIf="!cargandoReportes && reportes.length === 0">
+        No hay reportes registrados para este agente.
+      </p>
+    </div>
+
+    <!-- ================= ASIGNAR TAREA ================= -->
+    <div class="card" *ngIf="agente">
+      <h2>Asignar tarea al agente</h2>
+
+      <div class="info-grid">
+        <div>
+          <label>Descripción</label>
+          <input type="text" [(ngModel)]="descripcionTarea" />
+        </div>
+
+        <div>
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="fechaTarea" />
+        </div>
+
+        <div>
+          <label>Hora</label>
+          <input type="time" [(ngModel)]="horaTarea" />
+        </div>
+
+        <div>
+          <label>Prioridad</label>
+          <select [(ngModel)]="prioridadTarea">
+            <option value="BAJA">Baja</option>
+            <option value="MEDIA">Media</option>
+            <option value="ALTA">Alta</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-asignar" (click)="asignarTarea()">Asignar tarea</button>
+
+      <p class="mensaje-ok" *ngIf="mensajeTarea">{{ mensajeTarea }}</p>
+    </div>
+
+    <!-- ================= TAREAS ================= -->
+    <div class="card" *ngIf="agente">
+      <h2>Tareas asignadas</h2>
+
+      <table class="tabla-tareas" *ngIf="tareas.length > 0">
+        <tr *ngFor="let tarea of tareas">
+          <td>{{ tarea.fecha }}</td>
+          <td>{{ tarea.hora }}</td>
+          <td>{{ tarea.descripcion }}</td>
+          <td>
+            <span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">
+              {{ tarea.prioridad }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-eliminar" (click)="eliminarTarea(tarea)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div> <!-- 👈 admin-content -->
+</div> <!-- 👈 admin-container -->
