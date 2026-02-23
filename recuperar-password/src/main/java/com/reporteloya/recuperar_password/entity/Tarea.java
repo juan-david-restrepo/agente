@@ -1,0 +1,29 @@
+package com.reporteloya.recuperar_password.entity;
+
+import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+import lombok.ToString;
+import lombok.EqualsAndHashCode;
+
+@Entity
+@Table(name = "tareas")
+@Data
+@ToString(exclude = "agente") // Evita bucles infinitos en el log
+@EqualsAndHashCode(exclude = "agente") // Evita errores de recursividad
+public class Tarea {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String descripcion;
+    private String fecha;
+    private String hora;
+    private String prioridad;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agente_id")
+    @JsonIgnore // Evita que al consultar una tarea se traiga a todo el agente (bucle)
+    private Agentes agente;
+}

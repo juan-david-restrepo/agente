@@ -9,7 +9,7 @@ import { Observable } from 'rxjs';
 export class AdminService {
 
   // La URL debe coincidir con el server.port=60523 de tu properties
-  private apiUrl = 'http://localhost:60523/agentes';
+  private apiUrl = 'http://localhost:8080/agentes';
 
   constructor(private http: HttpClient) {}
 

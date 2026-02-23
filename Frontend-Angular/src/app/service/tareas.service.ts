@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class TareasService {
-  private apiUrl = 'http://localhost:60523/agentes';
+  private apiUrl = 'http://localhost:8080/agentes';
 
   constructor(private http: HttpClient) {}
 
@@ -17,11 +17,11 @@ export class TareasService {
 
 asignarTarea(placa: string, tarea: any): Observable<any> {
   // Ahora es un POST a la sub-ruta de tareas
-  return this.http.post(`http://localhost:60523/agentes/${placa}/tareas`, tarea);
+  return this.http.post(`http://localhost:8080/agentes/${placa}/tareas`, tarea);
 }
 
 eliminarTarea(idTarea: number): Observable<any> {
   // Cambia el PUT por DELETE y usa la ruta de tareas
-  return this.http.delete(`http://localhost:60523/agentes/tareas/${idTarea}`);
+  return this.http.delete(`http://localhost:8080/agentes/tareas/${idTarea}`);
 }
 }

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,78 +21,65 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final JwtAuthenticationFilter jwtAuthFilter;
-        private final AuthenticationProvider authenticationProvider;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                // === PERMITIR CORS PARA ANGULAR ===
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // === PERMITIR CORS PARA ANGULAR ===
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                                // === DESACTIVAR CSRF POR USO DE JWT ===
-                                .csrf(csrf -> csrf.disable())
+            // === DESACTIVAR CSRF POR USO DE JWT ===
+            .csrf(csrf -> csrf.disable())
 
-                                // === REGLAS DE AUTORIZACIÓN ===
-                                .authorizeHttpRequests(auth -> auth
+            // === REGLAS DE AUTORIZACIÓN ===
+            .authorizeHttpRequests(auth -> auth
+                // Rutas de Auth y Password
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/password/**").permitAll()
 
-                                                // Autenticación / Registro
-                                                .requestMatchers("/api/auth/**").permitAll()
+                // === LÍNEA AGREGADA: LIBERAR BUSCADOR DE AGENTES ===
+                .requestMatchers("/agentes/**").permitAll()
 
-                                                // Recuperación de contraseña
-                                                .requestMatchers("/api/password/**").permitAll()
+                // RUTAS POR ROL (Mantener igual)
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/agente/**").hasRole("AGENTE")
+                .requestMatchers("/api/ciudadano/**").hasRole("CIUDADANO")
 
-                                                // ===========================
-                                                // RUTAS POR ROL
-                                                // ===========================
+                // Cualquier otro endpoint requiere autenticación
+                .anyRequest().authenticated()
+            )
 
-                                                // ADMIN
-                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            // === NO MANEJAR SESIÓN ===
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                                                // AGENTE
-                                                .requestMatchers("/api/agente/**").hasRole("AGENTE")
+            // === PROVEEDOR DE AUTENTICACIÓN ===
+            .authenticationProvider(authenticationProvider)
 
-                                                // CIUDADANO
-                                                .requestMatchers("/api/ciudadano/**").hasRole("CIUDADANO")
+            // === AÑADIR FILTRO JWT ANTES DE LA AUTENTICACIÓN ===
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-                                                .requestMatchers("/api/usuarios/me").authenticated()
+        return http.build();
+    }
 
-                                                // // Ejemplo adicional:
-                                                // .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
-                                                // .requestMatchers(HttpMethod.GET, "/api/products")
-                                                // .hasAnyRole("ADMIN", "AGENTE", "CIUDADANO")
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
 
-                                                // Cualquier otro endpoint requiere autenticación
-                                                .anyRequest().authenticated())
+        configuration.setAllowedOrigins(List.of(
+            "http://localhost:4200",
+            "https://frontend-app-1-0-0.onrender.com"
+        ));
 
-                                // === NO MANEJAR SESIÓN ===
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowCredentials(true);
 
-                                // === PROVEEDOR DE AUTENTICACIÓN ===
-                                .authenticationProvider(authenticationProvider)
-
-                                // === AÑADIR FILTRO JWT ANTES DE LA AUTENTICACIÓN ===
-                                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-                return http.build();
-        }
-
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration configuration = new CorsConfiguration();
-
-                configuration.setAllowedOrigins(List.of(
-                                "http://localhost:4200",
-                                "https://frontend-app-1-0-0.onrender.com"));
-
-                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(List.of("*"));
-                configuration.setExposedHeaders(List.of("Authorization"));
-                configuration.setAllowCredentials(true);
-
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                return source;
-        }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
