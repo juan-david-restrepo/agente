@@ -15,18 +15,27 @@ import { OnInit } from '@angular/core';
 
 
 
+
+    export enum EstadoReporte {
+      PENDIENTE = 'pendiente',
+      EN_PROCESO = 'en_proceso',
+      RECHAZADO = 'rechazado',
+      FINALIZADO = 'finalizado'
+    }
+
+
     export interface Reporte {
     id:number;
     tipo:string;
     direccion:string;
     hora:string;
     descripcion:string;
-    foto:string;
+    foto:string ;
     coordenadas:string;
     etiqueta:string;
     lat?:number;
     lng?:number;
-    estado?:'pendiente'|'en_proceso'|'rechazado'|'finalizado';
+    estado?: EstadoReporte;
 
 
     fechaAceptado?: Date; 
@@ -85,7 +94,7 @@ import { OnInit } from '@angular/core';
 export class Agente implements OnInit {
 
     
-
+    EstadoReporte = EstadoReporte;
     reporteDesdeHistorial: Reporte | null = null;
 
     origenDetalle: 'historial' | 'reportes' = 'reportes';
@@ -135,7 +144,7 @@ export class Agente implements OnInit {
           etiqueta:'Alta',
           lat:4.653,
           lng:-74.083,
-          estado:'pendiente'
+          estado: EstadoReporte.PENDIENTE
         },
         {
           id:2,
@@ -148,7 +157,7 @@ export class Agente implements OnInit {
           etiqueta:'Alta',
           lat:4.670,
           lng:-74.080,
-          estado:'pendiente'
+          estado: EstadoReporte.PENDIENTE
         }
       ];
 
@@ -209,24 +218,23 @@ export class Agente implements OnInit {
     aceptarReporte(r: Reporte){
 
       //  Primero validar si ya hay uno en proceso
-      const yaHayEnProceso = this.reportesEntrantes.some(rep => rep.estado === 'en_proceso');
+      const yaHayEnProceso = this.reportesEntrantes.some(rep => rep.estado === EstadoReporte.EN_PROCESO);
+        if (yaHayEnProceso) {
+          return;
+        }
 
-      if (yaHayEnProceso) {
-        alert('Ya tienes un operativo en proceso');
-        return;
-      }
 
       //  Ahora sí aceptar
-      r.estado = 'en_proceso';
+     r.estado = EstadoReporte.EN_PROCESO;
       r.fechaAceptado = new Date();
 
       this.estadoAgente = 'OCUPADO';
     }
 
     rechazarReporte(r:Reporte){
-      if (r.estado === 'rechazado') return;
+      if (r.estado === EstadoReporte.RECHAZADO) return;
 
-      r.estado = 'rechazado';
+      r.estado = EstadoReporte.RECHAZADO;
       r.fechaRechazado = new Date();
 
       this.historialReportes.push({ ...r });
@@ -300,6 +308,12 @@ export class Agente implements OnInit {
           console.error('Error cargando perfil', err);
         }
       });
+    }
+
+    get hayEnProceso(): boolean {
+      return this.reportesEntrantes.some(
+        r => r.estado === EstadoReporte.EN_PROCESO
+      );
     }
 
 

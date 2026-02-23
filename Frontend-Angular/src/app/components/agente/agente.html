@@ -1,3 +1,5 @@
+
+  
   <div class="app-container"
   [class.dark]="config.modoNoche"
   [class.cb]="config.daltonismo">
@@ -100,6 +102,7 @@
       <app-reportes
         *ngIf="vistaActual==='reportes'"
         [reportes]="reportesEntrantes"
+        [hayEnProceso]="hayEnProceso"
         [reporteInicial]="reporteDesdeHistorial"
         [modoLectura]="reporteDesdeHistorial !== null"
         [origen]="origenDetalle"

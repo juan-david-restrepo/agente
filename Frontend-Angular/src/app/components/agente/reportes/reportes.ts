@@ -1,8 +1,14 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Reporte } from '../agente';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { Reporte, EstadoReporte } from '../agente';
+
+import { trigger, transition, style, animate } from '@angular/animations';
+
+
+
+
 
 @Component({
  selector: 'app-reportes',
@@ -10,8 +16,29 @@ import { FormsModule } from '@angular/forms';
  imports: [CommonModule, FormsModule],
  templateUrl: './reportes.html',
  styleUrl: './reportes.css',
+ animations: [
+  trigger('fadeInOut', [
+    transition(':enter', [
+      style({ opacity: 0, transform: 'translateY(10px)' }),
+      animate('200ms ease-out',
+        style({ opacity: 1, transform: 'translateY(0)' }))
+    ]),
+    transition(':leave', [
+      animate('150ms ease-in',
+        style({ opacity: 0, transform: 'translateY(10px)' }))
+    ])
+  ])
+]
 })
 export class Reportes {
+
+    @Input() hayEnProceso: boolean = false;
+
+    EstadoReporte = EstadoReporte;
+
+    mostrarImagenZoom = false;
+    imagenZoomUrl: string | null = null;
+    zoomScale = 1;
 
     mostrarModalResumen = false;
 
@@ -47,7 +74,7 @@ export class Reportes {
         }
     }
 
- reporteSeleccionado: Reporte | null = null;
+    reporteSeleccionado: Reporte | null = null;
 
     seleccionar(r: Reporte){
         this.reporteSeleccionado = r;
@@ -61,10 +88,19 @@ export class Reportes {
     }
 
     aceptarClick(r: Reporte){
+        if(this.hayEnProceso){
+            this.mostrarAlerta('Ya tienes un reporte en proceso');
+            return;
+        }
         this.aceptar.emit(r);
     }
 
     rechazarClick(r: Reporte){
+        if(this.hayEnProceso){
+            this.mostrarAlerta('No puedes rechazar mientras tienes uno en proceso');
+            return;
+        }
+
         this.rechazar.emit(r);
         this.reporteSeleccionado = null;
     }
@@ -98,8 +134,8 @@ export class Reportes {
 
     get reportesOrdenados(){
         return [...this.reportes].sort((a,b)=>{
-            if(a.estado === 'en_proceso')return -1;
-            if(b.estado === 'en_proceso')return 1;
+            if(a.estado === EstadoReporte.EN_PROCESO) return -1;
+        if(b.estado === EstadoReporte.EN_PROCESO) return 1;
             return 0;
         })
     }
@@ -114,13 +150,13 @@ export class Reportes {
     confirmarFinalizar(){
         if(!this.reporteSeleccionado) return;
 
-        // 🚨 Validación
+        //  Validación
         if(!this.resumenTexto || this.resumenTexto.trim().length < 10){
-            alert('Debes escribir un resumen del operativo (mínimo 10 caracteres)');
+            this.mostrarAlerta('Debes escribir un resumen mínimo de 10 caracteres');
             return;
         }
 
-        this.reporteSeleccionado.estado = 'finalizado';
+        this.reporteSeleccionado.estado = EstadoReporte.FINALIZADO;
         this.reporteSeleccionado.fechaFinalizado = new Date();
         this.reporteSeleccionado.resumenOperativo = this.resumenTexto.trim();
 
@@ -131,5 +167,72 @@ export class Reportes {
         this.reporteSeleccionado = null;
 
     }
+
+    abrirZoom(url: string){
+        this.imagenZoomUrl = url;
+        this.mostrarImagenZoom = true;
+    }
+
+    cerrarZoom(){
+        this.mostrarImagenZoom = false;
+        this.imagenZoomUrl = null;
+        this.zoomScale = 1;
+    }
+
+    zoomConRueda(event: WheelEvent){
+        event.preventDefault();
+
+        if(event.deltaY < 0){
+            this.zoomScale += 0.1;
+        } else {
+            this.zoomScale -= 0.1;
+        }
+
+        if(this.zoomScale < 1) this.zoomScale = 1;
+        if(this.zoomScale > 3) this.zoomScale = 3;
+    }
+
+    /*Filtros*/
+
+    filtroActivo: 'TODOS'|'BAJA'|'MEDIA'|'ALTA' = 'TODOS';
+
+    cambiarFiltro(filtro:'TODOS'|'BAJA'|'MEDIA'|'ALTA'){
+        this.filtroActivo = filtro;
+    }
+
+    get reportesFiltrados(){
+    if(this.filtroActivo === 'TODOS'){
+        return this.reportesOrdenados;
+    }
+
+    return this.reportesOrdenados.filter(r =>
+        r.etiqueta.toUpperCase() === this.filtroActivo
+    );
+    }
+
+    /*Prioridad dinamico*/
+    
+    getClasePrioridad(etiqueta:string){
+        switch(etiqueta.toLowerCase()){
+            case 'alta': return 'prioridad-alta';
+            case 'media': return 'prioridad-media';
+            case 'baja': return 'prioridad-baja';
+            default: return '';
+        }
+    }
+
+    /*Confirmacion*/
+
+    mensajeAlerta: string | null = null;
+
+        mostrarAlerta(msg:string){
+        this.mensajeAlerta = msg;
+
+        setTimeout(()=>{
+            this.mensajeAlerta = null;
+        },3000);
+    }
+
+
 
 }

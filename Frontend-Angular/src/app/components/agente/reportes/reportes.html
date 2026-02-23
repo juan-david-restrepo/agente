@@ -2,45 +2,50 @@
 <!-- LISTA DE REPORTES -->
 <!-- ========================= -->
 
-<div *ngIf="!reporteSeleccionado">
+  <div class="toast-alerta" *ngIf="mensajeAlerta">
+    {{mensajeAlerta}}
+  </div>
+
+<div *ngIf="!reporteSeleccionado" @fadeInOut>
 
   <div class="h2-filtros">
     <h2>Reportes</h2>
 
     <div class="filtros">
-      <button class="btn-filtro">Todos</button>
-      <button class="btn-filtro">Baja</button>
-      <button class="btn-filtro">Media</button>
-      <button class="btn-filtro">Alta</button>
+      <button class="btn-filtro" (click)="cambiarFiltro('TODOS')">Todos</button >
+      <button class="btn-filtro" (click)="cambiarFiltro('BAJA')">Baja</button>
+      <button class="btn-filtro" (click)="cambiarFiltro('MEDIA')">Media</button>
+      <button class="btn-filtro" (click)="cambiarFiltro('ALTA')">Alta</button>
     </div>
   </div>
 
   <div class="card reporte-list"
-       *ngFor="let r of reportesOrdenados"
+       *ngFor="let r of reportesFiltrados"
        (click)="seleccionar(r)">
 
     <b>{{r.tipo}}</b>
     <p>{{r.direccion}}</p>
 
     <!-- Prioridad -->
-    <span class="tag prioridad">
-      {{r.etiqueta}}
+    <span class="tag prioridad"
+        [ngClass]="getClasePrioridad(r.etiqueta)">
+        {{r.etiqueta}}
     </span>
 
     <!-- Estado -->
     <span class="tag estado"
       [ngClass]="{
-        'tag-pendiente': r.estado === 'pendiente',
-        'tag-proceso': r.estado === 'en_proceso',
-        'tag-rechazado': r.estado === 'rechazado',
-        'tag-finalizado': r.estado === 'finalizado'
+        'tag-pendiente': r.estado === EstadoReporte.PENDIENTE,
+        'tag-proceso':  r.estado === EstadoReporte.EN_PROCESO,
+        'tag-rechazado': r.estado === EstadoReporte.RECHAZADO,
+        'tag-finalizado': r.estado === EstadoReporte.FINALIZADO
       }">
 
       {{
-        r.estado === 'pendiente' ? 'PENDIENTE' :
-        r.estado === 'en_proceso' ? 'EN PROCESO' :
-        r.estado === 'rechazado' ? 'RECHAZADO' :
-        r.estado === 'finalizado' ? 'FINALIZADO' : ''
+        r.estado === EstadoReporte.PENDIENTE ? 'PENDIENTE' :
+        r.estado === EstadoReporte.EN_PROCESO ? 'EN PROCESO' :
+        r.estado === EstadoReporte.RECHAZADO ? 'RECHAZADO' :
+        r.estado === EstadoReporte.FINALIZADO ? 'FINALIZADO' : ''
       }}
 
     </span>
@@ -52,7 +57,7 @@
 <!-- DETALLE REPORTE -->
 <!-- ========================= -->
 
-<div *ngIf="reporteSeleccionado" class="detalle-reporte-full">
+<div *ngIf="reporteSeleccionado" class="detalle-reporte-full" @fadeInOut>
 
   <button class="btn-volver" (click)="volverClick()">
     <i class="fa-solid fa-arrow-left"></i>
@@ -64,8 +69,9 @@
     <!-- Imagen -->
     <div class="detalle-foto">
       <img class="evidencia"
-           src="assets/images/ejemplo2.jpg"
-           alt="Evidencia del reporte">
+          [src]="reporteSeleccionado?.foto"
+          (click)="abrirZoom(reporteSeleccionado?.foto!)"
+          alt="Evidencia del reporte">
     </div>
 
     <!-- Información -->
@@ -76,22 +82,23 @@
         <h2>{{reporteSeleccionado.tipo}}</h2>
 
         <div>
-          <span class="tag prioridad">
-            {{reporteSeleccionado.etiqueta}}
+          <span class="tag prioridad"
+              [ngClass]="getClasePrioridad(reporteSeleccionado?.etiqueta || '')">
+              {{reporteSeleccionado?.etiqueta}}
           </span>
 
           <span class="tag estado"
             [ngClass]="{
-              'tag-pendiente': reporteSeleccionado?.estado === 'pendiente',
-              'tag-proceso': reporteSeleccionado?.estado === 'en_proceso',
-              'tag-rechazado': reporteSeleccionado?.estado === 'rechazado',
-              'tag-finalizado': reporteSeleccionado?.estado === 'finalizado'
+                'tag-pendiente': reporteSeleccionado?.estado === EstadoReporte.PENDIENTE,
+                'tag-proceso': reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO,
+                'tag-rechazado': reporteSeleccionado?.estado === EstadoReporte.RECHAZADO,
+                'tag-finalizado': reporteSeleccionado?.estado === EstadoReporte.FINALIZADO
             }">
             {{
-              reporteSeleccionado?.estado === 'pendiente' ? 'PENDIENTE' :
-              reporteSeleccionado?.estado === 'en_proceso' ? 'EN PROCESO' :
-              reporteSeleccionado?.estado === 'rechazado' ? 'RECHAZADO' :
-              reporteSeleccionado?.estado === 'finalizado' ? 'FINALIZADO' : ''
+              reporteSeleccionado?.estado === EstadoReporte.PENDIENTE ? 'PENDIENTE' :
+              reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO ? 'EN PROCESO' :
+              reporteSeleccionado?.estado === EstadoReporte.RECHAZADO ? 'RECHAZADO' :
+              reporteSeleccionado?.estado === EstadoReporte.FINALIZADO ? 'FINALIZADO' : ''
             }}
           </span>
         </div>
@@ -127,7 +134,7 @@
       </div>
 
       <!-- Fechas -->
-      <div *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
+      <div *ngIf="reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO ">
         <p class="fecha-info">
           <i class="fa-solid fa-stopwatch"></i>
           <span class="info-label">Iniciado:</span>
@@ -135,7 +142,7 @@
         </p>
       </div>
 
-      <div *ngIf="reporteSeleccionado?.estado === 'finalizado'">
+      <div *ngIf="reporteSeleccionado?.estado === EstadoReporte.FINALIZADO">
 
         <p class="fecha-info">
           <i class="fa-solid fa-clock"></i>
@@ -157,7 +164,7 @@
 
       </div>
 
-      <div *ngIf="reporteSeleccionado?.estado === 'rechazado'">
+      <div *ngIf="reporteSeleccionado?.estado === EstadoReporte.RECHAZADO ">
         <p class="fecha-info">
           Rechazado:
           {{reporteSeleccionado.fechaRechazado | date:'dd/MM/yyyy - HH:mm'}}
@@ -174,14 +181,16 @@
 
       <!-- Acciones -->
       <div class="acciones"
-           *ngIf="reporteSeleccionado?.estado === 'pendiente'">
+           *ngIf="reporteSeleccionado?.estado === EstadoReporte.PENDIENTE ">
 
         <button class="btn-ok"
+                [disabled]="hayEnProceso"
                 (click)="aceptarClick(reporteSeleccionado)">
           Aceptar
         </button>
 
         <button class="btn-no"
+                [disabled]="hayEnProceso"
                 (click)="rechazarClick(reporteSeleccionado)">
           Rechazar
         </button>
@@ -189,7 +198,7 @@
       </div>
 
       <div class="en-proceso"
-           *ngIf="reporteSeleccionado?.estado === 'en_proceso'">
+           *ngIf="reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO">
         <button class="btn-finalizar"
                 (click)="abrirModalFinalizar()">
           Finalizar Operativo
@@ -197,7 +206,7 @@
       </div>
 
       <div class="estado-final"
-           *ngIf="reporteSeleccionado?.estado === 'finalizado'">
+           *ngIf="reporteSeleccionado?.estado === EstadoReporte.FINALIZADO">
         <button class="btn-resumen"
                 (click)="abrirModalResumen()">
           Ver resumen del operativo
@@ -262,4 +271,12 @@
     </div>
 
   </div>
+</div>
+
+<div class="zoom-backdrop" *ngIf="mostrarImagenZoom" (click)="cerrarZoom()">
+  <img class="zoom-img"
+     [src]="imagenZoomUrl"
+     [style.transform]="'scale(' + zoomScale + ')'"
+     (wheel)="zoomConRueda($event)"
+     (click)="$event.stopPropagation()">
 </div>
