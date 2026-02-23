@@ -1,0 +1,34 @@
+<div class="todo">
+ <app-sidebar-admin></app-sidebar-admin>
+
+  <div class="config-container">
+
+    <h2>Configuración de Accesibilidad</h2>
+
+    <!-- Modo Oscuro -->
+    <div class="option">
+      <label>
+        <input type="checkbox" (change)="toggleDarkMode($event)" />
+        Modo Oscuro
+      </label>
+    </div>
+
+    <!-- Daltonismo -->
+    <div class="option">
+      <label>
+        <input type="checkbox" (change)="toggleColorBlindMode($event)" />
+        Modo Daltonismo
+      </label>
+    </div>
+
+    <!-- Tamaño de Fuente -->
+    <div class="option">
+      <label for="fontSize">Tamaño de Fuente:</label>
+      <select id="fontSize" (change)="changeFontSize($event)">
+        <option value="normal">Normal</option>
+        <option value="small">Pequeño</option>
+        <option value="large">Grande</option>
+      </select>
+    </div>
+  </div>
+</div>

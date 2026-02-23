@@ -1,8 +1,5 @@
 import { authGuard } from './guards/auth-guard';
-import { adminGuard } from './guards/admin-guard';
-import { Routes } from '@angular/router';
 import { Home } from './components/home/home';
-import { AdminComponent } from './components/admin/admin';
 import { Login } from './components/login/login';
 import { Recuperar } from './components/recuperar/recuperar';
 import { Registro } from './components/registro/registro';
@@ -21,13 +18,17 @@ import { Reportes } from './components/agente/reportes/reportes';
 import { Configuracion } from './components/agente/configuracion/configuracion';
 import { Dashboard } from './components/agente/dashboard/dashboard';
 import { PerfilAgente } from './components/agente/perfil-agente/perfil-agente';
-
+import { ConfigAdminComponent } from './components/admin/config-admin/config-admin';
+import { GestionAgentes } from './components/admin/gestion-agentes/gestion-agentes';
+import { MapaReportesComponent } from './components/admin/mapa-reportes/mapa-reportes';
+import { SidebarAdmin } from './components/admin/sidebar-admin/sidebar-admin';
+import { Admin } from './components/admin/admin';
+import { Routes } from '@angular/router';
 
 
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'home', component: Home },
-  { path: 'admin', component: AdminComponent, canActivate: [adminGuard] },
   { path: 'login', component: Login },
   { path: 'recuperar', component: Recuperar },
   { path: 'registro', component: Registro },
@@ -45,5 +46,11 @@ export const routes: Routes = [
   {path: 'reportes', component: Reportes, },
   {path: 'configuracion', component: Configuracion, },
   {path: 'dashboard', component: Dashboard, },
-  {path: 'perfil-agente', component: PerfilAgente, }
+  {path: 'perfil-agente', component: PerfilAgente, },
+  {path: 'gestion-agentes', component: GestionAgentes},
+  {path: 'sidebar-admin', component: SidebarAdmin},
+  {path: 'config-admin', component: ConfigAdminComponent},
+  {path: 'mapa-reportes', component: MapaReportesComponent},
+  {path: 'perfil', component: Perfil, canActivate: [authGuard] },
+  { path: 'admin', component: Admin, },
 ];

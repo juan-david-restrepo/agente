@@ -1,0 +1,403 @@
+
+/* ===============================
+   CONTENEDOR GENERAL
+================================ */
+.admin-container {
+  display: flex;
+  height: 100vh;        
+  background: #f1f5f9;
+  overflow: hidden;       /* 👈 evita scroll del body */
+}
+
+/* ===============================
+   CONTENIDO PRINCIPAL
+================================ */
+
+.admin-content {
+  flex: 1;
+  padding: 40px;
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;   
+}
+
+/* Limita el ancho del contenido sin tocar HTML */
+.admin-content > * {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* Espaciado entre secciones / cards */
+.admin-content .card {
+  margin-bottom: 36px;
+}
+
+
+/* ===============================
+   TÍTULO PRINCIPAL
+================================ */
+
+.titulo {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0b1c2d;
+  margin-bottom: 30px;
+}
+
+/* ===============================
+   TARJETAS GENERALES
+================================ */
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 26px;
+  margin-bottom: 30px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0b1c2d;
+  margin-bottom: 20px;
+}
+
+/* ===============================
+   BUSCADOR
+================================ */
+
+.buscador label {
+  font-weight: 700;
+  color: #0f172a;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.busqueda {
+  display: flex;
+  gap: 14px;
+}
+
+.busqueda input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.busqueda input:focus {
+  outline: none;
+  border-color: #1e3a8a;
+}
+
+.busqueda button {
+  background: #0b1c2d;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.busqueda button:hover {
+  background: #1e3a8a;
+}
+
+/* ===============================
+   MENSAJES
+================================ */
+
+.error {
+  color: #dc2626;
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.cargando {
+  margin-top: 10px;
+  color: #475569;
+  font-style: italic;
+}
+
+.mensaje-ok {
+  margin-top: 10px;
+  color: #166534;
+  font-weight: 700;
+}
+
+/* ===============================
+   ESTADO INICIAL (PANTALLA NO VACÍA)
+================================ */
+
+.estado-inicial {
+  text-align: center;
+  padding: 70px 40px;
+  color: #475569;
+}
+
+.estado-inicial h2 {
+  font-size: 22px;
+  margin-bottom: 14px;
+  color: #0b1c2d;
+}
+
+.estado-inicial p {
+  font-size: 15px;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+
+/* ===============================
+   INFORMACIÓN DEL AGENTE
+================================ */
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.info-grid p {
+  background: #f8fafc;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #0f172a;
+  font-weight: 600;
+
+  /* CLAVE */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+}
+
+/* ===============================
+   ESTADO AGENTE
+================================ */
+
+.estado {
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+
+.estado.disponible {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.estado.ocupado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.estado.ausente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ===============================
+   TABLAS GENERALES
+================================ */
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 20px;
+  border-radius: 14px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+/* CABECERA */
+
+table thead {
+  background: linear-gradient(90deg, #0b1c2d, #1e293b);
+}
+
+table thead th {
+  padding: 14px 16px;
+  color: #ffffff;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+/* CUERPO */
+
+table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+table tbody tr:hover {
+  background: #eef4ff;
+}
+
+table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #0f172a;
+  vertical-align: middle;
+}
+
+/* ===============================
+   HISTORIAL DE REPORTES
+================================ */
+
+.tabla-reportes td:nth-child(1),
+.tabla-reportes td:nth-child(2) {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.tabla-reportes td:nth-child(3),
+.tabla-reportes td:nth-child(5) {
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* ===============================
+   PRIORIDAD TAREAS
+================================ */
+
+.prioridad {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  min-width: 80px;
+  text-align: center;
+}
+
+.prioridad.baja {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.prioridad.media {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.prioridad.alta {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ===============================
+   FORMULARIO ASIGNAR TAREA
+================================ */
+
+.card form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  align-items: end;
+}
+
+.card label {
+  display: block;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.card input,
+.card select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+.card input:focus,
+.card select:focus {
+  outline: none;
+  border-color: #1e3a8a;
+}
+
+/* BOTÓN ASIGNAR */
+
+.btn-asignar {
+  background: linear-gradient(90deg, #0b1c2d, #1e3a8a);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  margin-top: 10px;
+}
+
+.btn-asignar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(30, 58, 138, 0.35);
+}
+
+/* ===============================
+   TEXTO VACÍO
+================================ */
+
+.card p {
+  font-size: 14px;
+  color: #475569;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .busqueda {
+    flex-direction: column;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  .titulo {
+    font-size: 22px;
+  }
+}
+
+/* ===============================
+   BOTÓN ELIMINAR TAREA
+================================ */
+
+.btn-eliminar {
+  background: #991b1b;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-eliminar:hover {
+  background: #7f1d1d;
+  transform: translateY(-1px);
+}

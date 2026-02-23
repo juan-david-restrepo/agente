@@ -1,0 +1,20 @@
+.todo{
+  display: flex;
+}
+.config-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background: #f4f4f4;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.option {
+  margin-bottom: 15px;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+ 

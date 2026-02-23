@@ -9,7 +9,7 @@ import { Historial } from './historial/historial';
 import { Reportes } from './reportes/reportes';
 import { Dashboard } from './dashboard/dashboard';
 import { Tareas } from './tareas/tareas';
-import { AgenteServiceTs } from '../../service/agente.service.ts';
+import { AgenteServiceTs } from '../../service/agente.service';
 import { OnInit } from '@angular/core';
 
 
