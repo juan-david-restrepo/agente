@@ -2,19 +2,23 @@ import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 import { Router } from '@angular/router';
-
+import { catchError, map, of } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
-
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  const isLogged = !!localStorage.getItem('token');
+  return authService.getCurrentUser().pipe(
+    map(() => {
+      //  Sincronizamos estado global
+      authService.setAuthenticated(true);
+      return true;
+    }),
 
-  if (!isLogged) {
-    router.navigate(['/login']);
-    return false;
-  }
-
-  return true;
+    catchError(() => {
+      authService.setAuthenticated(false);
+      router.navigate(['/login']);
+      return of(false);
+    }),
+  );
 };

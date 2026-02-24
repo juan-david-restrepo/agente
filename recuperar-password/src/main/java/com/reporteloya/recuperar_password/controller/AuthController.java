@@ -3,13 +3,18 @@ package com.reporteloya.recuperar_password.controller;
 import com.reporteloya.recuperar_password.dto.AuthResponse;
 import com.reporteloya.recuperar_password.dto.LoginRequest;
 import com.reporteloya.recuperar_password.dto.RegisterRequest;
+import com.reporteloya.recuperar_password.entity.Usuario;
+import com.reporteloya.recuperar_password.service.AuthResult;
 import com.reporteloya.recuperar_password.service.AuthService;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -18,67 +23,115 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * Registro de usuario.
-     * Retorna AuthResponse (token, role, userId) y 201 Created.
-     * Además añade el header Authorization: Bearer <token>
-     */
+    // =========================
+    // REGISTER
+    // =========================
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(
+    public ResponseEntity<?> register(
             @RequestBody RegisterRequest request,
-            UriComponentsBuilder uriBuilder) {
+            HttpServletResponse response) {
+
         try {
-            AuthResponse response = authService.register(request);
+            AuthResult result = authService.register(request);
+            Usuario usuario = result.usuario();
 
-            // Construimos header Authorization para que el front pueda usarlo directamente
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + response.getToken());
+            setJwtCookie(response, result.token());
 
-            // Opcional: Exponer el header para CORS (tu CORS ya expone "Authorization")
-            // Devolvemos 201 Created y body con token + role + userId
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .headers(headers)
-                    .body(response);
+            return ResponseEntity.status(201).body(
+                    AuthResponse.builder()
+                            .userId(usuario.getId())
+                            .email(usuario.getEmail())
+                            .role(usuario.getRole())
+                            .build());
 
         } catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.internalServerError()
                     .body("Error interno al registrar el usuario.");
         }
     }
 
-    /**
-     * Login (autenticación).
-     * Retorna 200 OK con AuthResponse (token, role, userId) y header Authorization.
-     */
+    // =========================
+    // LOGIN
+    // =========================
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequest request,
+            HttpServletResponse response) {
+
         try {
-            AuthResponse response = authService.login(request);
+            AuthResult result = authService.login(request);
+            Usuario usuario = result.usuario();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + response.getToken());
+            setJwtCookie(response, result.token());
 
-            return ResponseEntity
-                    .ok()
-                    .headers(headers)
-                    .body(response);
+            return ResponseEntity.ok(
+                    AuthResponse.builder()
+                            .userId(usuario.getId())
+                            .email(usuario.getEmail())
+                            .role(usuario.getRole())
+                            .build());
 
         } catch (IllegalArgumentException e) {
-            // Credenciales invalidas u otros errores controlados por el service
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(e.getMessage());
+            return ResponseEntity.status(401).body(e.getMessage());
         } catch (Exception e) {
-            // Error inesperado
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.internalServerError()
                     .body("Error interno al procesar el login.");
         }
     }
+
+    // =========================
+    // LOGOUT
+    // =========================
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false) // true solo en HTTPS
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+    // =========================
+    // COOKIE HELPER
+    // =========================
+    private void setJwtCookie(HttpServletResponse response, String token) {
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(false) // true en producción con HTTPS
+                .path("/")
+                .maxAge(20 * 60) // 20 minutos
+                .sameSite("Lax") // importante para navegador moderno
+                .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+    @GetMapping("/me")
+public ResponseEntity<?> getCurrentUser() {
+
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+    if (authentication == null || !authentication.isAuthenticated()) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    Usuario usuario = (Usuario) authentication.getPrincipal();
+
+    return ResponseEntity.ok(
+            AuthResponse.builder()
+                    .userId(usuario.getId())
+                    .email(usuario.getEmail())
+                    .role(usuario.getRole())
+                    .build()
+    );
+}
+
 }

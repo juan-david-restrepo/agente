@@ -4,6 +4,20 @@ import Swal from 'sweetalert2';
 import * as L from 'leaflet';
 import Tesseract from 'tesseract.js';
 import { Nav } from '../../shared/nav/nav';
+import { SubirReporteService } from '../../service/subir-reporte.service';
+
+export interface ReporteRequest {
+  descripcion: string;
+  placa: string;
+  direccion: string;
+  latitud: number;
+  longitud: number;
+  fechaIncidente: string | null;
+  horaIncidente: string | null;
+  tipoInfraccion: string;
+  estado: string;
+}
+
 
 @Component({
   selector: 'app-subir-reporte',
@@ -11,7 +25,7 @@ import { Nav } from '../../shared/nav/nav';
   imports: [FormsModule, Nav],
   templateUrl: './subir-reporte.html',
   styleUrls: ['./subir-reporte.css'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class SubirReporteComponent implements OnInit {
   fileList: File[] = [];
@@ -26,6 +40,8 @@ export class SubirReporteComponent implements OnInit {
   private marker: any;
   recognition: any;
   recognitionRunning = false;
+
+  constructor(private reporteService: SubirReporteService) {}
 
   ngOnInit(): void {}
 
@@ -71,7 +87,6 @@ export class SubirReporteComponent implements OnInit {
             this.placa = matches[0].replace(/[- ]/, '');
           }
         });
-
       } else if (file.type.startsWith('video')) {
         const video = document.createElement('video');
         video.src = URL.createObjectURL(file);
@@ -95,7 +110,7 @@ export class SubirReporteComponent implements OnInit {
         if (!this.map) {
           this.map = L.map('map').setView([lat, lng], 16);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data © OpenStreetMap contributors'
+            attribution: 'Map data © OpenStreetMap contributors',
           }).addTo(this.map);
         } else {
           this.map.setView([lat, lng], 16);
@@ -107,7 +122,9 @@ export class SubirReporteComponent implements OnInit {
           this.marker = L.marker([lat, lng]).addTo(this.map);
         }
 
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+        );
         const data = await res.json();
         this.direccion = data.display_name || 'Ubicación no encontrada';
       });
@@ -127,14 +144,15 @@ export class SubirReporteComponent implements OnInit {
         this.recognition.interimResults = false;
 
         this.recognition.onresult = (event: any) => {
-          this.descripcion += event.results[event.resultIndex][0].transcript + ' ';
+          this.descripcion +=
+            event.results[event.resultIndex][0].transcript + ' ';
         };
 
         this.recognition.onerror = (event: any) => {
           alert('Error en el reconocimiento de voz: ' + event.error);
         };
 
-        this.recognition.onend = () => this.recognitionRunning = false;
+        this.recognition.onend = () => (this.recognitionRunning = false);
       }
 
       if (this.recognitionRunning) {
@@ -149,20 +167,41 @@ export class SubirReporteComponent implements OnInit {
     }
   }
 
-  // 📤 Enviar reporte con SweetAlert2
   enviarReporte() {
-    Swal.fire({
-      icon: 'success',
-      title: '¡Reporte enviado!',
-      text: 'Tu reporte ha sido registrado exitosamente.',
-      confirmButtonText: 'OK',
-      customClass: { popup: 'small-popup' },
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showClass: { popup: 'swal2-show animate__animated animate__fadeInDown' },
-      hideClass: { popup: 'swal2-hide animate__animated animate__fadeOutUp' }
-    }).then(() => {
-      this.resetFormulario();
+    if (!this.descripcion || !this.coordenadas) {
+      Swal.fire('Error', 'Completa los campos obligatorios', 'error');
+      return;
+    }
+
+    const [lat, lng] = this.coordenadas.split(',').map((c) => Number(c.trim()));
+  const reporte: ReporteRequest = {
+    descripcion: this.descripcion,
+    placa: this.placa,
+    direccion: this.direccion,
+    latitud: lat,
+    longitud: lng,
+    fechaIncidente: this.fecha || null,
+    horaIncidente: this.hora || null,
+    tipoInfraccion: 'GENERAL',
+    estado: 'PENDIENTE',
+  };
+
+
+    this.reporteService.crearReporte(reporte, this.fileList).subscribe({
+      next: () => {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Reporte enviado!',
+          text: 'Tu reporte ha sido registrado exitosamente.',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          this.resetFormulario();
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        Swal.fire('Error', 'No se pudo enviar el reporte', 'error');
+      },
     });
   }
 

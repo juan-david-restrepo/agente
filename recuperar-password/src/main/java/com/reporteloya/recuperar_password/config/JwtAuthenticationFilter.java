@@ -1,30 +1,25 @@
-package com.reporteloya.recuperar_password.config; // << PAQUETE CORREGIDO
+package com.reporteloya.recuperar_password.config;
 
-import com.reporteloya.recuperar_password.service.JwtService; // << IMPORT CORREGIDO
+import com.reporteloya.recuperar_password.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-
-
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 /**
- * Filtro encargado de validar el JWT y construir la autenticación.
+ * Filtro encargado de validar el JWT desde Cookie HttpOnly
  */
 @Component
 @RequiredArgsConstructor
@@ -33,71 +28,78 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
+    
+
+
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
-        // 1. Obtenemos encabezado Authorization
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
+        String jwt = null;
+        String username = null;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // =========================
+        // 1. Extraer JWT desde Cookie
+        // =========================
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // Si no hay token → continuar sin autenticar
+        if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Extraer token
-        jwt = authHeader.substring(7);
-
-        // 3. Extraer username (email) del token
-        // NOTA: jwtService puede lanzar una excepción (ej. SignatureException si el
-        // token es inválido)
+        // =========================
+        // 2. Extraer username (email)
+        // =========================
         try {
             username = jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            // Si hay error en el token (expirado, inválido), simplemente ignoramos y
-            // dejamos pasar
-            // para que Spring Security maneje el 403 Forbidden o 401 Unauthorized más
-            // adelante.
+            // Token inválido / expirado
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 4. Si el usuario no está autenticado aún:
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        // =========================
+        // 3. Autenticación
+        // =========================
+        if (username != null &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            // 5. Validación del token
             if (jwtService.isTokenValid(jwt, userDetails)) {
-
-                // >>> EXTRAER ROL DEL TOKEN <<<
-                String roleFromToken = jwtService.extractClaim(jwt,
-                        claims -> claims.get("role", String.class));
-
-                // Convertimos el rol extraído (ej. USER) al formato que Spring Security
-                // requiere (ej. ROLE_USER)
-                // Esto es vital para las verificaciones @PreAuthorize("hasRole('ADMIN')")
-                GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + roleFromToken);
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        Collections.singletonList(authority) // Usamos SOLO el rol del JWT
-                );
+                        userDetails.getAuthorities());
 
                 authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
+                        new WebAuthenticationDetailsSource()
+                                .buildDetails(request));
 
-                // 6. Guardamos autenticación en contexto de seguridad
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                SecurityContextHolder
+                        .getContext()
+                        .setAuthentication(authToken);
             }
+
         }
 
-        // 7. Continuamos con el filtro
+        // =========================
+        // 4. Continuar filtro
+        // =========================
         filterChain.doFilter(request, response);
     }
 }

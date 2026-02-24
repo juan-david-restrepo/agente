@@ -7,7 +7,7 @@ import { Nav } from '../../shared/nav/nav';
 import { Footer } from '../../shared/footer/footer';
 import { interval, Subscription } from 'rxjs';
 import { NoticiasComponent } from '../noticias/noticias';
-
+import { AuthService } from '../../service/auth.service';
 
 type ModuleKey = 'subir-reporte' | 'multas' | 'pico-placa' | 'parking';
 
@@ -25,43 +25,47 @@ interface Module {
   styleUrls: ['./home.css'],
 })
 export class Home implements OnInit, OnDestroy, AfterViewInit {
-
-  
   /* ------------------------------------------
      Modal de módulos
   ------------------------------------------- */
   isModalOpen = false;
+  isLoggedIn = false; // Simulación de estado de autenticación
   selectedModule: Module | null = null;
 
   modulesData: Record<ModuleKey, Module> = {
-    "subir-reporte": {
+    'subir-reporte': {
       title: 'Reporta una Foto Multa',
-      description: 'Sube evidencias de infracciones y contribuye a mejorar la movilidad en tu ciudad.',
+      description:
+        'Sube evidencias de infracciones y contribuye a mejorar la movilidad en tu ciudad.',
       image: 'assets/images/foto_multaslegales_carroya.webp',
     },
     multas: {
       title: 'Consulta tus Multas',
-      description: 'Revisa fácilmente el estado de tus infracciones de tránsito.',
+      description:
+        'Revisa fácilmente el estado de tus infracciones de tránsito.',
       image: 'assets/images/multas-de-transito.webp',
     },
-    "pico-placa": {
+    'pico-placa': {
       title: 'Consulta del Pico y Placa',
-      description: 'Conoce las restricciones vehiculares vigentes para tu zona.',
+      description:
+        'Conoce las restricciones vehiculares vigentes para tu zona.',
       image: 'assets/images/Captura de pantalla 2025-11-13 195849.png',
     },
     parking: {
       title: 'Localización de Parqueaderos',
-      description: 'Encuentra los parqueaderos más cercanos y sus horarios de atención.',
+      description:
+        'Encuentra los parqueaderos más cercanos y sus horarios de atención.',
       image: 'assets/images/120180114105953.jpg',
     },
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+  ) {}
 
   openModal(moduleKey: ModuleKey) {
-    const isLoggedIn = localStorage.getItem('userId') !== null;
-
-    if (!isLoggedIn) {
+    if (!this.isLoggedIn) {
       this.selectedModule = this.modulesData[moduleKey];
       this.isModalOpen = true;
     } else {
@@ -85,7 +89,7 @@ export class Home implements OnInit, OnDestroy, AfterViewInit {
     'infracciones',
     'informacionVial',
     'integracion',
-    'notificaciones'
+    'notificaciones',
   ];
 
   selectedSection = this.sections[0];
@@ -153,7 +157,8 @@ export class Home implements OnInit, OnDestroy, AfterViewInit {
 
   prevSlide() {
     this.headerIndex =
-      (this.headerIndex - 1 + this.headerSlides.length) % this.headerSlides.length;
+      (this.headerIndex - 1 + this.headerSlides.length) %
+      this.headerSlides.length;
   }
 
   startHeaderCarousel() {
@@ -171,6 +176,9 @@ export class Home implements OnInit, OnDestroy, AfterViewInit {
   ------------------------------------------- */
 
   ngOnInit() {
+    this.authService.authState$.subscribe((state) => {
+      this.isLoggedIn = state;
+    });
     this.startCarousel();
     this.startHeaderCarousel();
   }
@@ -181,31 +189,26 @@ export class Home implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-  const accordions = document.querySelectorAll(".accordion");
+    const accordions = document.querySelectorAll('.accordion');
 
-  accordions.forEach(acc => {
-    acc.addEventListener("click", () => {
+    accordions.forEach((acc) => {
+      acc.addEventListener('click', () => {
+        const isActive = acc.classList.contains('active');
 
-      const isActive = acc.classList.contains("active");
+        // Cerrar todos
+        accordions.forEach((a) => a.classList.remove('active'));
 
-      // Cerrar todos
-      accordions.forEach(a => a.classList.remove("active"));
-
-      // Abrir el seleccionado
-      if (!isActive) acc.classList.add("active");
-
+        // Abrir el seleccionado
+        if (!isActive) acc.classList.add('active');
+      });
     });
-  });
-  
-  AOS.init({
-    duration: 1100, // duración de la animación
-    once: true,     // solo animar la primera vez
-  });
 
-  // Opcional: recalcular si hay contenido dinámico
-  AOS.refresh();
-}
+    AOS.init({
+      duration: 1100, // duración de la animación
+      once: true, // solo animar la primera vez
+    });
 
-
-
+    // Opcional: recalcular si hay contenido dinámico
+    AOS.refresh();
+  }
 }

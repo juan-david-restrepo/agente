@@ -31,12 +31,6 @@ public class Usuario implements UserDetails {
     @Column(name = "nombre", nullable = false)
     private String nombreCompleto;
 
-    @Column(name = "celular", nullable = false)
-    private String celular;
-
-    @Column(name = "placa", nullable = true)
-    private String placa;
-
     @Column(name = "correo",unique = true, nullable = false)
     private String email;
 

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
 
     // Token JWT para el acceso a recursos protegidos
-    private String token;
+    // private String token;
 
     // Datos del usuario
     private Long userId;

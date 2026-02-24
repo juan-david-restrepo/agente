@@ -1,6 +1,5 @@
 package com.reporteloya.recuperar_password.service;
 
-// Importar la entidad Usuario del proyecto actual, no la antigua User
 import com.reporteloya.recuperar_password.entity.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,24 +9,21 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+
 @Service
 public class JwtService {
 
-    // Se recomienda obtener la clave del application.properties para mayor
-    // seguridad
-    // Aquí se mantiene su valor, pero se envuelve en una propiedad de Spring
-    // @Value("${jwt.secret.key}")
-    private static final String SECRET_KEY = "U3VwZXJEdXBlclNlY3JldEtleUZvckpXVEV4YW1wbGUxMjM0NTY=";
+    @Value("${jwt.secret.key}")
+    private String secretKey;
 
-    // Tiempo de expiración del token (10 horas)
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
+    @Value("${jwt.expiration.ms}")
+    private long expirationTime;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -47,8 +43,6 @@ public class JwtService {
      */
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
 
-        // 1. CRÍTICO: Casteamos la interfaz UserDetails a nuestra clase Usuario
-        // para acceder al Rol y al ID.
         if (userDetails instanceof Usuario customUsuario) {
             extraClaims.put("role", customUsuario.getRole().name());
             extraClaims.put("userId", customUsuario.getId());
@@ -56,16 +50,17 @@ public class JwtService {
 
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername()) // El Subject es el Email
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(
+                        new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -85,7 +80,9 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    
 }

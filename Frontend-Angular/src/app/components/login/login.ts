@@ -24,74 +24,50 @@ export class Login {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
-    // ✅ REACTIVAMOS ROL
     this.formLogin = this.fb.group({
-      rol: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
+      rol: ['']
     });
   }
 
   onSubmit(): void {
     if (this.formLogin.invalid) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Formulario incompleto',
-        text: 'Por favor completa todos los campos correctamente.',
-      });
+      Swal.fire('Formulario incompleto', 'Completa los campos', 'warning');
       return;
     }
 
-    const { rol, email, password } = this.formLogin.value;
+    const { email, password } = this.formLogin.value;
 
     this.authService.login(email, password).subscribe({
       next: (resp) => {
-        console.log('Respuesta del backend:', resp);
-
-        if (resp.token) {
-          localStorage.setItem('token', resp.token);
-          this.authService.setSession(resp.token);
-        }
-
-        if (resp.userId) {
-          localStorage.setItem('userId', resp.userId);
-        }
-
-
-        // Guardar sesión
-       // localStorage.setItem('token', resp.token);
-        localStorage.setItem('userId', resp.userId);
-        localStorage.setItem('email', resp.email);
-        localStorage.setItem('role', resp.role);
-
         Swal.fire({
           icon: 'success',
-          title: 'Bienvenido!',
-          text: 'Inicio de sesión exitoso',
-          timer: 1500,
+          title: '¡Bienvenido!',
+          timer: 1200,
           showConfirmButton: false,
         });
+        this.authService.setAuthenticated(true);
+        this.authService.setLoggedIn(true);
 
-        // 👉 REDIRECCIÓN SEGÚN ROL
-        if (rol === 'ciudadano') {
-          this.router.navigate(['/home']);
-        } else if (rol === 'agente') {
-          this.router.navigate(['/agente']);
-        } else if (rol === 'administrador') {
-          this.router.navigate(['/admin']);
+        // 🔁 REDIRECCIÓN SEGÚN ROL (BACKEND)
+        switch (resp.role) {
+          case 'ADMIN':
+            this.router.navigate(['/admin']);
+            break;
+          case 'AGENTE':
+            this.router.navigate(['/agente']);
+            break;
+          default:
+            this.router.navigate(['/home']);
+            break;
         }
       },
 
-      error: (err) => {
-        console.error(err);
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al iniciar sesión',
-          text: err.error || 'Credenciales incorrectas',
-        });
+      error: () => {
+        Swal.fire('Error', 'Credenciales incorrectas', 'error');
       },
     });
   }

@@ -77,19 +77,32 @@
 
             <div class="buttons">
 
-                <!-- ❌ Ocultar cuando esté logueado -->
-                <a *ngIf="!isLoggedIn" routerLink="/login" class="button button-login">Iniciar sesion</a>
-                <a *ngIf="!isLoggedIn" routerLink="/registro" class="button button-signup">Registrarme</a>
+                  <!-- 🔐 Usuario NO autenticado -->
+  <ng-container *ngIf="!isLoggedIn; else loggedTemplate">
+    <a routerLink="/login" class="button button-login">
+      Iniciar sesión
+    </a>
 
-                <!-- ✔ Mostrar cuando esté logueado -->
-                <button
-                    id="sidebarToggle"
-                    class="toggle-btn"
-                    (click)="toggleSidebar()"
-                    *ngIf="isLoggedIn"
-                >
-                    <i><img  [src]="currentAvatar" alt="Avatar 1" class="avatarnav"></i>
-                </button>
+    <a routerLink="/registro" class="button button-signup">
+      Registrarme
+    </a>
+  </ng-container>
+
+  <!-- 👤 Usuario autenticado -->
+  <ng-template #loggedTemplate>
+    <button
+      id="sidebarToggle"
+      class="toggle-btn"
+      type="button"
+      (click)="toggleSidebar()"
+    >
+      <img
+        [src]="currentAvatar"
+        alt="Avatar usuario"
+        class="avatarnav"
+      />
+    </button>
+  </ng-template>
 
             </div>
 
@@ -151,4 +164,5 @@
 
 
 <div id="overlay" class="overlay" [class.active]="isSidebarOpen" (click)="closeSidebar()"></div>
+
 

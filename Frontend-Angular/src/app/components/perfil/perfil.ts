@@ -1,41 +1,56 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Nav } from '../../shared/nav/nav';
 import { Footer } from '../../shared/footer/footer';
 import { Avatar } from '../../service/avatar';
-
+import { AuthService } from '../../service/auth.service';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule, Nav, Footer, ],
+  imports: [CommonModule, FormsModule, Nav, Footer],
   templateUrl: './perfil.html',
   styleUrls: ['./perfil.css'],
 })
 export class Perfil implements OnInit {
+  avatar = '';
 
-    avatar = '';
-
-  constructor(private avatarService: Avatar) {}
-
-  user = {
+  user: any = {
     name: '',
     lastname: '',
-    email: 'miguel@example.com',
+    email: '',
     phone: '',
-    city: 'Armenia',
-    avatar: 'assets/images/images (3).png'
+    city: '',
+    avatar: '',
   };
 
-  ngOnInit() {
-    // 👉 Cargar datos guardados si existen
-    const saved = localStorage.getItem('userProfile');
-    if (saved) {
-      this.user = JSON.parse(saved);
-    }
+  constructor(
+    private avatarService: Avatar,
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
-      this.avatarService.avatar$.subscribe(avatar => {
+  ngOnInit() {
+    // 🔥 Validar sesión real contra backend
+    this.authService.getCurrentUser().subscribe({
+      next: (data) => {
+        // Cargar datos reales del backend
+        this.user = data;
+
+        // Sincronizar estado global
+        this.authService.setAuthenticated(true);
+      },
+      error: () => {
+        // Si no hay sesión válida → redirigir
+        this.authService.setAuthenticated(false);
+        this.router.navigate(['/login']);
+      },
+    });
+
+    // Suscripción al avatar
+    this.avatarService.avatar$.subscribe((avatar) => {
       this.avatar = avatar;
     });
   }
@@ -45,15 +60,15 @@ export class Perfil implements OnInit {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = (e) => {
       this.user.avatar = String(e.target?.result);
-      this.saveProfile(); // guardar la imagen
     };
     reader.readAsDataURL(file);
   }
 
   saveProfile() {
-    localStorage.setItem('userProfile', JSON.stringify(this.user));
+    // Aquí idealmente deberías enviar al backend
+    console.log('Perfil actualizado:', this.user);
     alert('Cambios guardados correctamente');
   }
 }
