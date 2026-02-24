@@ -69,7 +69,7 @@ export class MapaReportesComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private cargarReportesIniciales(): void {
-    fetch('http://localhost:3000/reportes')
+    fetch('http://localhost:8080/reportes')
       .then(res => res.json())
       .then((data: Reporte[]) => {
         this.reportes = data.map(r => ({...r, fecha: new Date(r.fecha)}));
@@ -81,7 +81,7 @@ export class MapaReportesComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private escucharTiempoReal(): void {
     try {
-      this.socket = new WebSocket('ws://localhost:3000');
+      this.socket = new WebSocket('ws://localhost:8080');
       this.socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.tipo === 'nuevo_reporte') this.agregarReporte(data.reporte);

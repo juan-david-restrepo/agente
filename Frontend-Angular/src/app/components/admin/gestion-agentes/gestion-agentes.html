@@ -1,4 +1,4 @@
-<div class="admin-container">
+<div class="admin-container" [class.modal-abierto]="mostrarModal">
   <app-sidebar-admin></app-sidebar-admin>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -17,6 +17,7 @@
       <p class="error" *ngIf="error">{{ error }}</p>
       <p class="cargando" *ngIf="cargando">Buscando agente...</p>
     </div>
+
     <!-- ================= ESTADO INICIAL ================= -->
     <div class="card estado-inicial" *ngIf="!agente && !cargando">
       <h2>Gestión de Agentes</h2>
@@ -25,7 +26,6 @@
         historial de reportes y asignar nuevas tareas.
       </p>
     </div>
-
 
     <!-- ================= INFO AGENTE ================= -->
     <div class="card agente-info" *ngIf="agente">
@@ -46,6 +46,76 @@
         <p><strong>Teléfono:</strong> {{ agente.telefono }}</p>
         <p><strong>Promedio de reseñas:</strong> {{ agente.promedioResenas }}</p>
       </div>
+    </div>
+
+    <!-- ================= ASIGNAR TAREA ================= -->
+    <div class="card" *ngIf="agente">
+      <h2>Asignar tarea al agente</h2>
+
+      <div class="info-grid">
+        <div>
+          <label>Descripción</label>
+          <input type="text" [(ngModel)]="descripcionTarea" />
+        </div>
+
+        <div>
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="fechaTarea" />
+        </div>
+
+        <div>
+          <label>Hora</label>
+          <input type="time" [(ngModel)]="horaTarea" />
+        </div>
+
+        <div>
+          <label>Prioridad</label>
+          <select [(ngModel)]="prioridadTarea">
+            <option value="BAJA">Baja</option>
+            <option value="MEDIA">Media</option>
+            <option value="ALTA">Alta</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-asignar" (click)="asignarTarea()">Asignar tarea</button>
+      <p class="mensaje-ok" *ngIf="mensajeTarea">{{ mensajeTarea }}</p>
+    </div>
+
+    <!-- ================= TAREAS ================= -->
+    <div class="card" *ngIf="agente">
+      <h2>Tareas asignadas</h2>
+
+      <table class="tabla-tareas" *ngIf="tareas.length > 0">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Descripción</th>
+            <th>Prioridad</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tarea of tareas">
+            <td>{{ tarea.fecha }}</td>
+            <td>{{ tarea.hora }}</td>
+            <td>{{ tarea.descripcion }}</td>
+            <td>
+              <span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">
+                {{ tarea.prioridad }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-eliminar" (click)="abrirModalEliminar(tarea)">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p *ngIf="tareas.length === 0">No hay tareas asignadas.</p>
     </div>
 
     <!-- ================= HISTORIAL ================= -->
@@ -80,63 +150,23 @@
       </p>
     </div>
 
-    <!-- ================= ASIGNAR TAREA ================= -->
-    <div class="card" *ngIf="agente">
-      <h2>Asignar tarea al agente</h2>
+  </div>
+</div>
 
-      <div class="info-grid">
-        <div>
-          <label>Descripción</label>
-          <input type="text" [(ngModel)]="descripcionTarea" />
-        </div>
+<!-- ================= MODAL ================= -->
+<div class="modal-backdrop" *ngIf="mostrarModal">
+  <div class="modal-box">
+    <h3>Eliminar tarea</h3>
+    <p>¿Estás seguro de que deseas eliminar esta tarea?</p>
 
-        <div>
-          <label>Fecha</label>
-          <input type="date" [(ngModel)]="fechaTarea" />
-        </div>
+    <div class="modal-actions">
+      <button class="btn-cancelar" (click)="cancelarEliminacion()">
+        Cancelar
+      </button>
 
-        <div>
-          <label>Hora</label>
-          <input type="time" [(ngModel)]="horaTarea" />
-        </div>
-
-        <div>
-          <label>Prioridad</label>
-          <select [(ngModel)]="prioridadTarea">
-            <option value="BAJA">Baja</option>
-            <option value="MEDIA">Media</option>
-            <option value="ALTA">Alta</option>
-          </select>
-        </div>
-      </div>
-
-      <button class="btn-asignar" (click)="asignarTarea()">Asignar tarea</button>
-
-      <p class="mensaje-ok" *ngIf="mensajeTarea">{{ mensajeTarea }}</p>
+      <button class="btn-confirmar" (click)="confirmarEliminacion()">
+        Eliminar
+      </button>
     </div>
-
-    <!-- ================= TAREAS ================= -->
-    <div class="card" *ngIf="agente">
-      <h2>Tareas asignadas</h2>
-
-      <table class="tabla-tareas" *ngIf="tareas.length > 0">
-        <tr *ngFor="let tarea of tareas">
-          <td>{{ tarea.fecha }}</td>
-          <td>{{ tarea.hora }}</td>
-          <td>{{ tarea.descripcion }}</td>
-          <td>
-            <span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">
-              {{ tarea.prioridad }}
-            </span>
-          </td>
-          <td>
-            <button class="btn-eliminar" (click)="eliminarTarea(tarea)">
-              Eliminar
-            </button>
-          </td>
-        </tr>
-      </table>
-    </div>
-
-  </div> <!-- 👈 admin-content -->
-</div> <!-- 👈 admin-container -->
+  </div>
+</div>

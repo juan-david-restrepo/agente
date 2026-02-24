@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'; // CORREGIDO: Importación desde @angular/core
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,6 +43,12 @@ export class GestionAgentes {
   horaTarea = '';
   prioridadTarea: 'BAJA' | 'MEDIA' | 'ALTA' = 'MEDIA';
   mensajeTarea = '';
+
+  // =========================
+  // MODAL ELIMINAR
+  // =========================
+  tareaAEliminar: Tarea | null = null;
+  mostrarModal = false;
 
   constructor(
     private AdminService: AdminService,
@@ -107,7 +113,6 @@ export class GestionAgentes {
 
     this.tareasService.obtenerTareasPorAgente(this.agente.placa).subscribe({
       next: (data) => {
-        // Mapeamos la listaTareas que viene del objeto Agente en el Backend
         if (data && data.listaTareas) {
           this.tareas = data.listaTareas.map((t: any) => ({
             id: t.id,
@@ -146,7 +151,6 @@ export class GestionAgentes {
 
     this.tareasService.asignarTarea(this.agente.placa, nuevaTarea).subscribe({
       next: (agenteActualizado) => {
-        // Actualizamos la tabla con la lista completa del backend para que aparezcan todas
         this.tareas = agenteActualizado.listaTareas.map((t: any) => ({
           id: t.id,
           descripcion: t.descripcion,
@@ -166,19 +170,20 @@ export class GestionAgentes {
     });
   }
 
-  eliminarTarea(tarea: any): void {
-    if (!this.agente || !confirm('¿Desea eliminar esta tarea?')) return;
+  // =========================
+  // ELIMINAR (SOLO EJECUTA)
+  // =========================
+  eliminarTarea(tarea: Tarea): void {
+    if (!this.agente) return;
 
-    // Se envía el ID único de la tarea para borrar la fila exacta en MySQL
-    this.tareasService.eliminarTarea(tarea.id).subscribe({
+    this.tareasService.eliminarTarea(tarea.id!).subscribe({
       next: () => {
-        // Filtramos localmente para respuesta inmediata
         this.tareas = this.tareas.filter(t => t.id !== tarea.id);
-        
-        // Si ya no quedan tareas, el agente puede volver a estar disponible
+
         if (this.tareas.length === 0 && this.agente) {
           this.agente.estado = 'DISPONIBLE';
         }
+
         this.mensajeTarea = 'Tarea eliminada correctamente';
       },
       error: (err) => {
@@ -186,6 +191,25 @@ export class GestionAgentes {
         this.mensajeTarea = 'No se pudo eliminar la tarea';
       }
     });
+  }
+
+  // =========================
+  // CONTROL DEL MODAL
+  // =========================
+  abrirModalEliminar(tarea: Tarea): void {
+    this.tareaAEliminar = tarea;
+    this.mostrarModal = true;
+  }
+
+  cancelarEliminacion(): void {
+    this.tareaAEliminar = null;
+    this.mostrarModal = false;
+  }
+
+  confirmarEliminacion(): void {
+    if (!this.tareaAEliminar) return;
+    this.eliminarTarea(this.tareaAEliminar);
+    this.mostrarModal = false;
   }
 
   // =========================

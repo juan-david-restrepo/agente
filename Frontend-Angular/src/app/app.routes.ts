@@ -52,5 +52,5 @@ export const routes: Routes = [
   {path: 'config-admin', component: ConfigAdminComponent},
   {path: 'mapa-reportes', component: MapaReportesComponent},
   {path: 'perfil', component: Perfil, canActivate: [authGuard] },
-  { path: 'admin', component: Admin, },
+  { path: 'admin', component: Admin },
 ];
