@@ -510,3 +510,190 @@ table td {
   height: 100vh;
   overflow: hidden;
 }
+
+
+/* ================= TABLA TAREAS ================= */
+.tabla-tareas {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* CLAVE: la tabla respeta el contenedor */
+}
+
+/* encabezado */
+.tabla-tareas thead {
+  background: #0d2238;
+  color: white;
+}
+
+.tabla-tareas th {
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* celdas */
+.tabla-tareas td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== ANCHO DE COLUMNAS ===== */
+.tabla-tareas th:nth-child(1),
+.tabla-tareas td:nth-child(1) { width: 110px; } /* fecha */
+
+.tabla-tareas th:nth-child(2),
+.tabla-tareas td:nth-child(2) { width: 90px; } /* hora */
+
+.tabla-tareas th:nth-child(4),
+.tabla-tareas td:nth-child(4) { width: 120px; } /* prioridad */
+
+.tabla-tareas th:nth-child(5),
+.tabla-tareas td:nth-child(5) { width: 110px; text-align: center; } /* botón */
+
+
+/* columna descripción limpia */
+.tabla-tareas td:nth-child(3) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* contenedor interno */
+.descripcion-contenido {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* texto preview */
+.descripcion-texto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* ===== BOTÓN VER MÁS ===== */
+.ver-mas {
+  background: transparent;
+  border: none;
+  color: #1e3a8a;
+  font-weight: 700;
+  font-size: 13px;
+  margin-left: 6px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: all .18s ease;
+}
+
+/* hover */
+.ver-mas:hover {
+  background: rgba(30, 58, 138, 0.08);
+  text-decoration: underline;
+}
+
+/* click */
+.ver-mas:active {
+  transform: scale(.96);
+}
+
+/* focus accesible */
+.ver-mas:focus-visible {
+  outline: 2px solid #1e3a8a55;
+}
+
+/* contenedor full screen */
+.modal-descripcion {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* evita bloquear el backdrop */
+}
+
+/* caja */
+.modal-contenido {
+  pointer-events: auto;
+  width: 650px;
+  max-width: 92%;
+  max-height: 80vh;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 25px 70px rgba(0,0,0,.35);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  animation: scaleIn 0.18s ease;
+}
+
+/* header */
+.modal-header {
+  padding: 18px 22px;
+  font-weight: 800;
+  font-size: 18px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* body con scroll */
+.modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  overflow-x: hidden;   /* 🔴 elimina scroll lateral */
+
+  max-height: 65vh;
+
+  line-height: 1.6;
+  color: #0f172a;
+
+  white-space: pre-wrap;
+  word-break: break-word;     /* 🔥 rompe palabras largas */
+  overflow-wrap: anywhere;    /* 🔥 fuerza salto aunque no haya espacios */
+}
+
+/* footer */
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* botones */
+.cerrar {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.btn-cerrar {
+  background: #0b1c2d;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-cerrar:hover {
+  background: #1e3a8a;
+}
+
+

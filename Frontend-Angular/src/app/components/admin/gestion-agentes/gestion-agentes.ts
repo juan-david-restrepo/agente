@@ -24,20 +24,22 @@ import { SidebarAdmin } from '../sidebar-admin/sidebar-admin';
 export class GestionAgentes {
 
   // =========================
-  // PROPIEDADES DE ESTADO
+  // ESTADO GENERAL
   // =========================
   placaBuscada: string = '';
   agente: Agente | null = null;
-  
+
   reportes: Reporte[] = [];
   tareas: Tarea[] = [];
-  
+
   cargando = false;
   cargandoReportes = false;
   cargandoTareas = false;
   error = '';
 
-  // PROPIEDADES DEL FORMULARIO
+  // =========================
+  // FORMULARIO
+  // =========================
   descripcionTarea = '';
   fechaTarea = '';
   horaTarea = '';
@@ -50,6 +52,32 @@ export class GestionAgentes {
   tareaAEliminar: Tarea | null = null;
   mostrarModal = false;
 
+  // =========================
+  // MODAL DESCRIPCIÓN
+  // =========================
+  modalDescripcion = false;
+  modalAbierto = false; // <-- requerido por tu HTML
+  descripcionSeleccionada = '';
+
+  abrirModal(texto: string): void {
+    this.descripcionSeleccionada = texto;
+    this.modalDescripcion = true;
+    this.modalAbierto = true;
+    document.body.style.overflow = 'hidden';
+    
+  }
+
+    abrirModalDescripcion(texto: string): void {
+    this.abrirModal(texto);
+  }
+
+  cerrarModalDescripcion(): void {
+    this.modalDescripcion = false;
+    this.modalAbierto = false;
+    this.descripcionSeleccionada = '';
+    document.body.style.overflow = 'auto';
+  }
+
   constructor(
     private AdminService: AdminService,
     private reportesService: ReportesService,
@@ -57,7 +85,7 @@ export class GestionAgentes {
   ) {}
 
   // =========================
-  // MÉTODOS DE BÚSQUEDA
+  // BUSCAR AGENTE
   // =========================
   buscarAgente(): void {
     if (!this.placaBuscada.trim()) {
@@ -86,7 +114,7 @@ export class GestionAgentes {
   }
 
   // =========================
-  // GESTIÓN DE REPORTES
+  // REPORTES
   // =========================
   cargarReportes(): void {
     if (!this.agente) return;
@@ -105,7 +133,7 @@ export class GestionAgentes {
   }
 
   // =========================
-  // GESTIÓN DE TAREAS
+  // TAREAS
   // =========================
   cargarTareas(): void {
     if (!this.agente) return;
@@ -171,7 +199,7 @@ export class GestionAgentes {
   }
 
   // =========================
-  // ELIMINAR (SOLO EJECUTA)
+  // ELIMINAR
   // =========================
   eliminarTarea(tarea: Tarea): void {
     if (!this.agente) return;
@@ -194,22 +222,28 @@ export class GestionAgentes {
   }
 
   // =========================
-  // CONTROL DEL MODAL
+  // CONTROL MODAL ELIMINAR
   // =========================
   abrirModalEliminar(tarea: Tarea): void {
     this.tareaAEliminar = tarea;
     this.mostrarModal = true;
+    this.modalAbierto = true;
+    document.body.style.overflow = 'hidden';
   }
 
   cancelarEliminacion(): void {
     this.tareaAEliminar = null;
     this.mostrarModal = false;
+    this.modalAbierto = false;
+    document.body.style.overflow = 'auto';
   }
 
   confirmarEliminacion(): void {
     if (!this.tareaAEliminar) return;
     this.eliminarTarea(this.tareaAEliminar);
     this.mostrarModal = false;
+    this.modalAbierto = false;
+    document.body.style.overflow = 'auto';
   }
 
   // =========================

@@ -1,4 +1,4 @@
-<div class="admin-container" [class.modal-abierto]="mostrarModal">
+<div class="admin-container" [class.modal-abierto]="mostrarModal || modalDescripcion">
   <app-sidebar-admin></app-sidebar-admin>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -44,7 +44,6 @@
         </p>
 
         <p><strong>Teléfono:</strong> {{ agente.telefono }}</p>
-        <p><strong>Promedio de reseñas:</strong> {{ agente.promedioResenas }}</p>
       </div>
     </div>
 
@@ -100,12 +99,23 @@
           <tr *ngFor="let tarea of tareas">
             <td>{{ tarea.fecha }}</td>
             <td>{{ tarea.hora }}</td>
-            <td>{{ tarea.descripcion }}</td>
+
+            <td class="descripcion">
+              {{ tarea.descripcion | slice:0:30 }}{{ tarea.descripcion.length > 30 ? '...' : '' }}
+              <button 
+                *ngIf="tarea.descripcion.length > 60"
+                class="ver-mas"
+                (click)="abrirModalDescripcion(tarea.descripcion)">
+                Ver más
+              </button>
+            </td>
+
             <td>
               <span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">
                 {{ tarea.prioridad }}
               </span>
             </td>
+
             <td>
               <button class="btn-eliminar" (click)="abrirModalEliminar(tarea)">
                 Eliminar
@@ -153,20 +163,37 @@
   </div>
 </div>
 
-<!-- ================= MODAL ================= -->
+<!-- ================= MODAL ELIMINAR ================= -->
 <div class="modal-backdrop" *ngIf="mostrarModal">
   <div class="modal-box">
     <h3>Eliminar tarea</h3>
     <p>¿Estás seguro de que deseas eliminar esta tarea?</p>
 
     <div class="modal-actions">
-      <button class="btn-cancelar" (click)="cancelarEliminacion()">
-        Cancelar
-      </button>
-
-      <button class="btn-confirmar" (click)="confirmarEliminacion()">
-        Eliminar
-      </button>
+      <button class="btn-cancelar" (click)="cancelarEliminacion()">Cancelar</button>
+      <button class="btn-confirmar" (click)="confirmarEliminacion()">Eliminar</button>
     </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DESCRIPCIÓN ================= -->
+<div class="modal-backdrop" *ngIf="modalDescripcion" (click)="cerrarModalDescripcion()"></div>
+
+<div class="modal-descripcion" *ngIf="modalDescripcion">
+  <div class="modal-contenido">
+
+    <div class="modal-header">
+      <h3>Descripción completa</h3>
+      <button class="cerrar" (click)="cerrarModalDescripcion()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      {{ descripcionSeleccionada }}
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cerrar" (click)="cerrarModalDescripcion()">Cerrar</button>
+    </div>
+
   </div>
 </div>
