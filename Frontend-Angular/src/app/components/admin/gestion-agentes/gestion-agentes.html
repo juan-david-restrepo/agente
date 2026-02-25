@@ -1,10 +1,8 @@
 <div class="admin-container" [class.modal-abierto]="mostrarModal || modalDescripcion">
   <app-sidebar-admin></app-sidebar-admin>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <div class="admin-content">
 
-    <!-- ================= BUSCADOR ================= -->
     <div class="card buscador">
       <h1 class="titulo">Gestión de Agentes de Tránsito</h1>
       <label>Buscar agente por número de placa</label>
@@ -18,7 +16,6 @@
       <p class="cargando" *ngIf="cargando">Buscando agente...</p>
     </div>
 
-    <!-- ================= ESTADO INICIAL ================= -->
     <div class="card estado-inicial" *ngIf="!agente && !cargando">
       <h2>Gestión de Agentes</h2>
       <p>
@@ -27,7 +24,6 @@
       </p>
     </div>
 
-    <!-- ================= INFO AGENTE ================= -->
     <div class="card agente-info" *ngIf="agente">
       <h2>Información del Agente</h2>
 
@@ -47,7 +43,6 @@
       </div>
     </div>
 
-    <!-- ================= ASIGNAR TAREA ================= -->
     <div class="card" *ngIf="agente">
       <h2>Asignar tarea al agente</h2>
 
@@ -81,54 +76,64 @@
       <p class="mensaje-ok" *ngIf="mensajeTarea">{{ mensajeTarea }}</p>
     </div>
 
-    <!-- ================= TAREAS ================= -->
     <div class="card" *ngIf="agente">
       <h2>Tareas asignadas</h2>
-
+      
       <table class="tabla-tareas" *ngIf="tareas.length > 0">
         <thead>
           <tr>
             <th>Fecha</th>
             <th>Hora</th>
             <th>Descripción</th>
+            <th>Estado</th>
             <th>Prioridad</th>
-            <th></th>
+            <th>Acción</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let tarea of tareas">
             <td>{{ tarea.fecha }}</td>
             <td>{{ tarea.hora }}</td>
-
-            <td class="descripcion">
-              {{ tarea.descripcion | slice:0:30 }}{{ tarea.descripcion.length > 30 ? '...' : '' }}
-              <button 
-                *ngIf="tarea.descripcion.length > 60"
-                class="ver-mas"
-                (click)="abrirModalDescripcion(tarea.descripcion)">
-                Ver más
-              </button>
+            <td class="td-descripcion">
+              <div class="descripcion-contenido">
+                <span class="descripcion-texto">{{ tarea.descripcion }}</span>
+                <button 
+                  *ngIf="tarea.descripcion.length > 30" 
+                  class="ver-mas" 
+                  (click)="abrirModalDescripcion(tarea.descripcion)">
+                  Ver más
+                </button>
+              </div>
             </td>
-
+            <td>
+              <span class="badge-estado" [ngClass]="{
+                'bg-rechazado': tarea.estado === 'RECHAZADO',
+                'bg-proceso': tarea.estado === 'EN PROCESO',
+                'bg-finalizado': tarea.estado === 'FINALIZADO',
+                'bg-pendiente': !tarea.estado || tarea.estado === 'PENDIENTE'
+              }">
+                {{ tarea.estado || 'PENDIENTE' }}
+              </span>
+            </td>
             <td>
               <span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">
                 {{ tarea.prioridad }}
               </span>
             </td>
-
             <td>
-              <button class="btn-eliminar" (click)="abrirModalEliminar(tarea)">
+              <button 
+                *ngIf="tarea.estado !== 'EN PROCESO' && tarea.estado !== 'FINALIZADO'"
+                class="btn-eliminar" 
+                (click)="abrirModalEliminar(tarea)">
                 Eliminar
               </button>
             </td>
           </tr>
         </tbody>
       </table>
-
       <p *ngIf="tareas.length === 0">No hay tareas asignadas.</p>
     </div>
 
-    <!-- ================= HISTORIAL ================= -->
     <div class="card" *ngIf="agente">
       <h2>Historial de Reportes</h2>
 
@@ -163,7 +168,6 @@
   </div>
 </div>
 
-<!-- ================= MODAL ELIMINAR ================= -->
 <div class="modal-backdrop" *ngIf="mostrarModal">
   <div class="modal-box">
     <h3>Eliminar tarea</h3>
@@ -176,24 +180,19 @@
   </div>
 </div>
 
-<!-- ================= MODAL DESCRIPCIÓN ================= -->
 <div class="modal-backdrop" *ngIf="modalDescripcion" (click)="cerrarModalDescripcion()"></div>
 
 <div class="modal-descripcion" *ngIf="modalDescripcion">
   <div class="modal-contenido">
-
     <div class="modal-header">
       <h3>Descripción completa</h3>
       <button class="cerrar" (click)="cerrarModalDescripcion()">✕</button>
     </div>
-
     <div class="modal-body">
       {{ descripcionSeleccionada }}
     </div>
-
     <div class="modal-footer">
       <button class="btn-cerrar" (click)="cerrarModalDescripcion()">Cerrar</button>
     </div>
-
   </div>
 </div>

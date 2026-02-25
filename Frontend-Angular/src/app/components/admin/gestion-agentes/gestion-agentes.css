@@ -1,4 +1,3 @@
-
 /* ===============================
    CONTENEDOR GENERAL
 ================================ */
@@ -380,6 +379,10 @@ table td {
   .titulo {
     font-size: 22px;
   }
+  .tabla-tareas{
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* ===============================
@@ -512,11 +515,11 @@ table td {
 }
 
 
-/* ================= TABLA TAREAS ================= */
+/* ================= TABLA TAREAS (ACTUALIZADO CON ESTADO) ================= */
 .tabla-tareas {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* CLAVE: la tabla respeta el contenedor */
+  table-layout: fixed; /* Mantiene la tabla bajo control con 6 columnas */
 }
 
 /* encabezado */
@@ -538,22 +541,15 @@ table td {
   border-bottom: 1px solid #e5e7eb;
   vertical-align: middle;
   font-size: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* ===== ANCHO DE COLUMNAS ===== */
-.tabla-tareas th:nth-child(1),
-.tabla-tareas td:nth-child(1) { width: 110px; } /* fecha */
-
-.tabla-tareas th:nth-child(2),
-.tabla-tareas td:nth-child(2) { width: 90px; } /* hora */
-
-.tabla-tareas th:nth-child(4),
-.tabla-tareas td:nth-child(4) { width: 120px; } /* prioridad */
-
-.tabla-tareas th:nth-child(5),
-.tabla-tareas td:nth-child(5) { width: 110px; text-align: center; } /* botón */
+/* ===== ANCHOS ESPECÍFICOS PARA 6 COLUMNAS ===== */
+.tabla-tareas th:nth-child(1), .tabla-tareas td:nth-child(1) { width: 110px; } /* Fecha */
+.tabla-tareas th:nth-child(2), .tabla-tareas td:nth-child(2) { width: 80px;  } /* Hora */
+.tabla-tareas th:nth-child(3), .tabla-tareas td:nth-child(3) { width: auto;  } /* Descripción */
+.tabla-tareas th:nth-child(4), .tabla-tareas td:nth-child(4) { width: 125px; } /* Estado (NUEVA) */
+.tabla-tareas th:nth-child(5), .tabla-tareas td:nth-child(5) { width: 110px; } /* Prioridad */
+.tabla-tareas th:nth-child(6), .tabla-tareas td:nth-child(6) { width: 100px; text-align: center; } /* Acción */
 
 
 /* columna descripción limpia */
@@ -695,5 +691,40 @@ table td {
 .btn-cerrar:hover {
   background: #1e3a8a;
 }
+/* ================= COLORES DE ESTADOS ACTUALIZADOS ================= */
+.badge-estado {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 10px;
+  color: #fff;
+  text-transform: uppercase;
+  display: inline-block;
+  min-width: 95px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
+/* Pendiente -> Amarillo */
+.bg-pendiente { 
+  background-color: #ffca28 !important; 
+  color: #f7f7f7 !important; 
+} 
 
+/* En Proceso -> Azul */
+.bg-proceso { 
+  background-color: #3b82f6 !important; 
+  color: #fff !important; 
+} 
+
+/* Finalizado -> Verde */
+.bg-finalizado { 
+  background-color: #2ecc71 !important; 
+  color: #fff !important; 
+} 
+
+/* Rechazado (por si lo usas) -> Rojo */
+.bg-rechazado { 
+  background-color: #e63946 !important; 
+  color: #fff !important; 
+}
