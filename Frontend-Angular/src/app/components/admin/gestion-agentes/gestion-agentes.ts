@@ -25,13 +25,15 @@ import { SidebarAdmin } from '../sidebar-admin/sidebar-admin';
 export class GestionAgentes implements OnDestroy {
 
   // =========================
-  // ESTADO GENERAL
+  // 1. ESTADO GENERAL
   // =========================
   placaBuscada: string = '';
   agente: Agente | null = null;
   reportes: Reporte[] = [];
   tareas: Tarea[] = [];
-
+  
+  // Estado de filtros y carga
+  filtroSeleccionado: 'TODOS' | 'TAREAS' | 'REPORTES' = 'TODOS';
   cargando = false;
   cargandoReportes = false;
   cargandoTareas = false;
@@ -40,7 +42,21 @@ export class GestionAgentes implements OnDestroy {
   private pollingSubscription?: Subscription;
 
   // =========================
-  // FORMULARIO TAREAS
+  // 2. GETTERS (Lógica de filtrado para el Historial)
+  // =========================
+
+  // Solo devuelve las tareas que ya están cerradas
+  get tareasFinalizadas(): Tarea[] {
+    return this.tareas.filter(t => t.estado === 'FINALIZADO');
+  }
+
+  // Si en un futuro los reportes tienen estados, los filtrarías aquí
+  get reportesHistorial(): Reporte[] {
+    return this.reportes; 
+  }
+
+  // =========================
+  // 3. FORMULARIO TAREAS
   // =========================
   descripcionTarea = '';
   fechaTarea = '';
@@ -49,7 +65,7 @@ export class GestionAgentes implements OnDestroy {
   mensajeTarea = '';
 
   // =========================
-  // MODALES
+  // 4. MODALES
   // =========================
   tareaAEliminar: Tarea | null = null;
   mostrarModal = false;
@@ -58,7 +74,7 @@ export class GestionAgentes implements OnDestroy {
   descripcionSeleccionada = '';
 
   constructor(
-    private AdminService: AdminService,
+    private adminService: AdminService,
     private reportesService: ReportesService,
     private tareasService: TareasService
   ) {}
@@ -74,7 +90,7 @@ export class GestionAgentes implements OnDestroy {
   }
 
   // =========================
-  // BUSCAR AGENTE
+  // 5. MÉTODOS DE BÚSQUEDA
   // =========================
   buscarAgente(): void {
     if (!this.placaBuscada.trim()) {
@@ -88,15 +104,15 @@ export class GestionAgentes implements OnDestroy {
     this.agente = null;
     this.reportes = [];
     this.tareas = [];
+    this.filtroSeleccionado = 'TODOS'; // Reset de filtro al buscar nuevo agente
 
-    this.AdminService.obtenerAgentePorPlaca(this.placaBuscada).subscribe({
+    this.adminService.obtenerAgentePorPlaca(this.placaBuscada).subscribe({
       next: (data) => {
         this.agente = data;
         this.cargando = false;
         this.cargarReportes();
         this.cargarTareas();
 
-        // Refresco automático cada 10 segundos para ver actualizaciones del agente
         this.pollingSubscription = interval(10000).subscribe(() => {
           this.cargarTareasSilent(); 
         });
@@ -109,7 +125,7 @@ export class GestionAgentes implements OnDestroy {
   }
 
   // =========================
-  // GESTIÓN DE TAREAS
+  // 6. GESTIÓN DE TAREAS
   // =========================
   cargarTareas(): void {
     if (!this.agente) return;
@@ -181,7 +197,6 @@ export class GestionAgentes implements OnDestroy {
         this.limpiarFormulario();
       },
       error: (err) => {
-        console.error('Error al asignar tarea:', err);
         this.mensajeTarea = 'Error al asignar la tarea';
       }
     });
@@ -199,14 +214,13 @@ export class GestionAgentes implements OnDestroy {
         this.mensajeTarea = 'Tarea eliminada correctamente';
       },
       error: (err) => {
-        console.error('Error al eliminar:', err);
         this.mensajeTarea = 'No se pudo eliminar la tarea';
       }
     });
   }
 
   // =========================
-  // REPORTES
+  // 7. REPORTES
   // =========================
   cargarReportes(): void {
     if (!this.agente) return;
@@ -225,7 +239,7 @@ export class GestionAgentes implements OnDestroy {
   }
 
   // =========================
-  // CONTROL DE MODALES
+  // 8. CONTROL DE MODALES
   // =========================
   abrirModalDescripcion(texto: string): void {
     this.descripcionSeleccionada = texto;

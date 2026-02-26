@@ -5,7 +5,8 @@
   display: flex;
   height: 100vh;        
   background: #f1f5f9;
-  overflow: hidden;       /* 👈 evita scroll del body */
+  overflow: hidden;      /* 👈 evita scroll del body */
+  
 }
 
 /* ===============================
@@ -20,6 +21,7 @@
   flex-direction: column;
   align-items: center;
   overflow-y: auto;   
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Limita el ancho del contenido sin tocar HTML */
@@ -707,7 +709,7 @@ table td {
 
 /* Pendiente -> Amarillo */
 .bg-pendiente { 
-  background-color: #ffca28 !important; 
+  background-color: #ffb921e0 !important; 
   color: #f7f7f7 !important; 
 } 
 
@@ -727,4 +729,94 @@ table td {
 .bg-rechazado { 
   background-color: #e63946 !important; 
   color: #fff !important; 
+}
+
+
+/* =========================================
+   ESTILOS NUEVOS: HISTORIAL Y FILTROS
+   ========================================= */
+
+/* Cabecera del historial con botones a la derecha */
+.header-historial {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* Contenedor de los botones de filtro (Tabs) */
+.filtros-container {
+  display: flex;
+  background: #e2e8f0; /* Color similar a tu bg-cancelar */
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.filtros-container button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  background: transparent;
+  color: #475569;
+  font-weight: 700;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+/* Botón de filtro seleccionado */
+.filtros-container button.activo {
+  background: #ffffff;
+  color: #0b1c2d;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filtros-container button:hover:not(.activo) {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Subtítulos de secciones dentro del historial */
+.subtitulo-seccion {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 20px 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtitulo-seccion::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: #1e3a8a;
+  border-radius: 10px;
+}
+
+/* Línea divisoria elegante */
+.divisor {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 30px 0;
+}
+
+/* Estilo para las tablas dentro del historial (reutilizando tus clases) */
+.tabla-reportes {
+  margin-top: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Mensajes cuando no hay datos en el historial */
+.card p {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+  font-style: italic;
 }
