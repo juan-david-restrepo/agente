@@ -131,6 +131,15 @@
           </div>
         </div>
 
+
+        <div class="dato" *ngIf="reporteSeleccionado?.acompanado">
+          <i class="fa-solid fa-user-group"></i>
+          <div class="label-datos">
+            <span class="info-label">Acompañado:</span>
+              {{reporteSeleccionado?.placaCompanero}}
+          </div>
+        </div>
+
       </div>
 
       <!-- Fechas -->
@@ -279,4 +288,86 @@
      [style.transform]="'scale(' + zoomScale + ')'"
      (wheel)="zoomConRueda($event)"
      (click)="$event.stopPropagation()">
+</div>
+
+
+<!-- MODAL ACEPTAR REPORTE -->
+<div class="modal-backdrop" *ngIf="mostrarModalAceptar">
+  <div class="modal-box">
+
+    <h2>¿Cómo deseas atender el reporte?</h2>
+
+    <!-- OPCIONES SOLO / ACOMPAÑADO -->
+    <div class="opciones">
+
+      <label>
+        <input 
+          type="radio" 
+          name="modo" 
+          value="solo" 
+          [(ngModel)]="modoAceptacion">
+        <span>
+          <i class="fa-solid fa-user"></i>
+          Ir solo
+        </span>
+      </label>
+
+      <label>
+        <input 
+          type="radio" 
+          name="modo" 
+          value="acompanado" 
+          [(ngModel)]="modoAceptacion">
+        <span>
+          <i class="fa-solid fa-user-group"></i>
+          Ir acompañado
+        </span>
+      </label>
+
+    </div>
+
+    <!-- SECCIÓN BUSCAR COMPAÑERO -->
+    <div *ngIf="modoAceptacion === 'acompanado'" class="busqueda-companero">
+
+      <input 
+        type="text"
+        placeholder="Ingrese la placa del compañero"
+        [(ngModel)]="placaBusqueda">
+
+      <button 
+        class="btn-ok"
+        (click)="buscarCompanero()">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Buscar agente
+      </button>
+
+      <!-- RESULTADO ENCONTRADO -->
+      <div *ngIf="companeroEncontrado" class="companero-card">
+        <i class="fa-solid fa-user-check"></i>
+        <div class="nombre-small">
+          <strong>{{ companeroEncontrado.nombre }}</strong>
+          <small>Placa: {{ companeroEncontrado.placa }}</small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BOTONES FINALES -->
+    <div class="modal-actions">
+
+      <button 
+        class="btn-no"
+        (click)="cerrarModalAceptar()">
+        Cancelar
+      </button>
+
+      <button 
+        class="btn-ok"
+        (click)="confirmarAceptar()">
+        Confirmar
+      </button>
+
+    </div>
+
+  </div>
 </div>

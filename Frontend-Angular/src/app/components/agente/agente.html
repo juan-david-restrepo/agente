@@ -121,7 +121,8 @@
       <app-tareas
         *ngIf="vistaActual==='tareas'"
         [tareas]="tareasAdmin"
-        (marcar)="marcarTarea($event)">
+        (comenzar)="comenzarTarea($event)"
+        (finalizar)="finalizarTarea($event)">
       </app-tareas>
 
       <app-perfil-agente

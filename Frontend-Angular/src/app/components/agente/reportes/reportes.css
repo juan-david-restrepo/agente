@@ -168,7 +168,7 @@
 
 .prioridad-alta{
   background: rgba(239,68,68,.15);
-  color: #dc2626;
+  color: #f04848;
   border: 1px solid rgba(239,68,68,.3);
 }
 
@@ -368,16 +368,19 @@ button:disabled {
 ========================= */
 
 .modal-box {
-  background: var(--card);
-  border-radius: 20px;
-  padding: 30px;
-  width: 600px;
+  background: linear-gradient(145deg, #ffffff, #f1f5f9);
+  border-radius: 24px;
+  padding: 35px;
+  width: 520px;
   max-width: 95%;
-  max-height: 80vh;
 
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
+
+  box-shadow: 0 25px 60px rgba(0,0,0,.35);
+  animation: modalPop .35s cubic-bezier(.2,.8,.2,1);
+  transform-origin: center;
 
   overflow: hidden; /* ← IMPORTANTE que sea hidden */
 }
@@ -434,6 +437,155 @@ button:disabled {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+@keyframes modalPop{
+  from{
+    transform: scale(.8) translateY(30px);
+    opacity:0;
+  }
+  to{
+    transform: scale(1) translateY(0);
+    opacity:1;
+  }
+}
+
+.modal-box h2{
+  margin:0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: #1e293b;
+}
+
+/* =========================
+   MODALES SOLO O ACOMPAÑADO
+========================= */
+
+.modal-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeBackdrop .25s ease;
+}
+
+@keyframes fadeBackdrop{
+  from{ opacity:0 }
+  to{ opacity:1 }
+}
+
+.busqueda-companero{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: slideDown .3s ease;
+}
+
+@keyframes slideDown{
+  from{
+    opacity:0;
+    transform: translateY(-10px);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0);
+  }
+}
+
+.busqueda-companero input{
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2px solid #e2e8f0;
+  font-size: 14px;
+  outline: none;
+  transition: .25s;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+
+.busqueda-companero input:focus{
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,.2);
+}
+
+.busqueda-companero .btn-ok{
+  width: 100%;
+  background: linear-gradient(135deg,#22c55e,#16a34a);
+  box-shadow: 0 10px 25px rgba(34,197,94,.4);
+  transition: .25s;
+}
+
+.busqueda-companero .btn-ok:hover{
+  transform: translateY(-2px);
+}
+
+.opciones{
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.opciones label{
+  position: relative;
+  padding: 12px 20px;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  background: #f1f5f9;
+  transition: .25s;
+  border: 2px solid transparent;
+}
+
+.opciones input{
+  display: none;
+}
+
+.opciones input:checked + span,
+.opciones label:has(input:checked){
+  background: linear-gradient(135deg,#3b82f6,#60a5fa);
+  color: white;
+  border: 2px solid #2563eb;
+  box-shadow: 0 8px 20px rgba(59,130,246,.4);
+}
+
+.companero-card{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12PX;
+  box-shadow: 0 8px 25px rgba(0,0,0,.4);
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 6px ;
+}
+
+.nombre-small{
+  display: flex;
+  flex-direction: row;
+  gap: 9px;
+}
+
+label{
+  color: #020617;
+}
+
+strong{
+  color: #020617;
+}
+
+small{
+  color: #020617;
+}
+
+.companero-card i{
+  color: grey;
+}
+
+
 /* =========================
    MODO OSCURO
 ========================= */
