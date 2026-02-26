@@ -1,119 +1,172 @@
 <app-nav></app-nav>
 
-<div class="report-container">
-  <h2 class="title">Reporte de Infracción</h2>
-  <p class="subtitle">
-    Completa la información requerida para reportar una infracción de forma clara y precisa.
-  </p>
+<div class="contenedor-form">
+  <form (ngSubmit)="enviarReporte()" #reporteForm="ngForm">
 
-  <form class="report-form" (ngSubmit)="enviarReporte()" #formReporte="ngForm">
+    <h2>Reportar Incidente</h2>
 
-    <!-- Evidencia -->
-    <section class="form-section">
-      <h3>Evidencia</h3>
+    <!-- ============================= -->
+    <!-- TIPO DE INCIDENTE -->
+    <!-- ============================= -->
+    <div class="seccion">
+      <label>Tipo de incidente *</label>
 
-      <label class="file-upload">
+      <div class="grid-incidentes">
+        <div 
+          *ngFor="let incidente of incidentes"
+          class="card-incidente"
+          [class.selected]="tipoSeleccionado === incidente.nombre"
+          (click)="seleccionarIncidente(incidente)"
+        >
+          {{ incidente.nombre }}
+        </div>
+      </div>
+
+      <!-- Campo Otros -->
+      <div *ngIf="mostrarCampoOtros" class="campo-otros">
         <input
-          type="file"
-          multiple
-          accept="image/*,video/*"
-          (change)="onFileChange($event)"
+          type="text"
+          name="detalleOtro"
+          [(ngModel)]="detalleOtroIncidente"
+          placeholder="Especifica el tipo de incidente"
           required
         />
-        <span>📎 Adjuntar fotos o videos (máx. 5)</span>
-      </label>
+      </div>
+    </div>
 
-      <div id="preview" class="preview-grid"></div>
-    </section>
+    <!-- ============================= -->
+    <!-- DESCRIPCIÓN -->
+    <!-- ============================= -->
+    <div class="seccion">
+      <label>Descripción *</label>
+      <textarea
+        name="descripcion"
+        [(ngModel)]="descripcion"
+        maxlength="300"
+        required
+        placeholder="Describe lo sucedido con el mayor detalle posible"
+      ></textarea>
+      <small>{{ descripcion?.length || 0 }}/300</small>
+    </div>
 
-    <!-- Descripción -->
-    <section class="form-section">
-      <h3>Descripción del incidente</h3>
-
-      <div class="textarea-group">
-        <textarea
-          [(ngModel)]="descripcion"
-          name="descripcion"
-          rows="4"
-          placeholder="Describe lo ocurrido…"
+    <!-- ============================= -->
+    <!-- FECHA Y HORA -->
+    <!-- ============================= -->
+    <div class="seccion fila">
+      <div>
+        <label>Fecha *</label>
+        <input
+          type="date"
+          name="fecha"
+          [(ngModel)]="fecha"
           required
-        ></textarea>
+        />
+      </div>
 
-        <button
-          type="button"
-          class="btn-voice"
-          (click)="iniciarVoz()"
-          title="Dictar por voz"
+      <div>
+        <label>Hora *</label>
+        <input
+          type="time"
+          name="hora"
+          [(ngModel)]="hora"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- PLACA (DINÁMICA) -->
+    <!-- ============================= -->
+    <div class="seccion" *ngIf="requierePlacaActual || placaOpcional">
+  <label>
+    Placa del vehículo 
+    <span *ngIf="requierePlacaActual">*</span>
+  </label>
+
+  <input
+    type="text"
+    name="placa"
+    [(ngModel)]="placa"
+    placeholder="ABC123"
+    maxlength="6"
+    [required]="requierePlacaActual"
+  />
+
+  <small *ngIf="placaOpcional">
+    Opcional. Si la ingresas debe tener formato válido.
+  </small>
+
+  <small *ngIf="requierePlacaActual">
+    Formato válido: ABC123
+  </small>
+</div>
+
+    <!-- ============================= -->
+    <!-- ARCHIVOS -->
+    <!-- ============================= -->
+    <div class="seccion">
+      <label>Adjuntar imágenes o videos (máx 5)</label>
+      <input
+        type="file"
+        multiple
+        (change)="onFileChange($event)"
+      />
+
+      <div class="preview-container">
+        <div
+          class="preview-item"
+          *ngFor="let file of fileList; let i = index"
         >
-          🎙️
-        </button>
+          <button
+            type="button"
+            class="remove-btn"
+            (click)="removeFile(i)"
+          >
+            ×
+          </button>
+
+          <img
+            *ngIf="file.type.startsWith('image')"
+            [src]="getPreviewUrl(file)"
+          />
+
+          <video
+            *ngIf="file.type.startsWith('video')"
+            [src]="getPreviewUrl(file)"
+            controls
+          ></video>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Fecha y Hora -->
-    <section class="form-section grid-2">
-      <div>
-        <label>Fecha</label>
-        <input type="date" [(ngModel)]="fecha" name="fecha" required />
-      </div>
-
-      <div>
-        <label>Hora</label>
-        <input type="time" [(ngModel)]="hora" name="hora" required />
-      </div>
-    </section>
-
-    <!-- Ubicación -->
-    <section class="form-section">
-      <h3>Ubicación</h3>
-
+    <!-- ============================= -->
+    <!-- UBICACIÓN -->
+    <!-- ============================= -->
+    <div class="seccion">
       <button
         type="button"
-        class="btn-location"
         (click)="obtenerUbicacion()"
       >
-        📍 Obtener mi ubicación
+        Obtener ubicación
       </button>
 
-      <div class="grid-2">
-        <input
-          type="text"
-          [(ngModel)]="direccion"
-          name="direccion"
-          placeholder="Dirección aproximada"
-        />
-        <input
-          type="text"
-          [(ngModel)]="coordenadas"
-          name="coordenadas"
-          placeholder="Latitud, Longitud"
-        />
-      </div>
+      <p *ngIf="direccion">
+        <strong>Dirección detectada:</strong> {{ direccion }}
+      </p>
 
-      <div id="map" class="map-box"></div>
-    </section>
-
-    <!-- Placa -->
-    <section class="form-section">
-      <label>Placa del vehículo (opcional)</label>
-      <input
-        type="text"
-        [(ngModel)]="placa"
-        name="placa"
-        placeholder="Ej: ABC123"
-      />
-    </section>
-
-    <!-- Enviar -->
-    <div class="actions">
-      <button
-        type="submit"
-        class="btn-submit"
-        [disabled]="formReporte.invalid"
-      >
-        Enviar Reporte
-      </button>
+      <div id="map"></div>
     </div>
+
+    <!-- ============================= -->
+    <!-- BOTÓN ENVIAR -->
+    <!-- ============================= -->
+    <button
+      type="submit"
+      class="btn-enviar"
+      [disabled]="!formularioValido() || isSubmitting"
+    >
+      {{ isSubmitting ? 'Enviando...' : 'Enviar Reporte' }}
+    </button>
 
   </form>
 </div>

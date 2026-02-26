@@ -32,7 +32,7 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'recuperar', component: Recuperar },
   { path: 'registro', component: Registro },
-  { path: 'subir-reporte', component: SubirReporteComponent, canActivate: [authGuard] },
+  { path: 'subir-reporte', component: SubirReporteComponent },
   { path: 'parking', component: Parking, canActivate: [authGuard] },
   { path: 'agente', component: Agente, },
   { path: 'footer', component: Footer },
