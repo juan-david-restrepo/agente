@@ -32,7 +32,7 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'recuperar', component: Recuperar },
   { path: 'registro', component: Registro },
-  { path: 'subir-reporte', component: SubirReporteComponent, canActivate: [authGuard] },
+  { path: 'subir-reporte', component: SubirReporteComponent },
   { path: 'parking', component: Parking, canActivate: [authGuard] },
   { path: 'agente', component: Agente, },
   { path: 'footer', component: Footer },
@@ -52,5 +52,5 @@ export const routes: Routes = [
   {path: 'config-admin', component: ConfigAdminComponent},
   {path: 'mapa-reportes', component: MapaReportesComponent},
   {path: 'perfil', component: Perfil, canActivate: [authGuard] },
-  { path: 'admin', component: Admin, },
+  { path: 'admin', component: Admin },
 ];

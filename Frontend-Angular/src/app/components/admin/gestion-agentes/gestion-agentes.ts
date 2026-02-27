@@ -1,7 +1,8 @@
-import { Component } from '@angular/core'; // CORREGIDO: Importación desde @angular/core
+import { Component, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { interval, Subscription } from 'rxjs';
 
 // Servicios
 import { AdminService } from '../../../service/admin-agente.service';
@@ -21,37 +22,75 @@ import { SidebarAdmin } from '../sidebar-admin/sidebar-admin';
   templateUrl: './gestion-agentes.html',
   styleUrl: './gestion-agentes.css',
 })
-export class GestionAgentes {
+export class GestionAgentes implements OnDestroy {
 
   // =========================
-  // PROPIEDADES DE ESTADO
+  // 1. ESTADO GENERAL
   // =========================
   placaBuscada: string = '';
   agente: Agente | null = null;
-  
   reportes: Reporte[] = [];
   tareas: Tarea[] = [];
   
+  // Estado de filtros y carga
+  filtroSeleccionado: 'TODOS' | 'TAREAS' | 'REPORTES' = 'TODOS';
   cargando = false;
   cargandoReportes = false;
   cargandoTareas = false;
   error = '';
 
-  // PROPIEDADES DEL FORMULARIO
+  private pollingSubscription?: Subscription;
+
+  // =========================
+  // 2. GETTERS (Lógica de filtrado para el Historial)
+  // =========================
+
+  // Solo devuelve las tareas que ya están cerradas
+  get tareasFinalizadas(): Tarea[] {
+    return this.tareas.filter(t => t.estado === 'FINALIZADO');
+  }
+
+  // Si en un futuro los reportes tienen estados, los filtrarías aquí
+  get reportesHistorial(): Reporte[] {
+    return this.reportes; 
+  }
+
+  // =========================
+  // 3. FORMULARIO TAREAS
+  // =========================
   descripcionTarea = '';
   fechaTarea = '';
   horaTarea = '';
   prioridadTarea: 'BAJA' | 'MEDIA' | 'ALTA' = 'MEDIA';
   mensajeTarea = '';
 
+  // =========================
+  // 4. MODALES
+  // =========================
+  tareaAEliminar: Tarea | null = null;
+  mostrarModal = false;
+  modalDescripcion = false;
+  modalAbierto = false; 
+  descripcionSeleccionada = '';
+
   constructor(
-    private AdminService: AdminService,
+    private adminService: AdminService,
     private reportesService: ReportesService,
     private tareasService: TareasService
   ) {}
 
+  ngOnDestroy(): void {
+    this.detenerRefresco();
+  }
+
+  private detenerRefresco(): void {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
+  }
+
   // =========================
-  // MÉTODOS DE BÚSQUEDA
+  // 5. MÉTODOS DE BÚSQUEDA
   // =========================
   buscarAgente(): void {
     if (!this.placaBuscada.trim()) {
@@ -59,18 +98,24 @@ export class GestionAgentes {
       return;
     }
 
+    this.detenerRefresco();
     this.cargando = true;
     this.error = '';
     this.agente = null;
     this.reportes = [];
     this.tareas = [];
+    this.filtroSeleccionado = 'TODOS'; // Reset de filtro al buscar nuevo agente
 
-    this.AdminService.obtenerAgentePorPlaca(this.placaBuscada).subscribe({
+    this.adminService.obtenerAgentePorPlaca(this.placaBuscada).subscribe({
       next: (data) => {
         this.agente = data;
         this.cargando = false;
         this.cargarReportes();
         this.cargarTareas();
+
+        this.pollingSubscription = interval(10000).subscribe(() => {
+          this.cargarTareasSilent(); 
+        });
       },
       error: () => {
         this.error = 'No se encontró ningún agente con esa placa';
@@ -80,7 +125,102 @@ export class GestionAgentes {
   }
 
   // =========================
-  // GESTIÓN DE REPORTES
+  // 6. GESTIÓN DE TAREAS
+  // =========================
+  cargarTareas(): void {
+    if (!this.agente) return;
+    this.cargandoTareas = true;
+    this.fetchTareas();
+  }
+
+  private cargarTareasSilent(): void {
+    if (!this.agente) return;
+    this.fetchTareas(true);
+  }
+
+  private fetchTareas(silent = false): void {
+    this.tareasService.obtenerTareasPorAgente(this.agente!.placa).subscribe({
+      next: (data) => {
+        if (data && data.listaTareas) {
+          this.tareas = data.listaTareas.map((t: any) => ({
+            id: t.id,
+            descripcion: t.descripcion,
+            fecha: t.fecha,
+            hora: t.hora,
+            prioridad: t.prioridad,
+            estado: t.estado || 'PENDIENTE',
+            placaAgente: data.placa
+          }));
+        } else {
+          this.tareas = [];
+        }
+        if (!silent) this.cargandoTareas = false;
+      },
+      error: () => {
+        if (!silent) {
+          this.tareas = [];
+          this.cargandoTareas = false;
+        }
+      }
+    });
+  }
+
+  asignarTarea(): void {
+    if (!this.agente) return;
+
+    if (!this.descripcionTarea || !this.fechaTarea || !this.horaTarea) {
+      this.mensajeTarea = 'Complete todos los campos';
+      return;
+    }
+
+    const nuevaTarea = {
+      descripcion: this.descripcionTarea,
+      fecha: this.fechaTarea,
+      hora: this.horaTarea,
+      prioridad: this.prioridadTarea,
+      estado: 'PENDIENTE'
+    };
+
+    this.tareasService.asignarTarea(this.agente.placa, nuevaTarea).subscribe({
+      next: (agenteActualizado) => {
+        this.tareas = agenteActualizado.listaTareas.map((t: any) => ({
+          id: t.id,
+          descripcion: t.descripcion,
+          fecha: t.fecha,
+          hora: t.hora,
+          prioridad: t.prioridad,
+          estado: t.estado || 'PENDIENTE',
+          placaAgente: agenteActualizado.placa
+        }));
+
+        this.mensajeTarea = '¡Tarea añadida con éxito!';
+        this.limpiarFormulario();
+      },
+      error: (err) => {
+        this.mensajeTarea = 'Error al asignar la tarea';
+      }
+    });
+  }
+
+  eliminarTarea(tarea: Tarea): void {
+    if (!this.agente) return;
+
+    this.tareasService.eliminarTarea(tarea.id!).subscribe({
+      next: () => {
+        this.tareas = this.tareas.filter(t => t.id !== tarea.id);
+        if (this.tareas.length === 0) {
+          this.agente!.estado = 'DISPONIBLE';
+        }
+        this.mensajeTarea = 'Tarea eliminada correctamente';
+      },
+      error: (err) => {
+        this.mensajeTarea = 'No se pudo eliminar la tarea';
+      }
+    });
+  }
+
+  // =========================
+  // 7. REPORTES
   // =========================
   cargarReportes(): void {
     if (!this.agente) return;
@@ -99,98 +239,44 @@ export class GestionAgentes {
   }
 
   // =========================
-  // GESTIÓN DE TAREAS
+  // 8. CONTROL DE MODALES
   // =========================
-  cargarTareas(): void {
-    if (!this.agente) return;
-    this.cargandoTareas = true;
-
-    this.tareasService.obtenerTareasPorAgente(this.agente.placa).subscribe({
-      next: (data) => {
-        // Mapeamos la listaTareas que viene del objeto Agente en el Backend
-        if (data && data.listaTareas) {
-          this.tareas = data.listaTareas.map((t: any) => ({
-            id: t.id,
-            descripcion: t.descripcion,
-            fecha: t.fecha,
-            hora: t.hora,
-            prioridad: t.prioridad,
-            placaAgente: data.placa
-          }));
-        } else {
-          this.tareas = [];
-        }
-        this.cargandoTareas = false;
-      },
-      error: () => {
-        this.tareas = [];
-        this.cargandoTareas = false;
-      }
-    });
+  abrirModalDescripcion(texto: string): void {
+    this.descripcionSeleccionada = texto;
+    this.modalDescripcion = true;
+    this.modalAbierto = true;
+    document.body.style.overflow = 'hidden';
   }
 
-  asignarTarea(): void {
-    if (!this.agente) return;
-
-    if (!this.descripcionTarea || !this.fechaTarea || !this.horaTarea) {
-      this.mensajeTarea = 'Complete todos los campos';
-      return;
-    }
-
-    const nuevaTarea = {
-      descripcion: this.descripcionTarea,
-      fecha: this.fechaTarea,
-      hora: this.horaTarea,
-      prioridad: this.prioridadTarea
-    };
-
-    this.tareasService.asignarTarea(this.agente.placa, nuevaTarea).subscribe({
-      next: (agenteActualizado) => {
-        // Actualizamos la tabla con la lista completa del backend para que aparezcan todas
-        this.tareas = agenteActualizado.listaTareas.map((t: any) => ({
-          id: t.id,
-          descripcion: t.descripcion,
-          fecha: t.fecha,
-          hora: t.hora,
-          prioridad: t.prioridad,
-          placaAgente: agenteActualizado.placa
-        }));
-
-        this.mensajeTarea = '¡Tarea añadida con éxito!';
-        this.limpiarFormulario();
-      },
-      error: (err) => {
-        console.error('Error al asignar tarea:', err);
-        this.mensajeTarea = 'Error al asignar la tarea';
-      }
-    });
+  cerrarModalDescripcion(): void {
+    this.modalDescripcion = false;
+    this.modalAbierto = false;
+    this.descripcionSeleccionada = '';
+    document.body.style.overflow = 'auto';
   }
 
-  eliminarTarea(tarea: any): void {
-    if (!this.agente || !confirm('¿Desea eliminar esta tarea?')) return;
-
-    // Se envía el ID único de la tarea para borrar la fila exacta en MySQL
-    this.tareasService.eliminarTarea(tarea.id).subscribe({
-      next: () => {
-        // Filtramos localmente para respuesta inmediata
-        this.tareas = this.tareas.filter(t => t.id !== tarea.id);
-        
-        // Si ya no quedan tareas, el agente puede volver a estar disponible
-        if (this.tareas.length === 0 && this.agente) {
-          this.agente.estado = 'DISPONIBLE';
-        }
-        this.mensajeTarea = 'Tarea eliminada correctamente';
-      },
-      error: (err) => {
-        console.error('Error al eliminar:', err);
-        this.mensajeTarea = 'No se pudo eliminar la tarea';
-      }
-    });
+  abrirModalEliminar(tarea: Tarea): void {
+    this.tareaAEliminar = tarea;
+    this.mostrarModal = true;
+    this.modalAbierto = true;
+    document.body.style.overflow = 'hidden';
   }
 
-  // =========================
-  // UTILIDADES
-  // =========================
+  cancelarEliminacion(): void {
+    this.tareaAEliminar = null;
+    this.mostrarModal = false;
+    this.modalAbierto = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  confirmarEliminacion(): void {
+    if (!this.tareaAEliminar) return;
+    this.eliminarTarea(this.tareaAEliminar);
+    this.mostrarModal = false;
+    this.modalAbierto = false;
+    document.body.style.overflow = 'auto';
+  }
+
   limpiarFormulario(): void {
     this.descripcionTarea = '';
     this.fechaTarea = '';

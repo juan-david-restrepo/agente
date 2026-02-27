@@ -123,3 +123,39 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* --- AGREGAR AL FINAL PARA ACCESIBILIDAD --- */
+
+/* Ajuste Modo Oscuro */
+.admin-layout.dark-mode {
+  background: #121212 !important;
+  color: #ffffff !important;
+}
+
+.admin-layout.dark-mode .main-content {
+  background: #121212 !important;
+}
+
+.admin-layout.dark-mode .chart-card,
+.admin-layout.dark-mode .table-section {
+  background: #1e1e1e !important;
+  color: #ffffff !important;
+  border-color: #333 !important;
+}
+
+.admin-layout.dark-mode .header h2,
+.admin-layout.dark-mode .chart-card h4,
+.admin-layout.dark-mode .table-section h3 {
+  color: #818cf8 !important;
+}
+
+/* Ajuste Fuentes */
+.admin-layout.font-Small { font-size: 12px !important; }
+.admin-layout.font-Large { font-size: 20px !important; }
+.admin-layout.font-Large h2 { font-size: 32px !important; }
+
+/* Ajuste Daltonismo */
+.admin-layout.color-blind-mode {
+  filter: contrast(120%) saturate(110%) !important;
+}

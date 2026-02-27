@@ -1,4 +1,3 @@
-
 /* ===============================
    CONTENEDOR GENERAL
 ================================ */
@@ -6,7 +5,8 @@
   display: flex;
   height: 100vh;        
   background: #f1f5f9;
-  overflow: hidden;       /* 👈 evita scroll del body */
+  overflow: hidden;      /* 👈 evita scroll del body */
+  
 }
 
 /* ===============================
@@ -21,6 +21,7 @@
   flex-direction: column;
   align-items: center;
   overflow-y: auto;   
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Limita el ancho del contenido sin tocar HTML */
@@ -380,6 +381,10 @@ table td {
   .titulo {
     font-size: 22px;
   }
+  .tabla-tareas{
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 /* ===============================
@@ -387,7 +392,7 @@ table td {
 ================================ */
 
 .btn-eliminar {
-  background: #991b1b;
+  background: #e53935;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -398,6 +403,420 @@ table td {
 }
 
 .btn-eliminar:hover {
-  background: #7f1d1d;
+  background: #e53935;
   transform: translateY(-1px);
+}
+
+
+
+
+
+/* ================= MODAL OVERLAY ================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.15s ease;
+}
+
+/* ================= CAJA DEL MODAL ================= */
+.modal-box {
+  width: 360px;
+  max-width: 90%;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 26px 24px 22px;
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+  animation: scaleIn 0.18s ease;
+  font-family: inherit;
+}
+
+.modal-box h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+}
+
+.modal-box p {
+  margin: 0 0 20px;
+  font-size: 14.5px;
+  color: #555;
+}
+
+/* ================= BOTONES ================= */
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-cancelar,
+.btn-confirmar {
+  flex: 1;
+  border: none;
+  padding: 10px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+
+/* cancelar */
+.btn-cancelar {
+  background: #eef0f3;
+  color: #333;
+}
+
+.btn-cancelar:hover {
+  background: #e0e3e7;
+  transform: translateY(-1px);
+}
+
+/* eliminar */
+.btn-confirmar {
+  background: #e53935;
+  color: white;
+  box-shadow: 0 6px 18px rgba(229,57,53,0.35);
+}
+
+.btn-confirmar:hover {
+  background: #d32f2f;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(229,57,53,0.45);
+}
+
+/* ================= ANIMACIONES ================= */
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ================= BLOQUEAR SCROLL ================= */
+.admin-container.modal-abierto {
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+/* ================= TABLA TAREAS (ACTUALIZADO CON ESTADO) ================= */
+.tabla-tareas {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* Mantiene la tabla bajo control con 6 columnas */
+}
+
+/* encabezado */
+.tabla-tareas thead {
+  background: #0d2238;
+  color: white;
+}
+
+.tabla-tareas th {
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* celdas */
+.tabla-tareas td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+/* ===== ANCHOS ESPECÍFICOS PARA 6 COLUMNAS ===== */
+.tabla-tareas th:nth-child(1), .tabla-tareas td:nth-child(1) { width: 110px; } /* Fecha */
+.tabla-tareas th:nth-child(2), .tabla-tareas td:nth-child(2) { width: 80px;  } /* Hora */
+.tabla-tareas th:nth-child(3), .tabla-tareas td:nth-child(3) { width: auto;  } /* Descripción */
+.tabla-tareas th:nth-child(4), .tabla-tareas td:nth-child(4) { width: 125px; } /* Estado (NUEVA) */
+.tabla-tareas th:nth-child(5), .tabla-tareas td:nth-child(5) { width: 110px; } /* Prioridad */
+.tabla-tareas th:nth-child(6), .tabla-tareas td:nth-child(6) { width: 100px; text-align: center; } /* Acción */
+
+
+/* columna descripción limpia */
+.tabla-tareas td:nth-child(3) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* contenedor interno */
+.descripcion-contenido {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* texto preview */
+.descripcion-texto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* ===== BOTÓN VER MÁS ===== */
+.ver-mas {
+  background: transparent;
+  border: none;
+  color: #1e3a8a;
+  font-weight: 700;
+  font-size: 13px;
+  margin-left: 6px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  transition: all .18s ease;
+}
+
+/* hover */
+.ver-mas:hover {
+  background: rgba(30, 58, 138, 0.08);
+  text-decoration: underline;
+}
+
+/* click */
+.ver-mas:active {
+  transform: scale(.96);
+}
+
+/* focus accesible */
+.ver-mas:focus-visible {
+  outline: 2px solid #1e3a8a55;
+}
+
+/* contenedor full screen */
+.modal-descripcion {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* evita bloquear el backdrop */
+}
+
+/* caja */
+.modal-contenido {
+  pointer-events: auto;
+  width: 650px;
+  max-width: 92%;
+  max-height: 80vh;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 25px 70px rgba(0,0,0,.35);
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  animation: scaleIn 0.18s ease;
+}
+
+/* header */
+.modal-header {
+  padding: 18px 22px;
+  font-weight: 800;
+  font-size: 18px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* body con scroll */
+.modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  overflow-x: hidden;   /* 🔴 elimina scroll lateral */
+
+  max-height: 65vh;
+
+  line-height: 1.6;
+  color: #0f172a;
+
+  white-space: pre-wrap;
+  word-break: break-word;     /* 🔥 rompe palabras largas */
+  overflow-wrap: anywhere;    /* 🔥 fuerza salto aunque no haya espacios */
+}
+
+/* footer */
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* botones */
+.cerrar {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.btn-cerrar {
+  background: #0b1c2d;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-cerrar:hover {
+  background: #1e3a8a;
+}
+/* ================= COLORES DE ESTADOS ACTUALIZADOS ================= */
+.badge-estado {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 10px;
+  color: #fff;
+  text-transform: uppercase;
+  display: inline-block;
+  min-width: 95px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Pendiente -> Amarillo */
+.bg-pendiente { 
+  background-color: #ffb921e0 !important; 
+  color: #f7f7f7 !important; 
+} 
+
+/* En Proceso -> Azul */
+.bg-proceso { 
+  background-color: #3b82f6 !important; 
+  color: #fff !important; 
+} 
+
+/* Finalizado -> Verde */
+.bg-finalizado { 
+  background-color: #2ecc71 !important; 
+  color: #fff !important; 
+} 
+
+/* Rechazado (por si lo usas) -> Rojo */
+.bg-rechazado { 
+  background-color: #e63946 !important; 
+  color: #fff !important; 
+}
+
+
+/* =========================================
+   ESTILOS NUEVOS: HISTORIAL Y FILTROS
+   ========================================= */
+
+/* Cabecera del historial con botones a la derecha */
+.header-historial {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* Contenedor de los botones de filtro (Tabs) */
+.filtros-container {
+  display: flex;
+  background: #e2e8f0; /* Color similar a tu bg-cancelar */
+  padding: 4px;
+  border-radius: 12px;
+  gap: 4px;
+}
+
+.filtros-container button {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  background: transparent;
+  color: #475569;
+  font-weight: 700;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+/* Botón de filtro seleccionado */
+.filtros-container button.activo {
+  background: #ffffff;
+  color: #0b1c2d;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.filtros-container button:hover:not(.activo) {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Subtítulos de secciones dentro del historial */
+.subtitulo-seccion {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 20px 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.subtitulo-seccion::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: #1e3a8a;
+  border-radius: 10px;
+}
+
+/* Línea divisoria elegante */
+.divisor {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 30px 0;
+}
+
+/* Estilo para las tablas dentro del historial (reutilizando tus clases) */
+.tabla-reportes {
+  margin-top: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Mensajes cuando no hay datos en el historial */
+.card p {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+  font-style: italic;
 }
