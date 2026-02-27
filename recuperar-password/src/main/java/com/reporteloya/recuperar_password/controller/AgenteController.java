@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/agentes")
-@CrossOrigin(origins = {"http://localhost:4200", "https://frontend-app-1-0-0.onrender.com"})
+@CrossOrigin(origins = {"http://localhost:4200"})
 public class AgenteController {
 
     @Autowired

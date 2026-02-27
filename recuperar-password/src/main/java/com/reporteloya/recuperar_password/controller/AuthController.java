@@ -108,7 +108,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(false) // true en producción con HTTPS
                 .path("/")
-                .maxAge(20 * 60) // 20 minutos
+                .maxAge(60 * 60) // 20 minutos
                 .sameSite("Lax") // importante para navegador moderno
                 .build();
 

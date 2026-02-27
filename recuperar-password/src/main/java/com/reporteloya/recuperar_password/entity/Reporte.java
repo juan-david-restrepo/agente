@@ -6,6 +6,7 @@ import java.time.LocalTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -37,25 +38,27 @@ public class Reporte {
     private String direccion;
     private Double latitud;
     private Double longitud;
+
+  
+
+    private String estado;
     private String placa;
     private LocalDate fechaIncidente;
     private LocalTime horaIncidente;
-    private String estado;
 
     @OneToMany(mappedBy = "reporte", cascade = CascadeType.ALL)
     private List<Evidencia> evidencias;
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 
-@PrePersist
-protected void onCreate() {
-    createdAt = LocalDateTime.now();
-    updatedAt = LocalDateTime.now();
-}
-
-@PreUpdate
-protected void onUpdate() {
-    updatedAt = LocalDateTime.now();
-}
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -63,7 +66,4 @@ protected void onUpdate() {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
 }
-
-

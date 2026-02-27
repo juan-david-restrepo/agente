@@ -4,10 +4,9 @@ import { Agente } from '../models/agente.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AdminService {
-
   // La URL debe coincidir con el server.port=60523 de tu properties
   private apiUrl = 'http://localhost:8080/agentes';
 
@@ -17,7 +16,7 @@ export class AdminService {
   // OBTENER TODOS LOS AGENTES
   // ===============================
   obtenerAgentes(): Observable<Agente[]> {
-    return this.http.get<Agente[]>(this.apiUrl);
+    return this.http.get<Agente[]>(this.apiUrl, { withCredentials: true });
   }
 
   // ===============================
@@ -25,7 +24,9 @@ export class AdminService {
   // ===============================
   // Este llamará al endpoint: GET http://localhost:60523/agentes/AT-125
   obtenerAgentePorPlaca(placa: string): Observable<Agente> {
-    return this.http.get<Agente>(`${this.apiUrl}/${placa}`);
+    return this.http.get<Agente>(`${this.apiUrl}/${placa}`, {
+      withCredentials: true,
+    });
   }
 
   // ===============================
@@ -34,8 +35,12 @@ export class AdminService {
   // Este llamará al endpoint: PATCH http://localhost:60523/agentes/AT-125
   actualizarEstado(
     placa: string,
-    estado: 'DISPONIBLE' | 'OCUPADO' | 'AUSENTE'
+    estado: 'DISPONIBLE' | 'OCUPADO' | 'AUSENTE',
   ): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/${placa}`, { estado });
+    return this.http.patch(
+      `${this.apiUrl}/${placa}`,
+      { estado },
+      { withCredentials: true },
+    );
   }
 }

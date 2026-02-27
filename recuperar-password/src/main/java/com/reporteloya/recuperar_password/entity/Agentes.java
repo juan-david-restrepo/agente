@@ -18,7 +18,7 @@ public class Agentes {
     private String documento;
     private String telefono;
     private String estado;
-    private Double promedioResenas;
+   
     private String foto;
 
     // Relación para permitir múltiples tareas
