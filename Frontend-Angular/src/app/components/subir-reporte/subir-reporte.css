@@ -1,245 +1,382 @@
-/* =========================
-   FONDO GENERAL
-========================= */
-body {
-  background: linear-gradient(135deg, #4e4e4e, #f8fafc);
-}
-html{
-  margin: 0;
-  padding: 0;
-}
-
-/* =========================
-   CONTENEDOR PRINCIPAL
-========================= */
-.contenedor-form {
-  margin-bottom: 10px;
-  max-width: 780px;
-  margin: 60px auto;
-  padding: 40px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-  font-family: 'Inter', 'Segoe UI', sans-serif;
-  transition: 0.3s ease;
+/* =========================================
+   VARIABLES Y RESET
+   ========================================= */
+:root {
+  --primary-dark: #0A192F;
+  --accent-blue: #2563EB;
+  --bg-light: #F8FAFC;
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --border-color: #E2E8F0;
 }
 
-/* =========================
-   TITULO
-========================= */
-.contenedor-form h2 {
-  text-align: center;
-  font-size: 26px;
-  font-weight: 600;
-  margin-bottom: 40px;
-  color: #1e293b;
-  letter-spacing: -0.5px;
-}
-
-/* =========================
-   SECCIONES
-========================= */
-.seccion {
-  margin-bottom: 32px;
+/* Fondo oscuro de la página */
+.padre {
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  margin-top: 60px;
 }
 
-.seccion label {
-  font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 10px;
-  color: #334155;
-}
-
-/* =========================
-   GRID INCIDENTES
-========================= */
-.grid-incidentes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 14px;
-}
-
-/* =========================
-   TARJETAS INCIDENTES
-========================= */
-.card-incidente {
-  padding: 14px 18px;
-  background: #f1f5f9;
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.25s ease;
-  border: 2px solid transparent;
-}
-
-.card-incidente:hover {
-  background: #e2e8f0;
-  transform: translateY(-2px);
-}
-
-.card-incidente.selected {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  color: white;
-  border-color: #1d4ed8;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
-}
-
-/* =========================
-   INPUTS & TEXTAREAS
-========================= */
-input,
-textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  background: #f8fafc;
-  font-size: 14px;
-  transition: all 0.25s ease;
-  margin-top: 10px;
-}
-
-input:focus,
-textarea:focus {
-  outline: none;
+/* Tarjeta blanca central */
+.contenedor-form {
   background: #ffffff;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 1000px;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-textarea {
-  min-height: 120px;
+h2 {
+  text-align: center;
+  color: var(--primary-dark);
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+h2 i { color: var(--accent-blue); }
+
+/* =========================================
+   GRID DE DOS COLUMNAS
+   ========================================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 35px;
+  margin-bottom: 25px;
+}
+
+.seccion {
+  margin-bottom: 24px;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: var(--text-main);
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* Inputs y Textarea */
+input[type="text"], 
+input[type="date"], 
+input[type="time"], 
+.textarea-compacto {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--bg-light);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box; 
+  margin-top: 10px;/* Crucial para que no se salgan del borde */
+}
+
+input:focus, .textarea-compacto:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.textarea-compacto {
+  height: 130px;
   resize: none;
 }
 
-/* CONTADOR DESCRIPCIÓN */
-small {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #64748b;
-}
-
-/* =========================
-   FILA FECHA Y HORA
-========================= */
-.fila {
-  display: flex;
-  gap: 20px;
-}
-
-.fila > div {
-  flex: 1;
-}
-
-/* =========================
-   ARCHIVOS PREVIEW
-========================= */
-.preview-container {
-  margin-top: 14px;
-  display: flex;
+/* =========================================
+   TARJETAS DE INCIDENTE
+   ========================================= */
+.grid-incidentes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+.card-incidente {
+  padding: 14px;
+  background: #F1F5F9;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.card-incidente:hover { background: #E2E8F0; }
+
+.card-incidente.selected {
+  background: var(--primary-dark);
+  color: white;
+  box-shadow: 0 4px 12px rgba(10, 25, 47, 0.2);
+}
+
+/* =========================================
+   ZONA DE CARGA (FONT AWESOME)
+   ========================================= */
+.input-hidden { display: none; }
+
+.upload-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #CBD5E1;
+  border-radius: 14px;
+  padding: 30px 20px;
+  background: var(--bg-light);
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+}
+
+.upload-dropzone:hover {
+  border-color: var(--accent-blue);
+  background: #EFF6FF;
+}
+
+.upload-icon {
+  font-size: 40px;
+  color: var(--accent-blue);
+  margin-bottom: 12px;
+}
+
+.upload-text {
+  font-weight: 700;
+  color: var(--text-main);
+  display: block;
+}
+
+.upload-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Miniaturas de imágenes */
+.preview-container {
+  display: flex;
   flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .preview-item {
   position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
 }
 
-.preview-item img,
-.preview-item video {
-  width: 110px;
-  height: 110px;
+.preview-item img, .preview-item video {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
 }
 
 .remove-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #ef4444;
+  top: 2px;
+  right: 2px;
+  background: #EF4444;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
   cursor: pointer;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* =========================
-   MAPA
-========================= */
-#map {
-  margin-top: 14px;
-  height: 260px;
-  border-radius: 16px;
+/* =========================================
+   MAPA Y UBICACIÓN
+   ========================================= */
+.ubicacion-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btn-secundario {
+  background: white;
+  color: var(--primary-dark);
+  border: 1.5px solid var(--border-color);
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.btn-secundario:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+.mapa-compacto {
+  height: 180px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-color);
   overflow: hidden;
-  border: 1px solid #e2e8f0;
 }
 
-/* =========================
-   BOTÓN UBICACIÓN
-========================= */
-button[type="button"] {
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: none;
-  background: #64748b;
-  color: white;
-  cursor: pointer;
-  transition: 0.25s;
+.texto-direccion {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
 }
 
-button[type="button"]:hover {
-  background: #475569;
-}
-
-/* =========================
-   BOTÓN PRINCIPAL
-========================= */
+/* =========================================
+   BOTÓN ENVIAR
+   ========================================= */
 .btn-enviar {
   width: 100%;
-  padding: 16px;
-  border-radius: 14px;
-  border: none;
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  padding: 18px;
+  background: var(--accent-blue);
   color: white;
-  font-size: 15px;
-  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.25s ease;
   margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: 0.3s;
 }
 
-.btn-enviar:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3);
+.btn-enviar:hover:not(:disabled) {
+  background: #1D4ED8;
+  transform: translateY(-2px);
 }
 
 .btn-enviar:disabled {
-  background: #cbd5e1;
+  background: #94A3B8;
   cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-@media (max-width: 640px) {
-  .contenedor-form {
-    padding: 25px;
-    margin: 30px 15px;
-  }
+/* Layout de fecha/hora en una fila */
+.fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
 
-  .fila {
+
+/* Responsivo */
+@media (max-width: 850px) {
+  .form-grid { grid-template-columns: 1fr; }
+}
+
+/* --- ESTILO DE LAS MINIATURAS --- */
+.img-clickable {
+    cursor: pointer; /* Cambiado de 'zoom-in' a pointer para no confundir */
+    transition: filter 0.2s ease;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.img-clickable:hover {
+    filter: brightness(0.8);
+}
+
+/* --- MODAL OVERLAY --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 25, 47, 0.95); /* Azul muy oscuro profundo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    backdrop-filter: blur(5px);
+}
+
+/* --- CONTENEDOR DEL CONTENIDO --- */
+.modal-content {
+    position: relative;
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
     flex-direction: column;
-  }
+}
+
+/* --- LA IMAGEN DENTRO DEL MODAL (SOLUCIÓN AL DESBORDE) --- */
+.modal-content img {
+    max-width: 100%;
+    max-height: 85vh; /* Altura máxima basada en la pantalla */
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Muestra toda la imagen sin recortes */
+    border-radius: 4px;
+    display: block;
+}
+
+/* --- BOTÓN CERRAR (LA X ORGANIZADA) --- */
+.close-modal {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 35px;
+    height: 35px;
+    background: #ff4d4d; /* Rojo vibrante */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease, background 0.2s ease;
+    z-index: 100000;
+}
+
+.close-modal:hover {
+    background: #cc0000;
+    transform: scale(1.1);
+}
+
+/* --- ELIMINAR INTERFERENCIA DEL PUNTERO EN BOTONES --- */
+.remove-btn {
+    cursor: pointer !important;
+    pointer-events: auto; /* Asegura que siempre reciba el click */
 }
