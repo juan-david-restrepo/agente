@@ -13,6 +13,7 @@
   padding: 20px;
   border-radius: 18px;
   box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  cursor: pointer;
 }
 
 .preview-msg {
@@ -77,6 +78,7 @@
   margin-top: 10px;
   font-size: 14px;  
   box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  cursor: pointer;
 }
 /*----------------------------------------*/
 
@@ -92,7 +94,7 @@
 }
 
 .detalle-card{
-  width:50%;
+  width:54%;
   max-width:95%;
   background:white;
   border:3px solid #cbd5e1;
@@ -131,9 +133,10 @@
 /* Grid info */
 .detalle-info{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 10px;
   justify-content: center;
+  align-items: center;
   
 }
 
@@ -147,8 +150,14 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 200px;
+  width: auto;
   gap: 7px;
+}
+
+.info-actual{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .info-label {
@@ -193,6 +202,7 @@
   height: 42px;
   font-weight: 600;
   margin-top: 18px;
+  cursor: pointer;
 }
 
 /*---------------------------------------*/
@@ -246,6 +256,7 @@
 .mensaje-completo {
   max-height: 250px;
   overflow-y: auto;
+  width: 108%;
 }
 
 /* Scroll bonito */
@@ -303,18 +314,21 @@
 
 .filtros {
   display: flex;
+  justify-content: flex-end; /*  lo manda a la derecha */
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .filtros button {
-  padding: 8px 16px;
-  border-radius: 10px;
+  padding: 8px 18px;
+  border-radius: 12px;
   border: none;
   background: #e2e8f0;
+  color: #1e293b;
   cursor: pointer;
-  font-weight: 500;
-  transition: all .2s ease;
+  font-size: 14px;
+  font-weight: 600; /* 🔥 más fuerte */
+  transition: all .25s ease;
 }
 
 .filtros button:hover {
@@ -322,8 +336,10 @@
   transform: translateY(-2px);
 }
 
-.filtros button:active {
-  transform: scale(.95);
+.filtros button.activo {
+  background: linear-gradient(135deg,#3b82f6,#2563eb);
+  color: white;
+  box-shadow: 0 6px 18px rgba(37,99,235,.4);
 }
 
 /* =========================
@@ -478,6 +494,23 @@
   cursor: not-allowed;
 }
 
+/*--------------------------------------------*/
+
+.btn-resumen {
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.btn-resumen:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37,99,235,.3);
+}
+
 /*-------------------------*/
 
 @keyframes fadeIn {
@@ -522,4 +555,8 @@
 .detalle-card.finalizada {
   border: 3px solid #22c55e;
   box-shadow: 0 20px 45px rgba(34,197,94,.25);
+}
+
+.estado-final{
+  margin-left: 20px;
 }

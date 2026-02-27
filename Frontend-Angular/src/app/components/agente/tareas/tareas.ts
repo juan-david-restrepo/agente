@@ -14,6 +14,8 @@ import { FormsModule } from '@angular/forms';
 
 export class Tareas {
 
+
+
   @Input() tareas!: Tarea[];   // 🔥 ARREGLADO
 
   @Output() comenzar = new EventEmitter<Tarea>();
@@ -23,8 +25,9 @@ export class Tareas {
 
   filtro: 'PENDIENTES'|'HECHAS'|'TODAS' = 'PENDIENTES';
 
-  mostrarModal = false;
-  resumenTexto = '';
+    mostrarModal = false;
+    mostrarModalResumen = false;
+    resumenTexto = '';
 
   abrir(t: Tarea){
     this.tareaSeleccionada = t;
@@ -83,6 +86,11 @@ export class Tareas {
     return horas > 0
       ? `${horas}h ${minutos}min`
       : `${minutos} minutos`;
+  }
+
+
+  abrirModalResumen(){
+    this.mostrarModalResumen = true;
   }
 
 }

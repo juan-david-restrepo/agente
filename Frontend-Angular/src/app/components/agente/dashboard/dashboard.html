@@ -1,50 +1,46 @@
 <div class="container-fluid mt-4">
-
   <div class="chart-card shadow">
-
     <!-- ================= HEADER ================= -->
     <div class="chart-header">
-
       <!-- FECHAS -->
       <div class="chart-calendar">
-        <input type="date" [(ngModel)]="fechaInicio">
-        <input type="date" [(ngModel)]="fechaFin">
+        <input type="date" [(ngModel)]="fechaInicio" />
+        <input type="date" [(ngModel)]="fechaFin" />
         <button (click)="filtrarPorRango()">Aplicar</button>
       </div>
 
-
       <!-- FILTROS -->
       <div class="chart-filtros">
-
         <button
           (click)="cambiarModoGrafica('SEMANA')"
-          [class.active]="modoGrafica==='SEMANA'">
+          [class.active]="modoGrafica === 'SEMANA'"
+        >
           Semana
         </button>
 
         <button
           (click)="cambiarModoGrafica('ANIO')"
-          [class.active]="modoGrafica==='ANIO'">
+          [class.active]="modoGrafica === 'ANIO'"
+        >
           Año
         </button>
 
         <button
           (click)="cambiarModoGrafica('DIA')"
-          [class.active]="modoGrafica==='DIA'">
+          [class.active]="modoGrafica === 'DIA'"
+        >
           Día
         </button>
-
       </div>
     </div>
 
     <!-- ================= SOLO DIA ================= -->
-    <div *ngIf="modoGrafica==='DIA'" class="chart-calendar">
-      <input type="date" [(ngModel)]="fechaSeleccionada">
+    <div *ngIf="modoGrafica === 'DIA'" class="chart-calendar">
+      <input type="date" [(ngModel)]="fechaSeleccionada" />
     </div>
 
     <!-- ================= TARJETAS ================= -->
     <div class="dashboard-cards mt-4">
-
       <div class="dash-card">
         <div class="icono-titulo">
           <i class="fa-solid fa-camera"></i>
@@ -76,27 +72,30 @@
         </div>
         <h2>5h 32m</h2>
       </div>
-
     </div>
 
     <!-- ================= BOTONES TIPO GRAFICA ================= -->
     <div class="botones-grafica">
-
-      <button class="btn btn-outline-primary"
-              (click)="cambiarTipoGrafica('bar')">
+      <button
+        (click)="cambiarTipoGrafica('bar')"
+        [class.activo]="tipoGrafica === 'bar'"
+      >
         Barras
       </button>
 
-      <button class="btn btn-outline-primary"
-              (click)="cambiarTipoGrafica('line')">
+      <button
+        (click)="cambiarTipoGrafica('line')"
+        [class.activo]="tipoGrafica === 'line'"
+      >
         Línea
       </button>
 
-      <button class="btn btn-outline-primary"
-              (click)="cambiarTipoGrafica('pie')">
+      <button
+        (click)="cambiarTipoGrafica('pie')"
+        [class.activo]="tipoGrafica === 'pie'"
+      >
         Pastel
       </button>
-
     </div>
 
     <!-- ================= GRAFICA ================= -->
@@ -106,18 +105,32 @@
 
     <!-- ================= ACTIVIDAD ================= -->
     <div class="actividad-card">
-
-      <h3>Actividad reciente</h3>
-
-      <div class="actividad-item">
-         Reporte aceptado – Carrera 15
+      <div class="actividad-header">
+        <h3>Actividad reciente</h3>
+        <span class="contador">2 nuevos</span>
       </div>
 
-      <div class="actividad-item">
-         Tarea finalizada – Control vehicular
-      </div>
+      <div class="actividad-lista">
+        <div class="actividad-item">
+          <div class="actividad-icon success">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <div class="actividad-info">
+            <h4>Reporte aceptado</h4>
+            <p>Carrera 15 • Hace 5 minutos</p>
+          </div>
+        </div>
 
+        <div class="actividad-item">
+          <div class="actividad-icon pending">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div class="actividad-info">
+            <h4>Tarea en proceso</h4>
+            <p>Control vehicular • Hace 12 minutos</p>
+          </div>
+        </div>
+      </div>
     </div>
-
   </div>
 </div>

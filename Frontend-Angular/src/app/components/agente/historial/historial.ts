@@ -18,4 +18,22 @@ export class Historial {
     this.verDetalle.emit(r);
   }
 
+  filtroActivo: 'TODOS' | 'ACEPTADOS' | 'RECHAZADOS' = 'TODOS';
+
+  cambiarFiltro(filtro: 'TODOS' | 'ACEPTADOS' | 'RECHAZADOS'){
+    this.filtroActivo = filtro;
+  }
+
+  get historialFiltrado(){
+    if(this.filtroActivo === 'ACEPTADOS'){
+      return this.historial.filter(h => h.estado === 'finalizado');
+    }
+
+    if(this.filtroActivo === 'RECHAZADOS'){
+      return this.historial.filter(h => h.estado === 'rechazado');
+    }
+
+    return this.historial;
+  }
+
 }
