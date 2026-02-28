@@ -13,6 +13,7 @@
   padding: 20px;
   border-radius: 18px;
   box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  cursor: pointer;
 }
 
 .preview-msg {
@@ -77,6 +78,7 @@
   margin-top: 10px;
   font-size: 14px;  
   box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  cursor: pointer;
 }
 /*----------------------------------------*/
 
@@ -92,7 +94,7 @@
 }
 
 .detalle-card{
-  width:50%;
+  width:54%;
   max-width:95%;
   background:white;
   border:3px solid #cbd5e1;
@@ -131,9 +133,10 @@
 /* Grid info */
 .detalle-info{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 10px;
   justify-content: center;
+  align-items: center;
   
 }
 
@@ -144,6 +147,17 @@
   color: rgb(48, 47, 47);
   width: 140px;
   box-shadow: 0 4px 12px rgba(0,0,0,.4);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+  gap: 7px;
+}
+
+.info-actual{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .info-label {
@@ -188,6 +202,7 @@
   height: 42px;
   font-weight: 600;
   margin-top: 18px;
+  cursor: pointer;
 }
 
 /*---------------------------------------*/
@@ -241,6 +256,7 @@
 .mensaje-completo {
   max-height: 250px;
   overflow-y: auto;
+  width: 108%;
 }
 
 /* Scroll bonito */
@@ -253,3 +269,294 @@
   border-radius: 10px;
 }
 
+/* =========================
+   ESTADOS DINÁMICOS
+========================= */
+
+.estado {
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.estado.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado.proceso {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.estado.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+/*-----------------------------*/
+
+.estado-badge.pendiente {
+  background: linear-gradient(45deg,#f59e0b,#d97706);
+}
+
+.estado-badge.proceso {
+  background: linear-gradient(45deg,#3b82f6,#2563eb);
+}
+
+.estado-badge.ok {
+  background: linear-gradient(45deg,#22c55e,#16a34a);
+}
+
+/*------------------------*/
+
+.filtros {
+  display: flex;
+  justify-content: flex-end; /*  lo manda a la derecha */
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.filtros button {
+  padding: 8px 18px;
+  border-radius: 12px;
+  border: none;
+  background: #e2e8f0;
+  color: #1e293b;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600; /* 🔥 más fuerte */
+  transition: all .25s ease;
+}
+
+.filtros button:hover {
+  background: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.filtros button.activo {
+  background: linear-gradient(135deg,#3b82f6,#2563eb);
+  color: white;
+  box-shadow: 0 6px 18px rgba(37,99,235,.4);
+}
+
+/* =========================
+   ARREGLAR FILTROS
+========================= */
+
+.tareas-grid {
+  display: block; /* 🔥 ya no grid aquí */
+}
+
+.filtros {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+/* Nuevo contenedor grid solo para tarjetas */
+.tarea-card {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+/* Grid SOLO para tarjetas */
+.tareas-grid > .tarea-card,
+.tareas-grid > div.tarea-card {
+  display: inline-block;
+  width: calc(33% - 20px);
+  margin: 10px;
+}
+
+/*----------------------------------*/
+
+.btn-finalizar {
+  width: 100%;
+  height: 42px;
+  margin-top: 18px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+
+  background: linear-gradient(45deg,#ef4444,#dc2626);
+  color: white;
+
+  transition: all .2s ease;
+  box-shadow: 0 6px 18px rgba(239,68,68,.4);
+}
+
+.btn-finalizar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(239,68,68,.5);
+}
+
+/*------------------------*/
+
+/* =========================
+   HISTORIAL FINALIZADA
+========================= */
+
+.historial-box {
+  margin-top: 25px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+}
+
+.resumen-box {
+  margin-top: 15px;
+}
+
+.resumen-box p {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  color: #374151;
+}
+
+/*------------------------------*/
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,.3);
+  animation: fadeIn .25s ease;
+}
+
+.modal-box h2 {
+  margin-bottom: 15px;
+  color: #1e293b;
+}
+
+.modal-box textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  padding: 12px;
+  font-size: 14px;
+  resize: none;
+  transition: border .2s;
+}
+
+.modal-box textarea:focus {
+  outline: none;
+  border: 1px solid #2563eb;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-no {
+  background: #e2e8f0;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-ok {
+  background: linear-gradient(45deg,#22c55e,#16a34a);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-ok:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/*--------------------------------------------*/
+
+.btn-resumen {
+  background: linear-gradient(135deg,#2563eb,#1d4ed8);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.btn-resumen:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37,99,235,.3);
+}
+
+/*-------------------------*/
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/*----------------------------*/
+
+/* Animación suave cuando cambia estado */
+.detalle-card {
+  transition: all .3s ease;
+}
+
+/* Transición estado badge */
+.estado-badge {
+  transition: all .3s ease;
+}
+
+/* Historial animado */
+.historial-box {
+  animation: fadeSlide .3s ease;
+}
+
+.info-tarea{
+  display: flex;
+  flex-direction: row;
+  gap: 9px;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detalle-card.finalizada {
+  border: 3px solid #22c55e;
+  box-shadow: 0 20px 45px rgba(34,197,94,.25);
+}
+
+.estado-final{
+  margin-left: 20px;
+}

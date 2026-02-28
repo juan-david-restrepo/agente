@@ -43,18 +43,27 @@ import { OnInit } from '@angular/core';
     resumenOperativo?: string;
     fechaRechazado?: Date;
 
+    acompanado?: boolean;
+    placaCompanero?: string;
+
     }
 
     export interface Tarea {
-    id:number;
-    titulo:string;
-    admin:string;
-    descripcionTarea:string;
-    zona:string;
-    finalizada:boolean;
-    hora:string;
-    fecha: string;
-    prioridad: 'BAJA'|'MEDIA'|'ALTA';
+      id:number;
+      titulo:string;
+      admin:string;
+      descripcionTarea:string;
+      zona:string;
+
+      estado:'PENDIENTE'|'EN_PROCESO'|'FINALIZADA';
+
+      hora:string;
+      fecha: string;
+      prioridad: 'BAJA'|'MEDIA'|'ALTA';
+
+      fechaInicio?: Date;
+      fechaFin?: Date;
+      resumen?: string;
     }
 
     export interface Notificacion {
@@ -168,7 +177,7 @@ export class Agente implements OnInit {
           admin:'Admin Central',
           descripcionTarea:'Apoyar retén zona norte',
           zona:'Zona Norte',
-          finalizada:false,
+          estado:'PENDIENTE',
           hora:'10:00 AM',
           fecha:'2026-06-15',
           prioridad: 'ALTA'
@@ -179,10 +188,13 @@ export class Agente implements OnInit {
           admin:'Supervisor',
           descripcionTarea:'Revisión documentos vehículos pesados',
           zona:'Autopista Sur',
-          finalizada:true,
+          estado:'FINALIZADA',
           hora:'02:00 PM',
           fecha:'2026-06-15',
-          prioridad: 'MEDIA'
+          prioridad: 'MEDIA',
+          fechaInicio: new Date(),
+          fechaFin: new Date(),
+          resumen:'Operativo realizado sin novedades'
         }
       ];
 
@@ -211,24 +223,45 @@ export class Agente implements OnInit {
         ciudad:'Armenia'
       };
 
-    marcarTarea(t:Tarea){
-      t.finalizada = !t.finalizada;
+    comenzarTarea(t:Tarea){
+
+      const yaOcupado = this.tareasAdmin.some(
+        tarea => tarea.estado === 'EN_PROCESO'
+      );
+
+      if(yaOcupado) return;
+
+      t.estado = 'EN_PROCESO';
+      t.fechaInicio = new Date();
+
+      this.estadoAgente = 'OCUPADO';
+    }
+
+    finalizarTarea(t:Tarea){
+
+      t.estado = 'FINALIZADA';
+      t.fechaFin = new Date();
+
+      this.estadoAgente = 'LIBRE';
     }
 
     aceptarReporte(r: Reporte){
 
-      //  Primero validar si ya hay uno en proceso
-      const yaHayEnProceso = this.reportesEntrantes.some(rep => rep.estado === EstadoReporte.EN_PROCESO);
-        if (yaHayEnProceso) {
-          return;
-        }
+      const yaHayEnProceso = this.reportesEntrantes.some(
+        rep => rep.estado === EstadoReporte.EN_PROCESO
+      );
 
+      if (yaHayEnProceso) return;
 
-      //  Ahora sí aceptar
-     r.estado = EstadoReporte.EN_PROCESO;
+      r.estado = EstadoReporte.EN_PROCESO;
       r.fechaAceptado = new Date();
 
       this.estadoAgente = 'OCUPADO';
+
+      // 🔥 Si va acompañado
+      if(r.acompanado && r.placaCompanero){
+        this.asignarReporteACompanero(r);
+      }
     }
 
     rechazarReporte(r:Reporte){
@@ -323,6 +356,16 @@ export class Agente implements OnInit {
         '--font-size-base',
         config.fontSize + 'px'
       );
+    }
+
+
+    asignarReporteACompanero(reporte: Reporte){ // esto va en el backend solo es prueba
+      console.log(
+        `Asignando reporte ${reporte.id} al agente ${reporte.placaCompanero}`
+      );
+
+      // Aquí deberías llamar al backend
+      // agenteService.asignarACompanero(...)
     }
 
 }

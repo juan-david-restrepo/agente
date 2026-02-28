@@ -32,6 +32,14 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class Reportes {
 
+
+
+    mostrarModalAceptar = false;
+    modoAceptacion: 'solo' | 'acompanado' | null = null;
+    placaBusqueda = '';
+    companeroEncontrado: any = null;
+    reporteTemporal: Reporte | null = null;
+
     @Input() hayEnProceso: boolean = false;
 
     EstadoReporte = EstadoReporte;
@@ -92,7 +100,9 @@ export class Reportes {
             this.mostrarAlerta('Ya tienes un reporte en proceso');
             return;
         }
-        this.aceptar.emit(r);
+
+        this.reporteTemporal = r;
+        this.mostrarModalAceptar = true;
     }
 
     rechazarClick(r: Reporte){
@@ -231,6 +241,54 @@ export class Reportes {
         setTimeout(()=>{
             this.mensajeAlerta = null;
         },3000);
+    }
+
+    buscarCompanero(){
+        // Simulación (luego lo haces con servicio real)
+        if(this.placaBusqueda === 'ANT-9022'){
+            this.companeroEncontrado = {
+            nombre: 'Carlos Pérez',
+            placa: 'ANT-9022'
+            };
+        } else {
+            this.companeroEncontrado = null;
+            this.mostrarAlerta('No se encontró agente con esa placa');
+        }
+    }
+
+    confirmarAceptar(){
+
+        if(!this.reporteTemporal) return;
+
+        if(!this.modoAceptacion){
+            this.mostrarAlerta('Selecciona una opción');
+            return;
+        }
+
+        if(this.modoAceptacion === 'acompanado' && !this.companeroEncontrado){
+            this.mostrarAlerta('Debes seleccionar un compañero');
+            return;
+        }
+
+        const reporte = this.reporteTemporal;
+
+        reporte.acompanado = this.modoAceptacion === 'acompanado';
+
+        if(reporte.acompanado){
+            reporte.placaCompanero = this.companeroEncontrado.placa;
+        }
+
+        this.aceptar.emit(reporte);
+
+        this.cerrarModalAceptar();
+    }
+
+    cerrarModalAceptar(){
+        this.mostrarModalAceptar = false;
+        this.modoAceptacion = null;
+        this.placaBusqueda = '';
+        this.companeroEncontrado = null;
+        this.reporteTemporal = null;
     }
 
 
