@@ -1,25 +1,18 @@
 <div class="admin-layout">
-  <button class="mobile-menu-btn" (click)="menuAbierto = !menuAbierto">
-    ☰
-  </button>
-
+  <button class="mobile-menu-btn" (click)="menuAbierto = !menuAbierto">☰</button>
   <div class="sidebar-overlay" *ngIf="menuAbierto" (click)="menuAbierto = false"></div>
-
   <app-sidebar-admin [class.active]="menuAbierto"></app-sidebar-admin>
 
   <main class="main-content">
-    <div class="header">
-      <h2>Dashboard General</h2>
-    </div>
+    <div class="header"><h2>Dashboard General</h2></div>
 
     <div class="charts-grid">
       <div class="chart-card">
-        <h4>Reportes Semanales</h4>
+        <h4 (click)="abrirModalDetalle('reportes')" class="clickable">Reportes Semanales</h4>
         <canvas id="lineChart"></canvas>
       </div>
-
       <div class="chart-card">
-        <h4>Tipos de Infracción</h4>
+        <h4 (click)="abrirModalDetalle('tipos')" class="clickable">Tipos de Infracción</h4>
         <canvas id="pieChart"></canvas>
       </div>
     </div>
@@ -37,29 +30,62 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td data-label="#">1</td>
-            <td data-label="Fecha">03/07/2025</td>
-            <td data-label="Tipo">Velocidad</td>
-            <td data-label="Agente">Gómez</td>
-            <td data-label="Estado"><span class="status pending">Pendiente</span></td>
-          </tr>
-          <tr>
-            <td data-label="#">2</td>
-            <td data-label="Fecha">03/07/2025</td>
-            <td data-label="Tipo">Semáforo</td>
-            <td data-label="Agente">López</td>
-            <td data-label="Estado"><span class="status validated">Validado</span></td>
-          </tr>
-          <tr>
-            <td data-label="#">3</td>
-            <td data-label="Fecha">02/07/2025</td>
-            <td data-label="Tipo">Parqueo indebido</td>
-            <td data-label="Agente">Martínez</td>
-            <td data-label="Estado"><span class="status pending">Pendiente</span></td>
+          <tr *ngFor="let infraccion of infracciones; let i = index" 
+              (click)="abrirDetalleInfraccion(infraccion)"
+              class="clickable">
+            <td data-label="#"> {{ i + 1 }} </td>
+            <td data-label="Fecha"> {{ infraccion.fecha }} </td>
+            <td data-label="Tipo"> {{ infraccion.tipo }} </td>
+            <td data-label="Agente"> {{ infraccion.agente }} </td>
+            <td data-label="Estado">
+              <span class="status" [ngClass]="infraccion.estado === 'Pendiente' ? 'pending' : 'validated'">
+                {{ infraccion.estado }}
+              </span>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
   </main>
+</div>
+
+<div class="modal-overlay" *ngIf="modalAbierto">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h5 class="modal-title">{{ tituloModal }}</h5>
+      <button class="btn-close" (click)="cerrarModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="table-container" *ngIf="tipoModalActivo === 'reportes'">
+        <table class="modal-table">
+          <thead>
+            <tr><th>Referencia</th><th>Descripción</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of itemsFiltrados">
+              <td>{{ item.ref }}</td>
+              <td>{{ item.descripcion }}</td>
+              <td><span class="status-badge" [ngClass]="item.claseEstado">{{ item.estado }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="detalle-infraccion-container" *ngIf="tipoModalActivo === 'infraccion' && infraccionSeleccionada">
+        <div class="detalle-card">
+          <div class="detalle-item"><label>Referencia</label><p>{{ infraccionSeleccionada.ref }}</p></div>
+          <div class="detalle-item"><label>Tipo de Falta</label><p>{{ infraccionSeleccionada.tipo }}</p></div>
+          <div class="detalle-item"><label>Fecha</label><p>{{ infraccionSeleccionada.fecha }}</p></div>
+          <div class="detalle-item"><label>Agente Responsable</label><p>{{ infraccionSeleccionada.agente }}</p></div>
+          <div class="detalle-item">
+            <label>Estado Actual</label>
+            <p><span class="status-badge" [ngClass]="infraccionSeleccionada.estado === 'Pendiente' ? 'pending' : 'validated'">
+              {{ infraccionSeleccionada.estado }}
+            </span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
