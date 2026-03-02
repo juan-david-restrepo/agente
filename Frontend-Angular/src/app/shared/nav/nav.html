@@ -1,14 +1,18 @@
 <body>
     <div class="content-wrapper">
         <div class="navbar">
-            <div class="logo"><a routerLink="/"><img src="assets/images/Logo3.png" alt="logo"></a></div>
+            <div class="logo"><a routerLink="/"><img src="assets/images/LogoNuevo2.png" alt="logo"></a></div>
 
             <div class="menu-and-logo">
                 <div class="menu-buttons-group">
 
+                    <a routerLink="/" class="menu-item-home"  routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                        <i class="fa-solid fa-house"></i> Inicio
+                    </a>
+
                     <!-- REPORTES -->
-                    <div class="menu-item-container">
-                        <a class="menu-item active" (click)="$event.preventDefault()">
+                    <div class="menu-item-container" routerLinkActive="active">
+                        <a class="menu-item" (click)="$event.preventDefault()">
                             Reportes <i class='bx bx-chevron-down'></i>
                         </a>
                         <div class="dropdown">
@@ -33,13 +37,13 @@
                     </div>
 
                     <!-- EDUCACIÓN VIAL -->
-                    <div class="menu-item-container">
+                    <div class="menu-item-container" routerLinkActive="active">
                         <a class="menu-item" (click)="$event.preventDefault()">
                             Educación Vial <i class='bx bx-chevron-down'></i>
                         </a>
                         <div class="dropdown">
                             <div class="dropdown-section">
-                                <h4>Señales de Tránsito</h4>
+                                <a routerLink="/senales">Señales de Tránsito</a>
                                 <p>Significado y ejemplos comunes</p>
                             </div>
                             <div class="dropdown-section">
@@ -50,7 +54,7 @@
                     </div>
 
                     <!-- SERVICIOS -->
-                    <div class="menu-item-container">
+                    <div class="menu-item-container" routerLinkActive="active">
                         <a class="menu-item" (click)="$event.preventDefault()">
                             Servicios <i class='bx bx-chevron-down'></i>
                         </a>
@@ -67,9 +71,9 @@
                     </div>
 
                     <!-- LINKS NORMALES -->
-                    <a class="menu-item" (click)="$event.preventDefault()">Estadísticas</a>
-                    <a class="menu-item" (click)="$event.preventDefault()">Noticias</a>
-                    <a routerLink="/soporte" class="menu-item">Soporte</a>
+                    <a class="menu-item" routerLinkActive="active" (click)="$event.preventDefault()">Estadísticas</a>
+                    <a class="menu-item" routerLinkActive="active" (click)="$event.preventDefault()">Noticias</a>
+                    <a routerLink="/soporte" class="menu-item" routerLinkActive="active">Soporte</a>
 
                 </div>
             </div>
@@ -77,92 +81,74 @@
 
             <div class="buttons">
 
-                  <!-- 🔐 Usuario NO autenticado -->
-  <ng-container *ngIf="!isLoggedIn; else loggedTemplate">
-    <a routerLink="/login" class="button button-login">
-      Iniciar sesión
-    </a>
+                <!-- ❌ Ocultar cuando esté logueado -->
+                <a *ngIf="!isLoggedIn" routerLink="/login" class="button button-login"><i class='bx  bx-user'></i> Iniciar sesion</a>
+                <a *ngIf="!isLoggedIn" routerLink="/registro" class="button button-signup">Registrarme</a>
 
-    <a routerLink="/registro" class="button button-signup">
-      Registrarme
-    </a>
-  </ng-container>
-
-  <!-- 👤 Usuario autenticado -->
-  <ng-template #loggedTemplate>
-    <button
-      id="sidebarToggle"
-      class="toggle-btn"
-      type="button"
-      (click)="toggleSidebar()"
-    >
-      <img
-        [src]="currentAvatar"
-        alt="Avatar usuario"
-        class="avatarnav"
-      />
-    </button>
-  </ng-template>
+                <!-- ✔ Mostrar cuando esté logueado -->
+                <button
+                    id="sidebarToggle"
+                    class="toggle-btn"
+                    (click)="toggleSidebar()"
+                    *ngIf="isLoggedIn"
+                    title="Cuenta"
+                >
+                    <i><img  [src]="currentAvatar" alt="Avatar 1" class="avatarnav"></i>
+                </button>
 
             </div>
 
             <nav class="sidebar" [class.active]="isSidebarOpen">
-                <button title="Cerrar" id="closeSidebar" class="close-btn" (click)="toggleSidebar()">
-                    <i class="fas fa-times"></i>
-                </button>
+  <button title="Cerrar" id="closeSidebar" class="close-btn" (click)="toggleSidebar()">
+      <i class="bx bx-x"></i>
+  </button>
 
-                <div class="container">
-                    <img [src]="currentAvatar" alt="Avatar 1" class="avatar">
-                    <button class="edicion" (click)="isModalOpen = true">
-                        <i class='bx bx-pencil'></i> Avatar
-                    </button>
-                    <app-avatar-modal [(isOpen)]="isModalOpen"
-                        (avatarSelected)="onAvatarSelected($event)"></app-avatar-modal>
-                    <ul class="menu-list">
+  <div class="container">
+      <img [src]="currentAvatar" alt="Avatar 1" class="avatar">
+      <button class="edicion" (click)="isModalOpen = true">
+          <i class='bx bx-pencil'></i>  Avatar
+      </button>
+      <app-avatar-modal [(isOpen)]="isModalOpen"
+          (avatarSelected)="onAvatarSelected($event)"></app-avatar-modal>
 
-                        <li>
-                            <a routerLink="/home" class="menu-item">
-                                <i class="fas fa-home"></i>
-                                <span>Inicio</span>
-                            </a>
-                        </li>
+      <ul class="menu-list">
+          <li>
+              <a routerLink="/home" class="menu-item">
+                  <i class="bx bx-home-alt-2"></i>
+                  <span>Inicio</span>
+              </a>
+          </li>
+          <li>
+              <a routerLink="/perfil" class="menu-item">
+                  <i class="bx bx-user-circle"></i>
+                  <span>Perfil</span>
+              </a>
+          </li>
+          <li>
+              <a routerLink="/configuracion" class="menu-item">
+                  <i class="bx bx-cog"></i>
+                  <span>Configuración</span>
+              </a>
+          </li>
+          <li>
+              <a routerLink="/mensajes" class="menu-item">
+                  <i class="fas fa-bell"></i>
+                  <span>Notificaciones</span>
+              </a>
+          </li>
+          <li class="menu-item logout" (click)="logout()">
+              <i class="bx bx-log-out"></i>
+              <span>Salir</span>
+          </li>
+      </ul>
 
-                        <li>
-                            <a routerLink="/perfil" class="menu-item">
-                                <i class="fas fa-user"></i>
-                                <span>Perfil</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a routerLink="/configuracion" class="menu-item">
-                                <i class="fas fa-cog"></i>
-                                <span>Configuración</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a routerLink="/mensajes" class="menu-item">
-                                <i class="fas fa-bell"></i>
-                                <span>Notificaciones</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-item logout" (click)="logout()">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Salir</span>
-                        </li>
-
-                    </ul>
-
-                    <p>&copy; 2025 Reportelo Ya.</p>
-                </div>
-            </nav>
+      <p class="sidebar-footer">&copy; {{ currentYear }} Reportelo Ya.</p>
+  </div>
+</nav>
 
     </div>
 </div>
 
 
 <div id="overlay" class="overlay" [class.active]="isSidebarOpen" (click)="closeSidebar()"></div>
-
 

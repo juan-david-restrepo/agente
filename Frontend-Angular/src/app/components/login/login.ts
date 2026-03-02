@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Nav } from '../../shared/nav/nav';
+import { Avatar } from '../../service/avatar';
 import {
   FormBuilder,
   FormGroup,
@@ -25,49 +26,75 @@ export class Login {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private avatarService: Avatar
   ) {
+    // ✅ REACTIVAMOS ROL
     this.formLogin = this.fb.group({
+      rol: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-      rol: ['']
     });
   }
 
   onSubmit(): void {
     if (this.formLogin.invalid) {
-      Swal.fire('Formulario incompleto', 'Completa los campos', 'warning');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Formulario incompleto',
+        text: 'Por favor completa todos los campos correctamente.',
+      });
       return;
     }
 
-    const { email, password } = this.formLogin.value;
+    const { rol, email, password } = this.formLogin.value;
 
     this.authService.login(email, password).subscribe({
       next: (resp) => {
+        console.log('Respuesta del backend:', resp);
+
+        if (resp.token) {
+          localStorage.setItem('token', resp.token);
+          this.authService.setSession(resp.token);
+        }
+
+        if (resp.userId) {
+          localStorage.setItem('userId', resp.userId);
+          this.avatarService.loadAvatarForUser(resp.userId);
+        }
+
+
+        // Guardar sesión
+       // localStorage.setItem('token', resp.token);
+        localStorage.setItem('userId', resp.userId);
+        localStorage.setItem('email', resp.email);
+        localStorage.setItem('role', resp.role);
+
         Swal.fire({
           icon: 'success',
-          title: '¡Bienvenido!',
-          timer: 1200,
+          title: 'Bienvenido!',
+          text: 'Inicio de sesión exitoso',
+          timer: 1500,
           showConfirmButton: false,
         });
-        this.authService.setAuthenticated(true);
-        this.authService.setLoggedIn(true);
 
-        // 🔁 REDIRECCIÓN SEGÚN ROL (BACKEND)
-        switch (resp.role) {
-          case 'ADMIN':
-            this.router.navigate(['/admin']);
-            break;
-          case 'AGENTE':
-            this.router.navigate(['/agente']);
-            break;
-          default:
-            this.router.navigate(['/home']);
-            break;
+        // 👉 REDIRECCIÓN SEGÚN ROL
+        if (rol === 'ciudadano') {
+          this.router.navigate(['/home']);
+        } else if (rol === 'agente') {
+          this.router.navigate(['/agente']);
+        } else if (rol === 'administrador') {
+          this.router.navigate(['/admin']);
         }
       },
 
-      error: () => {
-        Swal.fire('Error', 'Credenciales incorrectas', 'error');
+      error: (err) => {
+        console.error(err);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al iniciar sesión',
+          text: err.error || 'Credenciales incorrectas',
+        });
       },
     });
   }

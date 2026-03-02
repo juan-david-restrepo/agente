@@ -5,62 +5,137 @@ import com.reporteloya.recuperar_password.entity.PasswordResetToken;
 import com.reporteloya.recuperar_password.repository.TokenRepository;
 import com.reporteloya.recuperar_password.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder; // Usar la interfaz
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
-@RequiredArgsConstructor // Inyecta automáticamente los campos 'final'
+@RequiredArgsConstructor
 public class PasswordService {
 
     private final UsuarioRepository usuarioRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
-    // CRÍTICO: Inyectamos el PasswordEncoder de Spring Security, no lo instanciamos
     private final PasswordEncoder passwordEncoder;
 
+    // 🛡 Control de intentos por IP
+    private final ConcurrentHashMap<String, AtomicInteger> requestCounts = new ConcurrentHashMap<>();
+    private static final int MAX_REQUESTS = 5;
+
+    /**
+     * 🔐 Enviar enlace de recuperación
+     * Respuesta genérica para evitar enumeración de emails.
+     */
     @Transactional
-    public boolean enviarEnlaceRecuperacion(String email) {
-        return usuarioRepository.findByEmail(email).map(usuario -> {
-            String token = UUID.randomUUID().toString();
+    public void enviarEnlaceRecuperacion(String email, String ip) {
 
-            PasswordResetToken resetToken = new PasswordResetToken(
-                    usuario.getEmail(), // Usar el email del usuario encontrado
-                    token,
-                    LocalDateTime.now().plusMinutes(15) // Token válido por 15 minutos
-            );
-            tokenRepository.save(resetToken);
+        // 🛡 Límite por IP para prevenir abuso
+        requestCounts.putIfAbsent(ip, new AtomicInteger(0));
+        if (requestCounts.get(ip).incrementAndGet() > MAX_REQUESTS) {
+            return; // No hacemos nada y no revelamos información
+        }
 
-            String enlace = "https://reporteloya.com/reset-password?token=" + token;
-            // Asumiendo que EmailService existe y tiene este método
-            emailService.enviarCorreoRecuperacion(email, enlace);
+        // Buscar usuario por email
+        usuarioRepository.findByEmail(email).ifPresent(usuario -> {
 
-            return true;
-        }).orElse(false);
+            try {
+                // 🗑 Eliminar tokens previos de este email
+                tokenRepository.deleteByEmail(email);
+
+                // Generar nuevo token
+                String tokenString = UUID.randomUUID().toString();
+
+                PasswordResetToken resetToken = new PasswordResetToken();
+                resetToken.setEmail(usuario.getEmail());
+                resetToken.setToken(tokenString);
+                resetToken.setExpirationDate(LocalDateTime.now().plusMinutes(15));
+                resetToken.setUsed(false);
+
+                // ✅ Asignar idUsuario obligatorio
+                resetToken.setIdUsuario(usuario.getId());
+
+                tokenRepository.save(resetToken);
+
+                // Construir enlace y enviar correo
+                String enlace = "http://localhost:4200/password?token=" + tokenString;
+                emailService.enviarCorreoRecuperacion(email, enlace);
+
+            } catch (Exception e) {
+                // 🔴 Evitar que cualquier error rompa la respuesta
+                System.err.println("Error al generar/enviar token: " + e.getMessage());
+                // No propagamos la excepción para que Angular siempre reciba OK
+            }
+        });
     }
 
+    /**
+     * 🔐 Resetear contraseña usando token
+     */
     @Transactional
     public boolean resetPassword(ResetPasswordRequest request) {
-        // 1. Buscar el token y validar expiración
+
+        // Validar seguridad de la contraseña antes de tocar la DB
+        if (!esPasswordSegura(request.getNewPassword())) {
+            return false;
+        }
+
         return tokenRepository.findByToken(request.getToken()).map(tokenEntity -> {
-            if (tokenEntity.getExpirationDate().isBefore(LocalDateTime.now())) {
+
+            // Verificar si ya fue usado
+            if (tokenEntity.isUsed()) return false;
+
+            // Verificar expiración
+            if (tokenEntity.isExpired()) {
                 tokenRepository.delete(tokenEntity);
-                return false; // Token expirado
+                return false;
             }
 
-            // 2. Buscar el usuario y actualizar la contraseña
+            // Buscar usuario y actualizar contraseña
             return usuarioRepository.findByEmail(tokenEntity.getEmail()).map(usuario -> {
-                // CRÍTICO: Hashear la nueva contraseña antes de guardar
+
                 usuario.setPassword(passwordEncoder.encode(request.getNewPassword()));
                 usuarioRepository.save(usuario);
 
-                // 3. Eliminar el token después de un uso exitoso
-                tokenRepository.delete(tokenEntity);
+                // Marcar token como usado
+                tokenEntity.setUsed(true);
+                tokenRepository.save(tokenEntity);
+
                 return true;
+
             }).orElse(false);
-        }).orElse(false); // Token inválido
+
+        }).orElse(false);
+    }
+
+    /**
+     * 🔐 Validación de contraseña fuerte:
+     * - Min 8 caracteres
+     * - Al menos 1 mayúscula
+     * - Al menos 1 minúscula
+     * - Al menos 1 número
+     * - Al menos 1 caracter especial
+     */
+    private boolean esPasswordSegura(String password) {
+        if (password == null) return false;
+
+        return password.length() >= 8 &&
+               password.matches(".*[A-Z].*") &&
+               password.matches(".*[a-z].*") &&
+               password.matches(".*\\d.*") &&
+               password.matches(".*[@$!%*?&].*");
+    }
+
+    /**
+     * 🧹 Limpieza automática de tokens expirados cada 10 minutos
+     */
+    @Scheduled(fixedRate = 600000)
+    public void limpiarTokensExpirados() {
+        tokenRepository.deleteByExpirationDateBefore(LocalDateTime.now());
     }
 }

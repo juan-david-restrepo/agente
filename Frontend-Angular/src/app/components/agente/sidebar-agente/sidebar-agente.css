@@ -87,3 +87,12 @@
   50% { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 260px;
+    height: 100vh;
+  }
+}

@@ -247,3 +247,54 @@ h4{
 
 
 
+/* =========================
+   RESPONSIVE DASHBOARD
+========================= */
+
+@media (max-width: 900px) {
+
+  .chart-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .chart-calendar {
+    flex-wrap: wrap; /* 🔥 clave */
+    gap: 8px;
+  }
+
+  .chart-calendar input,
+  .chart-calendar button {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .chart-filtros {
+    justify-content: flex-start;
+    flex-wrap: wrap; /* 🔥 clave */
+  }
+
+  .chart-filtros button {
+    flex: 1;
+    min-width: 100px;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-card {
+    padding: 18px;
+  }
+
+  .dash-card h2 {
+    font-size: 1.6em;
+  }
+
+}

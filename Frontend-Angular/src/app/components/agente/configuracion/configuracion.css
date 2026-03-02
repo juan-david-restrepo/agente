@@ -181,18 +181,79 @@ input[type="range"] {
 ========================= */
 
 @media (max-width: 768px) {
+
   .config-card {
-    margin: 20px;
-    padding: 25px;
+    margin: 15px;
+    padding: 22px;
+    border-radius: 16px;
+  }
+
+  .config-title {
+    font-size: 20px;
+  }
+
+  .config-subtitle {
+    margin-bottom: 25px;
   }
 
   .config-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: 18px;
+    padding: 18px 0;
+  }
+
+  .config-info {
+    width: 100%;
   }
 
   .switch {
     align-self: flex-end;
   }
+
+  input[type="range"] {
+    margin-top: 5px;
+  }
+}
+
+/*-----------------------------------------------*/
+
+@media (max-width: 480px) {
+
+  .config-card {
+    margin: 10px;
+    padding: 18px;
+  }
+
+  .config-title {
+    font-size: 18px;
+  }
+
+  .config-subtitle {
+    font-size: 12px;
+  }
+
+  .config-info strong {
+    font-size: 13px;
+  }
+
+  .config-info span {
+    font-size: 11px;
+  }
+
+  /* Switch más cómodo para dedo */
+  .switch {
+    width: 70px;
+    height: 36px;
+  }
+
+  .slider::before {
+    width: 30px;
+    height: 30px;
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(34px);
+  }
+
 }

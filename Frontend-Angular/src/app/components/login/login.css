@@ -40,10 +40,7 @@
 .right img {
   max-width: 180px;
   height: auto;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;  
 }
 
 .right h2 {
@@ -84,6 +81,39 @@
       border: 1px solid #ccc;
       width: 100%;
     }
+
+    .input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-group i {
+  position: absolute;
+  left: 14px;
+  color: #6c757d;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px 0 40px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  transition: border 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: #3c46cc;
+  outline: none;
+}
+
 
     .btn {
       padding: 12px;

@@ -64,7 +64,7 @@ public class ReporteController {
             reporte.setLongitud(longitud);
             reporte.setFechaIncidente(LocalDate.parse(fechaIncidente));
             reporte.setHoraIncidente(LocalTime.parse(horaIncidente));
-            reporte.setEstado("pendiente");
+            reporte.setEstado(Reporte.EstadoReporte.pendiente);
             reporte.setCreatedAt(LocalDateTime.now());
             reporte.setUpdatedAt(LocalDateTime.now());
 

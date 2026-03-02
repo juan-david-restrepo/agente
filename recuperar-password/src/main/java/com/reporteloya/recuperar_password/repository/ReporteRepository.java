@@ -7,4 +7,7 @@ import com.reporteloya.recuperar_password.entity.Reporte;
 
 @Repository
 public interface ReporteRepository extends JpaRepository<Reporte, Long> {
+ // Contar reportes por id del usuario
+    int countByUsuario_Id(Long idUsuario);
+
 }

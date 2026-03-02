@@ -1,216 +1,427 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { UserService, Usuario } from '../../service/user.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
-import { Nav } from '../../shared/nav/nav';
+
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: '',
+  iconUrl: '',
+  shadowUrl: ''
+});
 
 @Component({
   selector: 'app-parking',
-  imports: [Nav],
+  standalone: true,
+  imports: [RouterModule, CommonModule],
   templateUrl: './parking.html',
   styleUrl: './parking.css',
 })
-export class Parking implements OnInit {
+export class Parking implements OnInit, OnDestroy {
+
+  user = { name: '', lastname: '' };
+
+  constructor(private userService: UserService) {}
+
+private baseLayers: L.Layer[] = [];
+private currentLayerIndex = 0;
+
+  // Ícono usuario
+private userIcon = L.icon({
+  iconUrl: 'assets/icons/user-location.svg',
+  iconSize: [40, 40],
+  iconAnchor: [20, 40]
+});
+
+// Ícono parqueadero
+private parkingIcon = L.icon({
+  iconUrl: 'assets/icons/parking.svg',
+  iconSize: [35, 35],
+  iconAnchor: [17, 35]
+});
+  routeInstructions: string[] = [];
+  currentYear = new Date().getFullYear();
+  sidebarOpen = true;
+
   map!: L.Map;
+  routeControl!: L.Routing.Control;
+
+  userCoords!: L.LatLng;
   userMarker!: L.Marker;
-  realTimeMarker!: L.CircleMarker;
-  routeControl: any;
-  parkingMarkers: L.Marker[] = [];
+
   parkingData: any[] = [];
-  userCoords: { lat: number; lon: number } | null = null;
+  selectedParking: any = null;
+
+  isLoading = false;
+  searchCompleted = false;
+  watchId: number | null = null;
+
+  parkingLayer = L.layerGroup();
+
+  /* ================= INIT ================= */
 
   ngOnInit(): void {
     this.initMap();
-
-    // Asignación de eventos de botones (según tu HTML)
-    const btnUbicacion = document.getElementById('btnUbicacion');
-    const btnZoomIn = document.getElementById('btnZoomIn');
-    const btnZoomOut = document.getElementById('btnZoomOut');
-    const btnStreetView = document.getElementById('btnStreetView');
-    const btnBuscar = document.getElementById('btnBuscar');
-
-    if (btnUbicacion) btnUbicacion.addEventListener('click', () => this.irUbicacion());
-    if (btnZoomIn) btnZoomIn.addEventListener('click', () => this.map.zoomIn());
-    if (btnZoomOut) btnZoomOut.addEventListener('click', () => this.map.zoomOut());
-    if (btnStreetView) btnStreetView.addEventListener('click', () => this.mostrarStreetView());
-    if (btnBuscar) btnBuscar.addEventListener('click', () => this.obtenerUbicacion());
+    this.mostrarUbicacion();
+    this.userService.getProfile().subscribe({
+      next: (user: Usuario) => {
+        const parts = user.nombreCompleto.split(' ');
+        this.user.name = parts[0];
+        this.user.lastname = parts.length > 1 ? parts.slice(1).join(' ') : '';
+      },
+      error: err => console.error('Error al cargar usuario:', err)
+    });
   }
 
-  // ----------------- Funciones -----------------
-
-  getDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-    const R = 6371e3;
-    const φ1 = lat1 * Math.PI / 180;
-    const φ2 = lat2 * Math.PI / 180;
-    const Δφ = (lat2 - lat1) * Math.PI / 180;
-    const Δλ = (lon2 - lon1) * Math.PI / 180;
-
-    const a = Math.sin(Δφ / 2) ** 2 +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
+  ngOnDestroy(): void {
+    if (this.watchId) navigator.geolocation.clearWatch(this.watchId);
   }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+
+    setTimeout(() => {
+      this.map.invalidateSize();
+
+      if (this.selectedParking) {
+      this.trazarRuta(this.selectedParking);
+      }
+    }, 400);
+  }
+
+  /* ================= MAPA ================= */
+
 
   initMap(): void {
-    const armeniaCoords: [number, number] = [4.535, -75.675];
-    this.map = L.map('map').setView(armeniaCoords, 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(this.map);
+    
 
-    this.userMarker = L.marker(armeniaCoords, { title: 'Tu ubicación' })
-      .addTo(this.map)
-      .bindPopup('📍 Tu ubicación');
+    const armenia: L.LatLngExpression = [4.535, -75.675];
 
-    this.realTimeMarker = L.circleMarker(armeniaCoords, {
-      radius: 8,
-      fillColor: '#007bff',
-      color: '#ffffff',
-      weight: 2,
-      opacity: 1,
-      fillOpacity: 1
-    }).addTo(this.map).bindPopup('👤 Estás aquí (en tiempo real)');
+    const standard = L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { attribution: '© OpenStreetMap contributors' }
+    );
 
-    this.updateInfo(` Listo para buscar parqueaderos cercanos en Armenia, Quindío.`);
-  }
+    const dark = L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      { attribution: '© CartoDB' }
+    );
 
-  updateInfo(htmlContent: string): void {
-    const info = document.getElementById('info');
-    if (info) info.innerHTML = htmlContent;
-  }
+    const satellite = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/' +
+      'World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      { attribution: 'Tiles © Esri' }
+    );
 
-  limpiarMapa(): void {
-    if (this.routeControl) {
-      this.map.removeControl(this.routeControl);
-      this.routeControl = null;
-    }
-    this.parkingMarkers.forEach(m => this.map.removeLayer(m));
-    this.parkingMarkers = [];
-  }
+    const labels = L.tileLayer(
+    'https://services.arcgisonline.com/ArcGIS/rest/services/' +
+    'Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+      { attribution: 'Labels © Esri' }
+    );
 
-  async buscarParqueaderos(lat: number, lng: number): Promise<void> {
-    this.updateInfo(`⏳ Buscando parqueaderos reales cerca de (${lat.toFixed(5)}, ${lng.toFixed(5)})...`);
-    this.limpiarMapa();
-    const listado = document.getElementById('listado');
-    if (listado) listado.innerHTML = `<li class="text-gray-500">Aún no hay parqueaderos cargados...</li>`;
-    this.parkingData = [];
+    const hybrid = L.layerGroup([satellite, labels]);
 
-    const overpassQuery = `[out:json];node(around:40000,${lat},${lng})[amenity=parking];out;`;
+    this.baseLayers = [standard, dark, hybrid];
 
-    try {
-      const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`);
-      const data = await response.json();
-
-      if (!data.elements.length) {
-        this.updateInfo(`<p class="text-red-600"> No se encontraron parqueaderos en 40 km.</p>`);
-        if (listado) listado.innerHTML = `<li class="text-red-600">Sin resultados.</li>`;
-        return;
-      }
-
-      this.processParkingData(lat, lng, data.elements);
-    } catch (error) {
-      this.updateInfo("<p class='text-red-500'> Error al buscar parqueaderos.</p>");
-      console.error(error);
-    }
-  }
-
-  processParkingData(userLat: number, userLng: number, parkingNodes: any[]): void {
-    const listadoUl = document.getElementById('listado');
-    let closestDistance = Infinity;
-    let closestParking: any = null;
-
-    parkingNodes.forEach((node, index) => {
-      const dist = this.getDistance(userLat, userLng, node.lat, node.lon);
-      const name = node.tags && node.tags.name ? node.tags.name : `Parqueadero ${index + 1}`;
-      const parkingInfo = {
-        lat: node.lat,
-        lon: node.lon,
-        name,
-        distance: dist
-      };
-      this.parkingData.push(parkingInfo);
-
-      if (dist < closestDistance) {
-        closestDistance = dist;
-        closestParking = parkingInfo;
-      }
-
-      const marker = L.marker([node.lat, node.lon])
-        .addTo(this.map)
-        .bindPopup(`<strong>🅿️ ${name}</strong><br>📏 ${(dist / 1000).toFixed(2)} km`);
-      this.parkingMarkers.push(marker);
-
-      if (listadoUl) {
-        listadoUl.innerHTML += `
-          <li class="border-b pb-2">
-            <strong>🅿️ ${name}</strong><br>
-            Coordenadas: (${node.lat.toFixed(5)}, ${node.lon.toFixed(5)})<br>
-            Distancia: ${(dist / 1000).toFixed(2)} km
-          </li>
-        `;
-      }
+    this.map = L.map('map', {
+      center: armenia,
+      zoom: 13,
+      zoomControl: false,
+      layers: [this.baseLayers[0]]
     });
 
-    if (closestParking) {
-      this.updateInfo(`<p class="text-green-600 font-bold mt-3">🚗 Más cercano: ${closestParking.name} (${(closestDistance / 1000).toFixed(2)} km)</p>`);
+    L.control.scale({
+      position: 'bottomright',
+      metric: true,
+      imperial: true
+    }).addTo(this.map);
 
-      if (this.routeControl) {
-        this.map.removeControl(this.routeControl);
-      }
+    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
-      this.routeControl = L.Routing.control({
-        waypoints: [
-          L.latLng(userLat, userLng),
-          L.latLng(closestParking.lat, closestParking.lon)
-        ],
-        router: L.Routing.osrmv1({ language: 'es', profile: 'car' }),
-        show: false,
-        addWaypoints: false,
-        routeWhileDragging: false
-      }).addTo(this.map);
+    L.control.layers(
+      {
+        "Mapa estándar": standard,
+        "Modo oscuro": dark,
+        "Híbrido": hybrid
+      },
+      {},
+      { position: 'bottomleft' }
+    ).addTo(this.map);
 
-      this.routeControl.on('routesfound', (e: any) => {
-        const route = e.routes[0];
-        const durationSec = route.summary.totalTime;
-        const distanceKm = route.summary.totalDistance / 1000;
-        const minutes = Math.round(durationSec / 60);
-        this.updateInfo(`
-          <p class="text-blue-800 font-medium">Tiempo estimado: ${minutes} minutos</p>
-          <p class="text-blue-800 font-medium">Distancia de ruta: ${distanceKm.toFixed(2)} km</p>
-        `);
+    this.parkingLayer.addTo(this.map);
+  }
+
+  cambiarCapa(): void {
+
+  this.map.removeLayer(this.baseLayers[this.currentLayerIndex]);
+
+  this.currentLayerIndex =
+    (this.currentLayerIndex + 1) % this.baseLayers.length;
+
+  this.map.addLayer(this.baseLayers[this.currentLayerIndex]);
+}
+
+
+  async mostrarUbicacion(): Promise<void> {
+
+  const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true
+    })
+  );
+
+  this.userCoords = L.latLng(pos.coords.latitude, pos.coords.longitude);
+
+  this.map.setView(this.userCoords, 16);
+
+  setTimeout(() => {
+    if (this.sidebarOpen) {
+      this.map.panBy([180, 10]); // mueve el centro hacia la izquierda
+    }
+  }, 300);
+
+  if (!this.userMarker) {
+    this.userMarker = L.marker(this.userCoords, {
+      icon: this.userIcon
+    }).addTo(this.map);
+  } else {
+    this.userMarker.setLatLng(this.userCoords);
+  }
+
+  this.iniciarSeguimientoGPS();
+}
+
+  /* ================= GEO ================= */
+
+async obtenerUbicacion(): Promise<void> {
+  await this.buscarParqueaderos();
+}
+
+
+iniciarSeguimientoGPS(): void {
+
+  if (this.watchId) return;
+
+  this.watchId = navigator.geolocation.watchPosition(pos => {
+
+    this.userCoords = L.latLng(
+      pos.coords.latitude,
+      pos.coords.longitude
+    );
+
+    this.userMarker.setLatLng(this.userCoords);
+
+    if (this.selectedParking && this.routeControl) {
+      this.routeControl.setWaypoints([
+        this.userCoords,
+        L.latLng(this.selectedParking.lat, this.selectedParking.lng)
+      ]);
+    }
+
+  }, undefined, { enableHighAccuracy: true });
+}
+
+  /* ================= BUSCAR PARQUEADEROS ================= */
+  private cargandoParqueaderos = false;
+
+async buscarParqueaderos(): Promise<void> {
+
+  if (!this.userCoords) {
+    console.warn('Ubicación aún no disponible');
+    return;
+  }
+
+  if (this.cargandoParqueaderos) return;
+  this.cargandoParqueaderos = true;
+
+  this.isLoading = true;
+  this.searchCompleted = false;
+
+  try {
+
+    this.parkingLayer.clearLayers();
+
+    const query = `
+      [out:json][timeout:25];
+      node(around:30000,${this.userCoords.lat},${this.userCoords.lng}) [amenity=parking];
+      out center;
+    `;
+
+    const res = await fetch(
+      `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
+    );
+
+    if (!res.ok) {
+      throw new Error('Error consultando Overpass API');
+    }
+
+    const data = await res.json();
+
+    this.parkingData = data.elements
+      .filter((n: any) => n.lat || n.center)
+      .map((n: any) => {
+
+        const lat = n.lat ?? n.center?.lat;
+        const lon = n.lon ?? n.center?.lon;
+
+        const latLng = L.latLng(lat, lon);
+
+        const distanceMeters =
+          this.map.distance(this.userCoords, latLng) ?? 0;
+
+        const distanceKm = distanceMeters / 1000;
+        const estimatedMinutes = (distanceKm / 40) * 60;
+
+        return {
+          lat,
+          lng: lon,
+          name: n.tags?.name || 'Parqueadero',
+          address: `${n.tags?.['addr:street'] || ''} ${n.tags?.['addr:housenumber'] || ''}`.trim() || 'Dirección no disponible',
+          distanceKm: distanceKm.toFixed(2),
+          durationMin: Math.ceil(estimatedMinutes),
+          coordinates: `${lat.toFixed(5)}, ${lon.toFixed(5)}`
+        };
       });
-    }
-  }
 
-  irUbicacion(): void {
-    if (this.userMarker) {
-      this.map.setView(this.userMarker.getLatLng(), 16);
-    }
-  }
+    this.parkingData.sort(
+      (a, b) => Number(a.distanceKm) - Number(b.distanceKm)
+    );
 
-  mostrarStreetView(): void {
-    alert('Modo calle no implementado en Leaflet. Usa Google Maps directamente.');
-  }
+    this.renderMarkers();
 
-  obtenerUbicacion(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          this.userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
-          this.map.setView([this.userCoords.lat, this.userCoords.lon], 13);
-          this.userMarker.setLatLng([this.userCoords.lat, this.userCoords.lon]);
-          this.realTimeMarker.setLatLng([this.userCoords.lat, this.userCoords.lon]);
-          this.buscarParqueaderos(this.userCoords.lat, this.userCoords.lon);
-        },
-        (err) => {
-          this.updateInfo("<p class='text-red-500'> No se pudo obtener tu ubicación. Usa el botón para buscar.</p>");
-          console.error(err);
-        }
-      );
-    } else {
-      this.updateInfo("<p class='text-red-500'> La geolocalización no está soportada en tu navegador.</p>");
+    if (this.parkingData.length > 0) {
+      this.trazarRuta(this.parkingData[0]);
     }
+
+    this.searchCompleted = true;
+
+  } catch (error) {
+    console.error('Error buscando parqueaderos:', error);
+  } finally {
+    this.isLoading = false;
+    this.cargandoParqueaderos = false;
   }
 }
+  renderMarkers(): void {
+
+    this.parkingData.forEach(p => {
+
+      const marker = L.marker([p.lat, p.lng], {
+        icon: this.parkingIcon
+      });
+
+      marker.on('click', () => this.trazarRuta(p));
+      marker.addTo(this.parkingLayer);
+    });
+  }
+
+  /* ================= RUTA ================= */
+private simulationInterval: any;
+
+trazarRuta(parking: any): void {
+
+  this.selectedParking = parking;
+
+  const waypoints = [
+    this.userCoords,
+    L.latLng(parking.lat, parking.lng)
+  ];
+
+  // Si no existe el control, lo creamos
+  if (this.routeControl) {
+    this.map.removeControl(this.routeControl);
+    this.routeControl = undefined as any;
+  }
+
+  this.map.eachLayer((layer) => {
+    if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+      this.map.removeLayer(layer);
+    }
+  });
+
+    this.routeControl = L.Routing.control({
+      waypoints,
+      addWaypoints: false,
+      routeWhileDragging: false,
+      show: false,
+      lineOptions: {
+        styles: [{ color: '#2563eb', weight: 6 }]
+      },
+      router: L.Routing.osrmv1({
+        profile: 'car',
+        language: 'es'
+      })
+    }).addTo(this.map);
+
+    this.routeControl.on('routesfound', (e: any) => {
+
+       const route = e.routes[0];
+
+      this.hablarIndicaciones(e.routes[0]);
+
+      this.simularRecorrido(route.coordinates);
+
+      this.routeInstructions =
+        route.instructions?.map((i: any) => i.text) || [];
+  
+      const bounds = L.latLngBounds([
+        this.userCoords,
+        L.latLng(this.selectedParking.lat, this.selectedParking.lng)
+      ]);
+      this.map.fitBounds(bounds, {
+      paddingTopLeft: this.sidebarOpen ? [380, 120] : [120, 120],
+      paddingBottomRight: [120, 120],
+      maxZoom: 16
+    });
+
+    setTimeout(() => {
+      this.map.setZoom(this.map.getZoom() - 0.5);
+    }, 200);
+    });
+}
+
+    private hablarIndicaciones(route: any): void {
+
+  if (!('speechSynthesis' in window)) return;
+
+  const instrucciones = route.instructions;
+
+  instrucciones.forEach((inst: any, i: number) => {
+
+    setTimeout(() => {
+
+      const mensaje = new SpeechSynthesisUtterance(inst.text);
+      mensaje.lang = 'es-ES';
+      speechSynthesis.speak(mensaje);
+
+    }, i * 4000); // cada 4 segundos
+
+  });
+}
+
+    private simularRecorrido(coordinates: L.LatLng[]): void {
+
+  let index = 0;
+
+  const interval = setInterval(() => {
+
+    if (index >= coordinates.length) {
+      clearInterval(interval);
+      return;
+    }
+
+    const punto = coordinates[index];
+
+    this.userMarker.setLatLng(punto);
+
+    this.map.setView(punto, 17);
+
+    index++;
+
+  }, 500); // velocidad simulada (500ms por punto)
+    }
+  }

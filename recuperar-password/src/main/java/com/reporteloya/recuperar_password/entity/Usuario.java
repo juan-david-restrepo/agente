@@ -28,10 +28,10 @@ public class Usuario implements UserDetails {
     @Column(name = "numero_documento")
     private String numeroDocumento;
 
-    @Column(name = "nombre", nullable = false)
+    @Column(name = "nombre_completo", nullable = false)
     private String nombreCompleto;
 
-    @Column(name = "correo",unique = true, nullable = false)
+    @Column(name = "email",unique = true, nullable = false)
     private String email;
 
     @Column(name = "password",nullable = false)
@@ -40,7 +40,7 @@ public class Usuario implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // ===== UserDetails =====
+    // ===== UserDestails =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

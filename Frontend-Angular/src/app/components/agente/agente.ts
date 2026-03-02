@@ -368,4 +368,16 @@ export class Agente implements OnInit {
       // agenteService.asignarACompanero(...)
     }
 
+    // responsive
+
+    sidebarAbierto = false;
+
+    toggleSidebar() {
+      this.sidebarAbierto = !this.sidebarAbierto;
+    }
+
+    cerrarSidebar() {
+      this.sidebarAbierto = false;
+    }
+                 
 }

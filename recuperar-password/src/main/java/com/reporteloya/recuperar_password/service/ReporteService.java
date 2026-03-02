@@ -21,7 +21,7 @@ public class ReporteService {
 
     public Reporte crearReporte(Reporte reporte) {
 
-        reporte.setEstado("pendiente");
+        reporte.setEstado(Reporte.EstadoReporte.pendiente);
 
         Reporte guardado = reporteRepository.save(reporte);
 

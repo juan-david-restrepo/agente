@@ -24,6 +24,7 @@ import { MapaReportesComponent } from './components/admin/mapa-reportes/mapa-rep
 import { SidebarAdmin } from './components/admin/sidebar-admin/sidebar-admin';
 import { Admin } from './components/admin/admin';
 import { Routes } from '@angular/router';
+import { SenalesComponent } from './components/senales/senales';
 
 
 export const routes: Routes = [
@@ -53,4 +54,5 @@ export const routes: Routes = [
   {path: 'mapa-reportes', component: MapaReportesComponent},
   {path: 'perfil', component: Perfil, canActivate: [authGuard] },
   { path: 'admin', component: Admin, },
+  { path: 'senales', component: SenalesComponent },
 ];
