@@ -3,10 +3,11 @@
 ================================ */
 .admin-container {
   display: flex;
-  height: 100vh;        
+  height: 100vh;
   background: #f1f5f9;
-  overflow: hidden;      /* 👈 evita scroll del body */
-  
+  overflow: hidden;
+  /* 👈 evita scroll del body */
+
 }
 
 /* ===============================
@@ -20,12 +21,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: auto;   
+  overflow-y: auto;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Limita el ancho del contenido sin tocar HTML */
-.admin-content > * {
+.admin-content>* {
   width: 100%;
   max-width: 1100px;
 }
@@ -381,7 +382,8 @@ table td {
   .titulo {
     font-size: 22px;
   }
-  .tabla-tareas{
+
+  .tabla-tareas {
     display: flex;
     flex-direction: column;
   }
@@ -432,7 +434,7 @@ table td {
   border-radius: 14px;
   padding: 26px 24px 22px;
   text-align: center;
-  box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
   animation: scaleIn 0.18s ease;
   font-family: inherit;
 }
@@ -484,19 +486,24 @@ table td {
 .btn-confirmar {
   background: #e53935;
   color: white;
-  box-shadow: 0 6px 18px rgba(229,57,53,0.35);
+  box-shadow: 0 6px 18px rgba(229, 57, 53, 0.35);
 }
 
 .btn-confirmar:hover {
   background: #d32f2f;
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(229,57,53,0.45);
+  box-shadow: 0 10px 22px rgba(229, 57, 53, 0.45);
 }
 
 /* ================= ANIMACIONES ================= */
 @keyframes fadeIn {
-  from { opacity: 0 }
-  to { opacity: 1 }
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
 }
 
 @keyframes scaleIn {
@@ -504,6 +511,7 @@ table td {
     transform: scale(.85);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -521,7 +529,8 @@ table td {
 .tabla-tareas {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed; /* Mantiene la tabla bajo control con 6 columnas */
+  table-layout: fixed;
+  /* Mantiene la tabla bajo control con 6 columnas */
 }
 
 /* encabezado */
@@ -546,12 +555,43 @@ table td {
 }
 
 /* ===== ANCHOS ESPECÍFICOS PARA 6 COLUMNAS ===== */
-.tabla-tareas th:nth-child(1), .tabla-tareas td:nth-child(1) { width: 110px; } /* Fecha */
-.tabla-tareas th:nth-child(2), .tabla-tareas td:nth-child(2) { width: 80px;  } /* Hora */
-.tabla-tareas th:nth-child(3), .tabla-tareas td:nth-child(3) { width: auto;  } /* Descripción */
-.tabla-tareas th:nth-child(4), .tabla-tareas td:nth-child(4) { width: 125px; } /* Estado (NUEVA) */
-.tabla-tareas th:nth-child(5), .tabla-tareas td:nth-child(5) { width: 110px; } /* Prioridad */
-.tabla-tareas th:nth-child(6), .tabla-tareas td:nth-child(6) { width: 100px; text-align: center; } /* Acción */
+.tabla-tareas th:nth-child(1),
+.tabla-tareas td:nth-child(1) {
+  width: 110px;
+}
+
+/* Fecha */
+.tabla-tareas th:nth-child(2),
+.tabla-tareas td:nth-child(2) {
+  width: 80px;
+}
+
+/* Hora */
+.tabla-tareas th:nth-child(3),
+.tabla-tareas td:nth-child(3) {
+  width: auto;
+}
+
+/* Descripción */
+.tabla-tareas th:nth-child(4),
+.tabla-tareas td:nth-child(4) {
+  width: 125px;
+}
+
+/* Estado (NUEVA) */
+.tabla-tareas th:nth-child(5),
+.tabla-tareas td:nth-child(5) {
+  width: 110px;
+}
+
+/* Prioridad */
+.tabla-tareas th:nth-child(6),
+.tabla-tareas td:nth-child(6) {
+  width: 100px;
+  text-align: center;
+}
+
+/* Acción */
 
 
 /* columna descripción limpia */
@@ -615,7 +655,8 @@ table td {
   display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: none; /* evita bloquear el backdrop */
+  pointer-events: none;
+  /* evita bloquear el backdrop */
 }
 
 /* caja */
@@ -627,7 +668,7 @@ table td {
 
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 25px 70px rgba(0,0,0,.35);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, .35);
 
   display: flex;
   flex-direction: column;
@@ -651,7 +692,8 @@ table td {
 .modal-body {
   padding: 20px 22px;
   overflow-y: auto;
-  overflow-x: hidden;   /* 🔴 elimina scroll lateral */
+  overflow-x: hidden;
+  /* 🔴 elimina scroll lateral */
 
   max-height: 65vh;
 
@@ -659,8 +701,10 @@ table td {
   color: #0f172a;
 
   white-space: pre-wrap;
-  word-break: break-word;     /* 🔥 rompe palabras largas */
-  overflow-wrap: anywhere;    /* 🔥 fuerza salto aunque no haya espacios */
+  word-break: break-word;
+  /* 🔥 rompe palabras largas */
+  overflow-wrap: anywhere;
+  /* 🔥 fuerza salto aunque no haya espacios */
 }
 
 /* footer */
@@ -693,6 +737,7 @@ table td {
 .btn-cerrar:hover {
   background: #1e3a8a;
 }
+
 /* ================= COLORES DE ESTADOS ACTUALIZADOS ================= */
 .badge-estado {
   padding: 6px 14px;
@@ -704,31 +749,31 @@ table td {
   display: inline-block;
   min-width: 95px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Pendiente -> Amarillo */
-.bg-pendiente { 
-  background-color: #ffb921e0 !important; 
-  color: #f7f7f7 !important; 
-} 
+.bg-pendiente {
+  background-color: #ffb921e0 !important;
+  color: #f7f7f7 !important;
+}
 
 /* En Proceso -> Azul */
-.bg-proceso { 
-  background-color: #3b82f6 !important; 
-  color: #fff !important; 
-} 
+.bg-proceso {
+  background-color: #3b82f6 !important;
+  color: #fff !important;
+}
 
 /* Finalizado -> Verde */
-.bg-finalizado { 
-  background-color: #2ecc71 !important; 
-  color: #fff !important; 
-} 
+.bg-finalizado {
+  background-color: #2ecc71 !important;
+  color: #fff !important;
+}
 
 /* Rechazado (por si lo usas) -> Rojo */
-.bg-rechazado { 
-  background-color: #e63946 !important; 
-  color: #fff !important; 
+.bg-rechazado {
+  background-color: #e63946 !important;
+  color: #fff !important;
 }
 
 
@@ -749,7 +794,8 @@ table td {
 /* Contenedor de los botones de filtro (Tabs) */
 .filtros-container {
   display: flex;
-  background: #e2e8f0; /* Color similar a tu bg-cancelar */
+  background: #e2e8f0;
+  /* Color similar a tu bg-cancelar */
   padding: 4px;
   border-radius: 12px;
   gap: 4px;
@@ -819,4 +865,141 @@ table td {
   border-radius: 8px;
   text-align: center;
   font-style: italic;
+}
+
+
+/* =========================================
+   ESTILOS DE MENÚ MÓVIL (NUEVO)
+   ========================================= */
+.mobile-menu-btn {
+  left: 20px;
+  display: none;
+  position: absolute;
+  top: 7px;
+  /* right: 120px; */
+  z-index: 1001;
+  background: #0b1c2d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* =========================================
+   MEDIA QUERY: TABLETS Y MÓVILES
+   ========================================= */
+@media (max-width: 992px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  /* Escondemos el sidebar lateralmente */
+  app-sidebar-admin {
+    position: fixed;
+    left: -280px;
+    /* Ajusta según el ancho de tu sidebar */
+    top: 0;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+
+  app-sidebar-admin.active {
+    left: 0;
+  }
+
+  .admin-content {
+    padding: 60px 15px 20px 15px;
+    /* Espacio para el botón de arriba */
+  }
+}
+
+/* =========================================
+   MEDIA QUERY: MÓVILES PEQUEÑOS (HASTA 340px)
+   ========================================= */
+@media (max-width: 768px) {
+
+  /* Convertir tablas en formato lista/card */
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  tr {
+    border: 1px solid #e5e7eb;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px;
+  }
+
+  td {
+    border: none;
+    position: relative;
+    padding-left: 50% !important;
+    text-align: right !important;
+    width: 100% !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+  }
+
+  /* Crear etiquetas dinámicas para las tablas */
+  td::before {
+    content: attr(data-label);
+    /* Necesitarás agregar data-label en el HTML o usar nth-child */
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+    color: #475569;
+  }
+
+  /* Ajustes específicos para que no se rompa a 340px */
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .titulo {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .header-historial {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filtros-container {
+    width: 100%;
+    overflow-x: auto;
+    /* Permite scroll si los botones no caben */
+  }
+
+  .filtros-container button {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
 }

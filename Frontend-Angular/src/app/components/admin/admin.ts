@@ -2,25 +2,28 @@ import { Component, AfterViewInit } from '@angular/core';
 import Chart from 'chart.js/auto';
 import { SidebarAdmin } from './sidebar-admin/sidebar-admin';
 import { RouterModule } from '@angular/router';
-
-
-
+import { CommonModule } from '@angular/common'; // 👈 Importante para el *ngIf
 
 @Component({
   selector: 'app-admin',
   standalone: true,
   templateUrl: './admin.html',
-  imports: [SidebarAdmin, RouterModule],
-  styleUrls: ['./admin.css']
+  styleUrls: ['./admin.css'],
+  // 👈 Añadimos CommonModule aquí
+  imports: [SidebarAdmin, RouterModule, CommonModule] 
 })
 export class Admin implements AfterViewInit {
 
+  // 🔹 1. Propiedades de estado
+  menuAbierto: boolean = false; 
+
+  // 🔹 2. Ciclo de vida
   ngAfterViewInit(): void {
     this.createLineChart();
     this.createPieChart();
   }
 
-
+  // 🔹 3. Métodos de Gráficos
   private createLineChart(): void {
     new Chart('lineChart', {
       type: 'line',
@@ -36,7 +39,8 @@ export class Admin implements AfterViewInit {
         }]
       },
       options: {
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: false // Ayuda a que se adapte mejor a los contenedores
       }
     });
   }
@@ -52,10 +56,9 @@ export class Admin implements AfterViewInit {
         }]
       },
       options: {
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: false
       }
     });
   }
-
-
 }

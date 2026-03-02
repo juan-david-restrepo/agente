@@ -1,12 +1,13 @@
 <div class="admin-container">
 
-  <!-- SIDEBAR -->
-  <app-sidebar-admin></app-sidebar-admin>
+  <button class="mobile-menu-btn" (click)="menuAbierto = !menuAbierto">☰</button>
 
-  <!-- CONTENIDO DERECHO -->
+  <div class="sidebar-overlay" *ngIf="menuAbierto" (click)="menuAbierto = false"></div>
+
+  <app-sidebar-admin [class.active]="menuAbierto"></app-sidebar-admin>
+
   <div class="admin-content">
 
-    <!-- HEADER -->
     <div class="admin-header">
       <div>
         <h1>Centro de Control Vial</h1>
@@ -14,7 +15,6 @@
       </div>
     </div>
 
-    <!-- CONTADORES -->
     <div class="stats-grid">
 
       <div class="stat-card pendiente">
@@ -39,7 +39,6 @@
 
     </div>
 
-    <!-- MAPA -->
     <div class="map-card">
       <div class="map-header">
         <h2>Mapa de Reportes</h2>
@@ -50,8 +49,6 @@
     </div>
 
   </div>
-
-  <!-- ================= PANEL DETALLE ================= -->
 
   <div class="detalle-overlay" *ngIf="mostrarDetalle">
 

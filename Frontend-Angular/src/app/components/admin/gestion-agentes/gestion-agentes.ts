@@ -32,25 +32,26 @@ export class GestionAgentes implements OnDestroy {
   reportes: Reporte[] = [];
   tareas: Tarea[] = [];
   
-  // Estado de filtros y carga
+  // Estado de filtros, carga y responsive
   filtroSeleccionado: 'TODOS' | 'TAREAS' | 'REPORTES' = 'TODOS';
   cargando = false;
   cargandoReportes = false;
   cargandoTareas = false;
   error = '';
+  
+  // NUEVA PROPIEDAD PARA RESPONSIVE
+  menuAbierto = false; 
 
   private pollingSubscription?: Subscription;
 
   // =========================
-  // 2. GETTERS (Lógica de filtrado para el Historial)
+  // 2. GETTERS
   // =========================
 
-  // Solo devuelve las tareas que ya están cerradas
   get tareasFinalizadas(): Tarea[] {
     return this.tareas.filter(t => t.estado === 'FINALIZADO');
   }
 
-  // Si en un futuro los reportes tienen estados, los filtrarías aquí
   get reportesHistorial(): Reporte[] {
     return this.reportes; 
   }
@@ -104,7 +105,7 @@ export class GestionAgentes implements OnDestroy {
     this.agente = null;
     this.reportes = [];
     this.tareas = [];
-    this.filtroSeleccionado = 'TODOS'; // Reset de filtro al buscar nuevo agente
+    this.filtroSeleccionado = 'TODOS';
 
     this.adminService.obtenerAgentePorPlaca(this.placaBuscada).subscribe({
       next: (data) => {
@@ -196,7 +197,7 @@ export class GestionAgentes implements OnDestroy {
         this.mensajeTarea = '¡Tarea añadida con éxito!';
         this.limpiarFormulario();
       },
-      error: (err) => {
+      error: () => {
         this.mensajeTarea = 'Error al asignar la tarea';
       }
     });
@@ -213,7 +214,7 @@ export class GestionAgentes implements OnDestroy {
         }
         this.mensajeTarea = 'Tarea eliminada correctamente';
       },
-      error: (err) => {
+      error: () => {
         this.mensajeTarea = 'No se pudo eliminar la tarea';
       }
     });

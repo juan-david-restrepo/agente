@@ -1,17 +1,17 @@
-
-
 <div class="admin-layout">
-  <app-sidebar-admin></app-sidebar-admin>
+  <button class="mobile-menu-btn" (click)="menuAbierto = !menuAbierto">
+    ☰
+  </button>
 
+  <div class="sidebar-overlay" *ngIf="menuAbierto" (click)="menuAbierto = false"></div>
 
-  <!-- 🔹 Contenido principal -->
+  <app-sidebar-admin [class.active]="menuAbierto"></app-sidebar-admin>
+
   <main class="main-content">
     <div class="header">
-      
       <h2>Dashboard General</h2>
     </div>
 
-    <!-- 🔹 Gráficos -->
     <div class="charts-grid">
       <div class="chart-card">
         <h4>Reportes Semanales</h4>
@@ -24,9 +24,8 @@
       </div>
     </div>
 
-    <!-- 🔹 Tabla de infracciones recientes -->
     <div class="table-section">
-      <h3> Infracciones Recientes</h3>
+      <h3>Infracciones Recientes</h3>
       <table class="data-table">
         <thead>
           <tr>
@@ -39,25 +38,25 @@
         </thead>
         <tbody>
           <tr>
-            <td>1</td>
-            <td>03/07/2025</td>
-            <td>Velocidad</td>
-            <td>Gómez</td>
-            <td><span class="status pending">Pendiente</span></td>
+            <td data-label="#">1</td>
+            <td data-label="Fecha">03/07/2025</td>
+            <td data-label="Tipo">Velocidad</td>
+            <td data-label="Agente">Gómez</td>
+            <td data-label="Estado"><span class="status pending">Pendiente</span></td>
           </tr>
           <tr>
-            <td>2</td>
-            <td>03/07/2025</td>
-            <td>Semáforo</td>
-            <td>López</td>
-            <td><span class="status validated">Validado</span></td>
+            <td data-label="#">2</td>
+            <td data-label="Fecha">03/07/2025</td>
+            <td data-label="Tipo">Semáforo</td>
+            <td data-label="Agente">López</td>
+            <td data-label="Estado"><span class="status validated">Validado</span></td>
           </tr>
           <tr>
-            <td>3</td>
-            <td>02/07/2025</td>
-            <td>Parqueo indebido</td>
-            <td>Martínez</td>
-            <td><span class="status pending">Pendiente</span></td>
+            <td data-label="#">3</td>
+            <td data-label="Fecha">02/07/2025</td>
+            <td data-label="Tipo">Parqueo indebido</td>
+            <td data-label="Agente">Martínez</td>
+            <td data-label="Estado"><span class="status pending">Pendiente</span></td>
           </tr>
         </tbody>
       </table>

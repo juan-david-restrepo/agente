@@ -7,12 +7,20 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* Sidebar en escritorio: ancho fijo para que no flote sobre el contenido */
+app-sidebar-admin {
+  width: 260px;
+  flex-shrink: 0;
+  background: #ffffff;
+  display: block;
+}
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
   flex: 1;
   padding: 32px;
   background: #f4f7fb;
+  overflow-x: hidden;
 }
 
 /* ===== HEADER ===== */
@@ -26,10 +34,10 @@
   color: #0a2540;
 }
 
-/* ===== CHARTS GRID ===== */
+/* ===== CHARTS GRID (Escritorio: Lado a lado) ===== */
 .charts-grid {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
   gap: 24px;
   margin-bottom: 36px;
 }
@@ -50,7 +58,6 @@
   color: #1e3a8a;
 }
 
-/* 👇 MUY IMPORTANTE PARA QUE SE VEAN LOS GRÁFICOS */
 .chart-card canvas {
   width: 100% !important;
   height: 260px !important;
@@ -65,13 +72,6 @@
   box-shadow: 0 10px 24px rgba(10,37,64,0.08);
 }
 
-.table-section h3 {
-  margin-bottom: 18px;
-  font-size: 18px;
-  color: #1e3a8a;
-}
-
-/* ===== TABLE ===== */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -82,7 +82,7 @@
 }
 
 .data-table th {
-  padding: 12px;
+  padding: 15px;
   text-align: left;
   font-size: 13px;
   font-weight: 600;
@@ -90,7 +90,7 @@
 }
 
 .data-table td {
-  padding: 12px;
+  padding: 15px;
   font-size: 14px;
   border-top: 1px solid #e2e8f0;
 }
@@ -99,7 +99,7 @@
   background: #f1f5ff;
 }
 
-/* ===== STATUS ===== */
+/* ===== STATUS BADGES ===== */
 .status {
   padding: 4px 10px;
   border-radius: 999px;
@@ -107,55 +107,117 @@
   font-weight: 600;
 }
 
-.status.pending {
-  background: #fff7ed;
-  color: #c2410c;
+.status.pending { background: #fff7ed; color: #c2410c; }
+.status.validated { background: #ecfdf5; color: #15803d; }
+
+/* ===== ESTILOS DE MENÚ MÓVIL (BOTÓN) ===== */
+.mobile-menu-btn {
+  display: none; /* Oculto en PC */
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1100;
+  background: #0a2540;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-.status.validated {
-  background: #ecfdf5;
-  color: #15803d;
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1050;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1200px) {
+/* =========================================
+   MEDIA QUERIES (EL CORAZÓN DEL RESPONSIVE)
+   ========================================= */
+
+@media (max-width: 992px) {
+  .mobile-menu-btn {
+    display: flex; /* Aparece el botón */
+  }
+
+  app-sidebar-admin {
+    position: fixed;
+    left: -280px; /* Escondido */
+    top: 0;
+    height: 100vh;
+    z-index: 1080;
+    transition: left 0.3s ease;
+    width: 260px;
+  }
+
+  app-sidebar-admin.active {
+    left: 0; /* Entra el sidebar */
+  }
+
+  .main-content {
+    padding: 80px 15px 20px 15px; /* Espacio para el botón */
+  }
+
   .charts-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Gráficos uno sobre otro */
   }
 }
 
+@media (max-width: 768px) {
+  /* --- Tabla modo Card (Solo móvil) --- */
+  .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr {
+    display: block;
+  }
 
-/* --- AGREGAR AL FINAL PARA ACCESIBILIDAD --- */
+  .data-table thead {
+    display: none; /* Escondemos cabecera real */
+  }
 
-/* Ajuste Modo Oscuro */
-.admin-layout.dark-mode {
-  background: #121212 !important;
-  color: #ffffff !important;
+  .data-table tr {
+    margin-bottom: 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px 0;
+  }
+
+  .data-table td {
+    border: none;
+    position: relative;
+    padding: 10px 15px 10px 45% !important;
+    text-align: right !important;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .data-table td:last-child { border-bottom: none; }
+
+  /* Etiquetas dinámicas (USA DATA-LABEL EN EL HTML) */
+  .data-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    width: 40%;
+    text-align: left;
+    font-weight: 700;
+    color: #1e3a8a;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
 }
 
-.admin-layout.dark-mode .main-content {
-  background: #121212 !important;
+/* Ajuste extremo para 340px */
+@media (max-width: 360px) {
+  .header h2 { font-size: 18px; }
+  .data-table td { font-size: 12px; padding-left: 40% !important; }
 }
 
-.admin-layout.dark-mode .chart-card,
-.admin-layout.dark-mode .table-section {
-  background: #1e1e1e !important;
-  color: #ffffff !important;
-  border-color: #333 !important;
-}
-
-.admin-layout.dark-mode .header h2,
-.admin-layout.dark-mode .chart-card h4,
-.admin-layout.dark-mode .table-section h3 {
-  color: #818cf8 !important;
-}
-
-/* Ajuste Fuentes */
-.admin-layout.font-Small { font-size: 12px !important; }
-.admin-layout.font-Large { font-size: 20px !important; }
-.admin-layout.font-Large h2 { font-size: 32px !important; }
-
-/* Ajuste Daltonismo */
-.admin-layout.color-blind-mode {
-  filter: contrast(120%) saturate(110%) !important;
-}
+/* --- ACCESIBILIDAD --- */
+.admin-layout.dark-mode { background: #121212 !important; color: #fff; }
+.admin-layout.dark-mode .main-content { background: #121212 !important; }
+.admin-layout.dark-mode .chart-card, .admin-layout.dark-mode .table-section { background: #1e1e1e; border-color: #333; }

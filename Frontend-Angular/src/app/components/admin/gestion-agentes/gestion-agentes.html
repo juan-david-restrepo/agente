@@ -1,5 +1,12 @@
 <div class="admin-container" [class.modal-abierto]="mostrarModal || modalDescripcion">
-  <app-sidebar-admin></app-sidebar-admin>
+  
+  <button class="mobile-menu-btn" (click)="menuAbierto = !menuAbierto">
+    ☰
+  </button>
+
+  <div class="sidebar-overlay" *ngIf="menuAbierto" (click)="menuAbierto = false"></div>
+
+  <app-sidebar-admin [class.active]="menuAbierto"></app-sidebar-admin>
 
   <div class="admin-content">
 
@@ -79,15 +86,15 @@
         </thead>
         <tbody>
           <tr *ngFor="let tarea of tareas">
-            <td>{{ tarea.fecha }}</td>
-            <td>{{ tarea.hora }}</td>
-            <td class="td-descripcion">
+            <td data-label="Fecha">{{ tarea.fecha }}</td>
+            <td data-label="Hora">{{ tarea.hora }}</td>
+            <td data-label="Descripción" class="td-descripcion">
               <div class="descripcion-contenido">
                 <span class="descripcion-texto">{{ tarea.descripcion }}</span>
                 <button *ngIf="tarea.descripcion.length > 30" class="ver-mas" (click)="abrirModalDescripcion(tarea.descripcion)">Ver más</button>
               </div>
             </td>
-            <td>
+            <td data-label="Estado">
               <span class="badge-estado" [ngClass]="{
                 'bg-rechazado': tarea.estado === 'RECHAZADO',
                 'bg-proceso': tarea.estado === 'EN PROCESO',
@@ -95,8 +102,8 @@
                 'bg-pendiente': !tarea.estado || tarea.estado === 'PENDIENTE'
               }">{{ tarea.estado || 'PENDIENTE' }}</span>
             </td>
-            <td><span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">{{ tarea.prioridad }}</span></td>
-            <td>
+            <td data-label="Prioridad"><span class="prioridad" [ngClass]="tarea.prioridad.toLowerCase()">{{ tarea.prioridad }}</span></td>
+            <td data-label="Acción">
               <button *ngIf="tarea.estado !== 'EN PROCESO' && tarea.estado !== 'FINALIZADO'" class="btn-eliminar" (click)="abrirModalEliminar(tarea)">Eliminar</button>
             </td>
           </tr>
@@ -104,10 +111,6 @@
       </table>
       <p *ngIf="tareas.length === 0">No hay tareas asignadas.</p>
     </div>
-
-
-
-    
 
     <div class="card" *ngIf="agente">
       <div class="header-historial">
@@ -132,10 +135,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let tarea of tareasFinalizadas">
-              <td>{{ tarea.fecha }}</td>
-              <td>{{ tarea.hora }}</td>
-              <td>{{ tarea.descripcion }}</td>
-              <td><span class="badge-estado bg-finalizado">FINALIZADO</span></td>
+              <td data-label="Fecha">{{ tarea.fecha }}</td>
+              <td data-label="Hora">{{ tarea.hora }}</td>
+              <td data-label="Descripción">{{ tarea.descripcion }}</td>
+              <td data-label="Estado"><span class="badge-estado bg-finalizado">FINALIZADO</span></td>
             </tr>
           </tbody>
         </table>
@@ -157,10 +160,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let reporte of reportes">
-              <td>{{ reporte.fecha }}</td>
-              <td>{{ reporte.hora }}</td>
-              <td>{{ reporte.ubicacion }}</td>
-              <td>{{ reporte.tipoIncidente }}</td>
+              <td data-label="Fecha">{{ reporte.fecha }}</td>
+              <td data-label="Hora">{{ reporte.hora }}</td>
+              <td data-label="Ubicación">{{ reporte.ubicacion }}</td>
+              <td data-label="Incidente">{{ reporte.tipoIncidente }}</td>
             </tr>
           </tbody>
         </table>
