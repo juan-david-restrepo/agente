@@ -88,15 +88,20 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // MAPEADO DE CLASES SEGÚN TU CSS (pending, validated, etc)
-  getClaseEstado(estado: string): string {
-    switch (estado) {
-      case 'PENDIENTE': return 'pending';
-      case 'FINALIZADO': return 'validated';
-      case 'RECHAZADO': return 'alta'; // Usando los colores de prioridad para variedad
-      case 'EN PROCESO': return 'mediana';
-      default: return '';
-    }
+getClaseEstado(estado: EstadoInfraccion): string {
+  switch (estado) {
+    case 'PENDIENTE':
+      return 'estado-pendiente';
+    case 'FINALIZADO':
+      return 'estado-finalizado';
+    case 'RECHAZADO':
+      return 'estado-rechazado';
+    case 'EN PROCESO':
+      return 'estado-proceso';
+    default:
+      return '';
   }
+}
 
   abrirModalDetalle(seccion: 'reportes' | 'tipos'): void {
     if (seccion === 'reportes') {
