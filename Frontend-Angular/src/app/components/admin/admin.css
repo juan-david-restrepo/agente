@@ -730,6 +730,102 @@ app-sidebar-admin {
   gap: 30px;
 }
 
+/* =========================================
+   ESTILOS DE ESTADOS (BADGES) ACTUALIZADOS
+   ========================================= */
+
+/* Base para los badges de la tabla */
+.status {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+  min-width: 100px;
+}
+
+/* Base para los badges del Modal */
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-block;
+  border: 1px solid transparent;
+}
+
+/* --- COLORES POR ESTADO (Basado en tus capturas) --- */
+
+/* PENDIENTE: Naranja/Ámbar */
+.status.pending, .status-badge.pending {
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #ffedd5;
+}
+
+/* FINALIZADO / VALIDADO: Verde */
+.status.validated, .status-badge.validated {
+  background: #ecfdf5;
+  color: #166534;
+  border: 1px solid #d1fae5;
+}
+
+/* RECHAZADO: Rojo */
+.status.rejected, .status-badge.rejected {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
+}
+
+/* EN PROCESO: Azul Claro */
+.status.process, .status-badge.process {
+  background: #f0f9ff;
+  color: #075985;
+  border: 1px solid #e0f2fe;
+}
+
+/* ====================================================
+   🌙 SOPORTE PARA MODO NOCHE (DARK MODE)
+   ==================================================== */
+::ng-deep body.dark-mode .status.pending, 
+::ng-deep body.dark-mode .status-badge.pending {
+  background: #2a1b0a !important;
+  color: #fbbf24 !important;
+  border-color: #452b0d !important;
+}
+
+::ng-deep body.dark-mode .status.validated, 
+::ng-deep body.dark-mode .status-badge.validated {
+  background: #062016 !important;
+  color: #34d399 !important;
+  border-color: #064e3b !important;
+}
+
+::ng-deep body.dark-mode .status.rejected, 
+::ng-deep body.dark-mode .status-badge.rejected {
+  background: #2d0a0a !important;
+  color: #f87171 !important;
+  border-color: #7f1d1d !important;
+}
+
+::ng-deep body.dark-mode .status.process, 
+::ng-deep body.dark-mode .status-badge.process {
+  background: #082f49 !important;
+  color: #38bdf8 !important;
+  border-color: #0c4a6e !important;
+}
+
+/* Resto de tu layout general... */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f4f7fb;
+  color: #0a2540;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+/* (Aquí iría el resto de tu código de Layout, Header, etc.) */
+
 /* Etiquetas en mayúsculas y gris (image_fa569f.png) */
 .detail-block label {
   display: block;
@@ -898,3 +994,215 @@ app-sidebar-admin {
     border: 1px solid #2563eb !important;
 }
 
+
+/* ====================================================
+   🔹 CONTENEDOR DEL MODAL (OVERLAY)
+==================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4); /* Fondo oscuro suave */
+  backdrop-filter: blur(10px);        /* Desenfoque tipo iOS/Glassmorphism */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ====================================================
+   🔹 VENTANA DEL MODAL
+==================================================== */
+.modal-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 35px; /* Bordes muy redondeados según la imagen */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Encabezado */
+.modal-header {
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fdfdfd;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.title-group h5 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.5px;
+}
+
+/* Icono "i" azul al lado del título */
+.info-icon-blue {
+  background: #2563eb;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botón cerrar circular (Botón Blanco con punto azul) */
+.btn-close-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #2563eb;
+  background: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.btn-close-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: #2563eb;
+  border-radius: 50%;
+}
+
+.btn-close-circle:hover {
+  background: #f0f7ff;
+  transform: rotate(90deg);
+}
+
+/* ====================================================
+   🔹 CUERPO DEL MODAL (TABLAS Y DETALLES)
+==================================================== */
+.modal-body {
+  padding: 32px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Tablas dentro del modal */
+.modal-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px; /* Espaciado entre filas */
+}
+
+.modal-table th {
+  text-align: left;
+  padding: 12px;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.modal-table td {
+  padding: 16px 12px;
+  background: #f8faff;
+  border: none;
+}
+
+.modal-table tr td:first-child { border-radius: 12px 0 0 12px; }
+.modal-table tr td:last-child { border-radius: 0 12px 12px 0; }
+
+/* Badges de Prioridad */
+.priority-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.priority-pill.alta { background: #fee2e2; color: #ef4444; }
+.priority-pill.mediana { background: #fef3c7; color: #f59e0b; }
+.priority-pill.baja { background: #dcfce7; color: #10b981; }
+
+/* Grid de detalles (para infracción individual) */
+.detalle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.detalle-item label {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.detalle-item p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* ====================================================
+   🔹 PIE DEL MODAL
+==================================================== */
+.modal-footer-centered {
+  padding: 0 32px 32px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-action-blue {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 14px 60px;
+  border-radius: 18px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+.btn-action-blue:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 20px -5px rgba(37, 99, 235, 0.4);
+}
+
+/* ====================================================
+   🔹 ANIMACIONES
+==================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Estilo para el body cuando el modal está abierto */
+body.modal-open {
+  overflow: hidden;
+}
