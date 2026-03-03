@@ -3,41 +3,49 @@
   <div class="sidebar-overlay" *ngIf="menuAbierto" (click)="menuAbierto = false"></div>
   <app-sidebar-admin [class.active]="menuAbierto"></app-sidebar-admin>
 
-
-
-
-
   <main class="main-content">
     <div class="header">
       <h2>Dashboard General</h2>
     </div>
 
+    <!-- ============================= -->
+    <!-- GRÁFICOS -->
+    <!-- ============================= -->
+
     <div class="charts-grid">
+
+      <!-- 🔥 GRÁFICO DE BARRAS -->
       <div class="chart-card">
-        <h4 (click)="abrirModalDetalle('reportes')" class="clickable">
-          Análisis de Reportes 
+        <h4 class="clickable" (click)="abrirModalBarras()">
+          Análisis por Estado
         </h4>
-        <div class="canvas-container">
+        <div class="canvas-container clickable" (click)="abrirModalBarras()">
           <canvas id="lineChart"></canvas>
         </div>
       </div>
+
+      <!-- 🔥 GRÁFICO DONA -->
       <div class="chart-card">
-        <h4 (click)="abrirModalDona()" class="clickable">
-          Tipos de Infracciones por Prioridad
+        <h4 class="clickable" (click)="abrirModalDona()">
+          Tipos de Infracciones
         </h4>
-        <div class="canvas-container">
-          <canvas id="pieChart"></canvas>
+        <div class="canvas-container clickable" (click)="abrirModalDona()">
+          <canvas id="donaChart"></canvas>
         </div>
       </div>
+
     </div>
 
-
-
+    <!-- ============================= -->
+    <!-- TABLA -->
+    <!-- ============================= -->
 
     <div class="table-section">
-      <div class="table-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div class="table-header"
+           style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h3>Infracciones Recientes</h3>
-        <select (change)="aplicarFiltro($event)" style="padding: 8px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <select (change)="aplicarFiltro($event)"
+                style="padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
           <option value="">Todos los estados</option>
           <option value="PENDIENTE">PENDIENTE</option>
           <option value="EN PROCESO">EN PROCESO</option>
@@ -58,13 +66,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let inf of infraccionesAMostrar" (click)="abrirDetalleInfraccion(inf)" class="clickable-row">
+            <tr *ngFor="let inf of infraccionesAMostrar"
+                (click)="abrirDetalleInfraccion(inf)"
+                class="clickable-row">
               <td><strong>{{ inf.id }}</strong></td>
               <td>{{ inf.fecha }}</td>
               <td>{{ inf.tipo }}</td>
               <td>{{ inf.agente }}</td>
               <td>
-                <span class="status" [ngClass]="getClaseEstado(inf.estado)">
+                <span class="status"
+                      [ngClass]="getClaseEstado(inf.estado)">
                   {{ inf.estado }}
                 </span>
               </td>
@@ -73,64 +84,120 @@
         </table>
       </div>
     </div>
+
   </main>
 </div>
 
-<div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
-  <div class="modal-container" (click)="$event.stopPropagation()">
+<!-- ============================= -->
+<!-- 🔥 MODAL DINÁMICO -->
+<!-- ============================= -->
+
+<div class="modal-overlay"
+     *ngIf="modalAbierto"
+     (click)="cerrarModal()">
+
+  <div class="modal-container"
+       (click)="$event.stopPropagation()">
+
     <div class="modal-header">
-      <div class="title-group">
-        <h5>{{ tituloModal }}</h5>
-      </div>
-      <button class="btn-close-circle" (click)="cerrarModal()"></button>
+      <h5>{{ tituloModal }}</h5>
+      <button class="btn-close-circle"
+              (click)="cerrarModal()"></button>
     </div>
 
     <div class="modal-body">
-      <div *ngIf="tipoModalActivo === 'dona'">
+
+      <!-- ============================= -->
+      <!-- 🔥 MODAL BARRAS -->
+      <!-- ============================= -->
+
+      <div *ngIf="tipoModalActivo === 'barras'">
         <table class="modal-table">
           <thead>
-            <tr><th>Categoría</th><th>Prioridad</th><th>Total</th></tr>
+            <tr>
+              <th>Estado</th>
+              <th>Descripción</th>
+            </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of datosDonaDetalle">
-              <td><strong>{{ item.categoria }}</strong></td>
-              <td><span class="priority-pill" [ngClass]="item.prioridad.toLowerCase()">{{ item.prioridad }}</span></td>
-              <td>{{ item.cantidad }}</td>
+            <tr *ngFor="let item of itemsFiltrados">
+              <td>
+                <span class="status-badge"
+                      [ngClass]="getClaseEstado(item.estado)">
+                  {{ item.ref }}
+                </span>
+              </td>
+              <td>{{ item.descripcion }}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div *ngIf="tipoModalActivo === 'reportes'">
+      <!-- ============================= -->
+      <!-- 🔥 MODAL DONA -->
+      <!-- ============================= -->
+
+      <div *ngIf="tipoModalActivo === 'dona'">
         <table class="modal-table">
           <thead>
-            <tr><th>Referencia</th><th>Descripción</th><th>Estado</th></tr>
+            <tr>
+              <th>Tipo</th>
+              <th>Descripción</th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of itemsFiltrados">
               <td>{{ item.ref }}</td>
               <td>{{ item.descripcion }}</td>
-              <td><span class="status-badge" [ngClass]="getClaseEstado(item.estado)">{{ item.estado }}</span></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <div class="detalle-infraccion-container" *ngIf="tipoModalActivo === 'infraccion' && infraccionSeleccionada">
+      <!-- ============================= -->
+      <!-- 🔥 DETALLE DE INFRACCIÓN -->
+      <!-- ============================= -->
+
+      <div *ngIf="tipoModalActivo === 'infraccion' && infraccionSeleccionada"
+           class="detalle-infraccion-container">
+
         <div class="detalle-grid">
-          <div class="detalle-item"><label>Referencia</label><p>{{ infraccionSeleccionada.ref }}</p></div>
-          <div class="detalle-item"><label>Tipo</label><p>{{ infraccionSeleccionada.tipo }}</p></div>
-          <div class="detalle-item"><label>Agente</label><p>{{ infraccionSeleccionada.agente }}</p></div>
+          <div class="detalle-item">
+            <label>Referencia</label>
+            <p>{{ infraccionSeleccionada.ref }}</p>
+          </div>
+
+          <div class="detalle-item">
+            <label>Tipo</label>
+            <p>{{ infraccionSeleccionada.tipo }}</p>
+          </div>
+
+          <div class="detalle-item">
+            <label>Agente</label>
+            <p>{{ infraccionSeleccionada.agente }}</p>
+          </div>
+
           <div class="detalle-item">
             <label>Estado</label>
-            <p><span class="status-badge" [ngClass]="getClaseEstado(infraccionSeleccionada.estado)">{{ infraccionSeleccionada.estado }}</span></p>
+            <p>
+              <span class="status-badge"
+                    [ngClass]="getClaseEstado(infraccionSeleccionada.estado)">
+                {{ infraccionSeleccionada.estado }}
+              </span>
+            </p>
           </div>
         </div>
+
       </div>
+
     </div>
+
     <div class="modal-footer-centered">
-      <button class="btn-action-blue" (click)="cerrarModal()">Cerrar</button>
+      <button class="btn-action-blue"
+              (click)="cerrarModal()">
+        Cerrar
+      </button>
     </div>
+
   </div>
 </div>
-
