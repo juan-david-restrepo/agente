@@ -130,6 +130,18 @@ input:checked + .slider:before {
   font-size: 12px;
 }
 
+/*Estados*/
+
+.estado-badge.libre {
+  background: #16a34a;
+}
+.estado-badge.ocupado {
+  background: #d6c806;
+}
+.estado-badge.off {
+  background: #eb433e;
+}
+
 /* INFO GRID */
 
 .info-grid {
@@ -160,5 +172,72 @@ color: rgb(73, 73, 73);
   align-items: center;
   position: relative;
   z-index: 10;
+}
+
+
+@media (max-width: 768px) {
+
+  .profile-wrapper {
+    padding: 15px;
+  }
+
+  /* HEADER pasa a vertical */
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    padding: 25px 20px 60px; /* espacio extra abajo */
+  }
+
+  /* Switch deja de ser absoluto */
+  .perfil-switch {
+    position: static;
+    order: -1; /* lo pone arriba de todo */
+    margin-bottom: 10px;
+  }
+
+  /* Avatar más pequeño */
+  .big-avatar {
+    width: 110px;
+    height: 110px;
+    border-width: 4px;
+  }
+
+  /* Texto más compacto */
+  .header-info h2 {
+    font-size: 20px;
+  }
+
+  .rango {
+    font-size: 13px;
+  }
+
+  .ciudad {
+    font-size: 12px;
+  }
+
+  /* Badge centrado */
+  .estado-badge {
+    font-size: 11px;
+  }
+
+  /* Grid pasa a 1 columna */
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .perfil-switch {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 12px;
+    border-radius: 30px;
+    backdrop-filter: blur(6px);
+  }
+
 }
 

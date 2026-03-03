@@ -1,41 +1,41 @@
 package com.reporteloya.recuperar_password.controller;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import com.reporteloya.recuperar_password.entity.Evidencia;
 import com.reporteloya.recuperar_password.entity.Reporte;
-import com.reporteloya.recuperar_password.repository.ReporteRepository;
 import com.reporteloya.recuperar_password.repository.EvidenciaRepository;
+import com.reporteloya.recuperar_password.repository.ReporteRepository;
 import com.reporteloya.recuperar_password.service.FileStorageService;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.reporteloya.recuperar_password.service.ImageValidationService;
 
 @RestController
 @RequestMapping("/api/reportes")
 public class ReporteController {
 
     @Autowired
+    private ImageValidationService imageValidationService;
+
+    @Autowired
     private FileStorageService fileStorageService;
 
-    private final EvidenciaRepository EvidenciaRepository;
+    private final EvidenciaRepository evidenciaRepository;
     private final ReporteRepository reporteRepository;
 
-    public ReporteController(ReporteRepository reporteRepository, EvidenciaRepository evidenciaRepository) {
+    public ReporteController(ReporteRepository reporteRepository,
+                             EvidenciaRepository evidenciaRepository) {
         this.reporteRepository = reporteRepository;
-        this.EvidenciaRepository = evidenciaRepository;
+        this.evidenciaRepository = evidenciaRepository;
     }
 
     @PostMapping(value = "/crear", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -56,37 +56,77 @@ public class ReporteController {
 
         try {
 
+            // ================================
+            // 🔎 VALIDACIÓN CON GOOGLE VISION
+            // ================================
+            boolean imagenValida = false;
+
+            for (MultipartFile archivo : archivos) {
+
+                if (archivo.getContentType() != null &&
+                        archivo.getContentType().startsWith("image")) {
+
+                    boolean valida = imageValidationService.esImagenDeTransito(archivo);
+
+                    if (valida) {
+                        imagenValida = true;
+                        break; // con una válida basta
+                    }
+                }
+            }
+
+            if (!imagenValida) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("La imagen no parece estar relacionada con tránsito.");
+            }
+
+            // ================================
+            // 📝 CREAR REPORTE
+            // ================================
             Reporte reporte = new Reporte();
             reporte.setDescripcion(descripcion);
             reporte.setPlaca(placa);
             reporte.setDireccion(direccion);
             reporte.setLatitud(latitud);
             reporte.setLongitud(longitud);
-            reporte.setFechaIncidente(LocalDate.parse(fechaIncidente));
-            reporte.setHoraIncidente(LocalTime.parse(horaIncidente));
+
+            if (fechaIncidente != null && !fechaIncidente.isEmpty()) {
+                reporte.setFechaIncidente(LocalDate.parse(fechaIncidente));
+            }
+
+            if (horaIncidente != null && !horaIncidente.isEmpty()) {
+                reporte.setHoraIncidente(LocalTime.parse(horaIncidente));
+            }
+
             reporte.setEstado(Reporte.EstadoReporte.pendiente);
             reporte.setCreatedAt(LocalDateTime.now());
             reporte.setUpdatedAt(LocalDateTime.now());
 
             Reporte reporteGuardado = reporteRepository.save(reporte);
 
+            // ================================
+            // 📂 GUARDAR EVIDENCIAS
+            // ================================
             for (MultipartFile archivo : archivos) {
 
-                String url = fileStorageService.guardarArchivo(archivo, reporteGuardado.getId());
+                String url = fileStorageService
+                        .guardarArchivo(archivo, reporteGuardado.getId());
 
                 Evidencia evidencia = new Evidencia();
                 evidencia.setTipo(archivo.getContentType());
                 evidencia.setArchivo(url);
                 evidencia.setReporte(reporteGuardado);
 
-                EvidenciaRepository.save(evidencia);
+                evidenciaRepository.save(evidencia);
             }
 
             return ResponseEntity.ok(reporteGuardado);
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("Error al procesar el reporte: " + e.getMessage());
         }
     }
-
 }

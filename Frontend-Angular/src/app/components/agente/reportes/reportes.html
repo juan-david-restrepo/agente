@@ -10,35 +10,39 @@
   <div class="h2-filtros">
     <h2>Reportes</h2>
 
-      <div class="filtros">
-        <button 
-          class="btn-filtro"
-          (click)="cambiarFiltro('TODOS')"
-          [ngClass]="{ activo: filtroActivo === 'TODOS' }">
-          Todos
-        </button>
+    <div class="filtros">
+      <button
+        class="btn-filtro"
+        (click)="cambiarFiltro('TODOS')"
+        [ngClass]="{ activo: filtroActivo === 'TODOS' }"
+      >
+        Todos
+      </button>
 
-        <button 
-          class="btn-filtro"
-          (click)="cambiarFiltro('BAJA')"
-          [ngClass]="{ activo: filtroActivo === 'BAJA' }">
-          Baja
-        </button>
+      <button
+        class="btn-filtro"
+        (click)="cambiarFiltro('BAJA')"
+        [ngClass]="{ activo: filtroActivo === 'BAJA' }"
+      >
+        Baja
+      </button>
 
-        <button 
-          class="btn-filtro"
-          (click)="cambiarFiltro('MEDIA')"
-          [ngClass]="{ activo: filtroActivo === 'MEDIA' }">
-          Media
-        </button>
+      <button
+        class="btn-filtro"
+        (click)="cambiarFiltro('MEDIA')"
+        [ngClass]="{ activo: filtroActivo === 'MEDIA' }"
+      >
+        Media
+      </button>
 
-        <button 
-          class="btn-filtro"
-          (click)="cambiarFiltro('ALTA')"
-          [ngClass]="{ activo: filtroActivo === 'ALTA' }">
-          Alta
-        </button>
-      </div>
+      <button
+        class="btn-filtro"
+        (click)="cambiarFiltro('ALTA')"
+        [ngClass]="{ activo: filtroActivo === 'ALTA' }"
+      >
+        Alta
+      </button>
+    </div>
   </div>
 
   <div

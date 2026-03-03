@@ -9,7 +9,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import Swal from 'sweetalert2';
-import { AuthService } from '../../service/auth.service';
+import { AuthService, AuthUser } from '../../service/auth.service';
+import { Avatar } from '../../service/avatar';
 
 @Component({
   selector: 'app-registro',
@@ -24,19 +25,18 @@ export class Registro {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private avatarService: Avatar
   ) {
-    // Formulario de registro
     this.registroForm = this.fb.group({
       nombre: [
         '',
         [
           Validators.required,
           Validators.maxLength(60),
-          Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/)
+          Validators.pattern(/^[a-zA-ZÀ-ÿ\s]+$/),
         ],
       ],
-
       correo: [
         '',
         [
@@ -45,7 +45,6 @@ export class Registro {
           Validators.maxLength(80),
         ],
       ],
-
       contrasena: [
         '',
         [
@@ -53,9 +52,7 @@ export class Registro {
           Validators.minLength(6),
         ],
       ],
-
       tipoDocumento: ['', Validators.required],
-
       numeroDocumento: [
         '',
         [
@@ -65,21 +62,13 @@ export class Registro {
           Validators.maxLength(10),
         ],
       ],
-
-      rol: ['Ciudadano', Validators.required],
+      rol: ['CIUDADANO', Validators.required],
     });
   }
 
   /** Redirección según rol */
   private redirigirSegunRol(rol: string) {
-    if (!rol) {
-      this.router.navigate(['/home']);
-      return;
-    }
-
-    rol = rol.toUpperCase();
-
-    switch (rol) {
+    switch (rol?.toUpperCase()) {
       case 'ADMIN':
         this.router.navigate(['/admin']);
         break;
@@ -91,34 +80,16 @@ export class Registro {
         break;
       default:
         this.router.navigate(['/home']);
-        break;
     }
   }
 
   /** Enviar formulario */
   onSubmit(): void {
     if (this.registroForm.invalid) {
-
-      if (this.registroForm.get('numeroDocumento')?.invalid) {
-        Swal.fire('Documento inválido', 'La cédula debe tener solo números y entre 6 y 10 dígitos.', 'warning');
-        return;
-      }
-
-      if (this.registroForm.get('correo')?.invalid) {
-        Swal.fire('Correo inválido', 'Ingresa un correo electrónico válido.', 'warning');
-        return;
-      }
-
-      if (this.registroForm.get('nombre')?.invalid) {
-        Swal.fire('Nombre inválido', 'El nombre no debe superar los 60 caracteres ni contener números.', 'warning');
-        return;
-      }
-
       Swal.fire('Formulario inválido', 'Revisa los campos del formulario.', 'warning');
       return;
     }
 
-    // Datos enviados al backend
     const data = {
       nombreCompleto: this.registroForm.value.nombre,
       email: this.registroForm.value.correo,
@@ -128,35 +99,44 @@ export class Registro {
       rol: this.registroForm.value.rol,
     };
 
+    // Registramos al usuario
     this.authService.register(data).subscribe({
-      next: (resp) => {
-        // Guardar token e info del usuario
-        // 🔥 Guardar token y activar sesión
-        if (resp.token) {
-          localStorage.setItem('token', resp.token);
-          this.authService.setSession(resp.token);
-        }
+      next: () => {
+        // 🔹 Nos suscribimos al Observable currentUser$ para obtener el usuario actualizado
+        const sub = this.authService.currentUser$.subscribe({
+          next: (user: AuthUser | null) => {
+            if (!user) return;
 
-        if (resp.userId) {
-          localStorage.setItem('userId', resp.userId);
-        }
+            // Guardar info de usuario en localStorage
+            localStorage.setItem('userId', user.userId);
+            localStorage.setItem('email', user.email);
+            localStorage.setItem('role', user.role);
 
+            // Cargar avatar
+            this.avatarService.loadAvatarForUser(user.userId);
 
-        if (resp.role) {
-          localStorage.setItem('userRole', resp.role);
-        }
+            Swal.fire({
+              icon: 'success',
+              title: '¡Registro exitoso!',
+              timer: 1500,
+              showConfirmButton: false,
+            }).then(() => {
+              this.redirigirSegunRol(user.role);
+            });
 
-        Swal.fire({
-          icon: 'success',
-          title: '¡Registro exitoso!',
-          timer: 1500,
-          showConfirmButton: false,
-        }).then(() => {
-          // 🔥 Redirección correcta según el rol
-          this.redirigirSegunRol(resp.role);
+            // Cancelamos la suscripción para no escuchar más cambios
+            sub.unsubscribe();
+          },
+          error: (err) => {
+            console.error('Error al obtener usuario:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'No se pudo obtener la información del usuario después del registro.',
+            });
+          },
         });
       },
-
       error: (err) => {
         Swal.fire({
           icon: 'error',

@@ -2,6 +2,10 @@
    REPORTES
 ========================= */
 
+* {
+  box-sizing: border-box;
+}
+
 :root {
   --card: #ffffff;
   --soft-bg: #f1f5f9;
@@ -117,9 +121,8 @@
 
 .detalle-container {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr; /* 🔥 imagen más grande */
   gap: 30px;
-  margin-bottom: 30px;
 }
 
 /* =========================
@@ -232,9 +235,10 @@
 ========================= */
 
 .detalle-datos {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 
 .dato {
@@ -245,7 +249,8 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,.3);
   color: var(--text);
-  width: 250px;
+  flex: 1 1 250px; /* 🔥 clave */
+  min-width: 0;
 }
 
 .dato i {
@@ -449,6 +454,7 @@ button:disabled {
   min-height: 0;        /* necesario en flex */
   overflow-y: auto;     /* scroll vertical */
   overflow-x: hidden;
+  color: #020617;
 
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,.1);
@@ -682,12 +688,141 @@ small{
 }
 
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* =========================================
+   TABLET (≤ 900px)
+========================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1300px) {
+
+  /* Layout detalle pasa a vertical */
+  .detalle-container {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .detalle-datos {
+    flex-wrap: wrap;
+  }
+
+  .dato {
+    flex: 1 1 250px;
+    min-width: 220px; /* 🔥 controlamos tamaño mínimo */
+  }
+
+  .detalle-mapa iframe {
+    height: 300px;
+  }
+}
+
+/* =========================================
+   MOBILE (≤ 600px)
+========================================= */
+
+@media (max-width: 600px) {
+
+  /* Header filtros vertical */
+  .h2-filtros {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .filtros {
+    flex-wrap: wrap;
+    width: 100%;
+    margin: 0px 0px 17px 0;
+  }
+
+  .filtros button {
+    flex: 1 1 48%;
+  }
+
+  /* Cards */
+  .card {
+    padding: 16px;
+  }
+
+  /* Detalle header */
+  .detalle-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Datos totalmente vertical */
+  .detalle-datos {
+    flex-direction: column;
+  }
+
+  .dato {
+    width: 100%;
+  }
+
+  .label-datos {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  /* Botones vertical */
+  .acciones {
+    flex-direction: column;
+  }
+
+  .btn-ok,
+  .btn-no,
+  .btn-finalizar,
+  .btn-resumen {
+    width: 100%;
+  }
+
+  /* Modal */
+  .modal-box {
+    padding: 20px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+
+  .opciones {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Mapa */
+  .detalle-mapa iframe {
+    height: 220px;
+  }
+
+  /* Toast */
+  .toast-alerta {
+    left: 10px;
+    right: 10px;
+  }
+
+  .detalle-reporte-full{
+    padding: 0px;
+  }
+
   .detalle-container {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .detalle-info,
+  .detalle-foto {
+    width: 100%;
+  }
+
+  .evidencia {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
   }
 }

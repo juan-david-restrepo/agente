@@ -35,8 +35,15 @@
       <p class="rango">{{agente.rango}}</p>
       <h3 class="ciudad">{{agente.placa}}</h3>
 
-      <span class="estado-badge">
-        En servicio
+      <span class="estado-badge"
+        [class.libre]="estadoAgente === 'LIBRE'"
+        [class.ocupado]="estadoAgente === 'OCUPADO'"
+        [class.off]="estadoAgente === 'FUERA_SERVICIO'">
+         {{ estadoAgente === 'FUERA_SERVICIO'
+          ? 'Fuera de servicio'
+          : estadoAgente === 'OCUPADO'
+            ? 'Ocupado'
+            : 'Disponible' }}
       </span>
     </div>
 

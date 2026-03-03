@@ -24,6 +24,6 @@ export class App implements OnInit {
     this.idleService.startWatching(() => {
       // esto se ejecuta después de 10 min sin actividad
       this.showIdleModal = true;
-    });
+    }); 
   }
 }

@@ -19,13 +19,17 @@ export class ModalComponent {
     'assets/images/user-1.jpg',
     'assets/images/user-2.jpg',
     'assets/images/user-3.jpg',
+    'assets/images/user-14.png',
     'assets/images/user-4.jpg',
     'assets/images/user-5.jpg',
+    'assets/images/user-15.png',
     'assets/images/user-6.jpg',
     'assets/images/user-7.jpg',
     'assets/images/user-8.jpg',
+    'assets/images/user-13.png',
     'assets/images/user-9.jpg',
     'assets/images/user-10.jpg',
+    'assets/images/user-12.png',
   ];
 
   selectAvatar(avatar: string) {

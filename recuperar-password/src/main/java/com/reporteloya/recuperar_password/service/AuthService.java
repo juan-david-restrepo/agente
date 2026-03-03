@@ -23,9 +23,9 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    /**
-     * Registro de usuario
-     */
+    // =========================
+    // REGISTER
+    // =========================
     public AuthResult register(RegisterRequest request) {
 
         if (usuarioRepository.existsByEmail(request.getEmail())) {
@@ -52,19 +52,24 @@ public class AuthService {
         return new AuthResult(jwtToken, nuevoUsuario);
     }
 
-    /**
-     * Login de usuario
-     */
+    // =========================
+    // LOGIN
+    // =========================
     public AuthResult login(LoginRequest request) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
-                        request.getPassword()));
+                        request.getPassword()
+                )
+        );
 
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        "Usuario no encontrado con el correo: " + request.getEmail()));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Usuario no encontrado con el correo: " + request.getEmail()
+                        )
+                );
 
         String jwtToken = jwtService.generateToken(usuario);
 

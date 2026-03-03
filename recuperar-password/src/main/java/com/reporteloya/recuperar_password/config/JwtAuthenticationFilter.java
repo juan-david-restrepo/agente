@@ -1,5 +1,7 @@
 package com.reporteloya.recuperar_password.config;
 
+import com.reporteloya.recuperar_password.entity.Usuario;
+import com.reporteloya.recuperar_password.repository.UsuarioRepository;
 import com.reporteloya.recuperar_password.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,28 +11,22 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
-/**
- * Filtro encargado de validar el JWT desde Cookie HttpOnly
- */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-
-    
-
-
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     protected void doFilterInternal(
@@ -40,12 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String jwt = null;
-        String username = null;
 
         // =========================
-        // 1. Extraer JWT desde Cookie
+        // 1️⃣ Intentar obtener token desde Authorization header
         // =========================
-        if (request.getCookies() != null) {
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+        }
+
+        // =========================
+        // 2️⃣ Si no viene por header, buscar en Cookie
+        // =========================
+        if (jwt == null && request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {
                     jwt = cookie.getValue();
@@ -54,37 +57,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // Si no hay token → continuar sin autenticar
-        if (jwt == null) {
+        // Si no hay token → continuar
+        if (jwt == null || jwt.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // =========================
-        // 2. Extraer username (email)
+        // 3️⃣ Extraer username
         // =========================
+        String username;
         try {
             username = jwtService.extractUsername(jwt);
         } catch (Exception e) {
-            // Token inválido / expirado
             filterChain.doFilter(request, response);
             return;
         }
 
         // =========================
-        // 3. Autenticación
+        // 4️⃣ Autenticación
         // =========================
         if (username != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            Usuario user = usuarioRepository.findByEmail(username)
+                    .orElse(null);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            if (user != null && jwtService.isTokenValid(jwt, user)) {
 
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                // Extraer rol desde el token
+                String roleFromToken = jwtService.extractClaim(jwt,
+                        claims -> claims.get("role", String.class));
+
+                GrantedAuthority authority =
+                        new SimpleGrantedAuthority("ROLE_" + roleFromToken);
+
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                Collections.singletonList(authority)
+                        );
 
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource()
@@ -94,12 +107,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .getContext()
                         .setAuthentication(authToken);
             }
-
         }
 
-        // =========================
-        // 4. Continuar filtro
-        // =========================
         filterChain.doFilter(request, response);
     }
 }

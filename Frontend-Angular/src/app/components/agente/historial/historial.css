@@ -4,15 +4,17 @@
 
 .filtro-h2{
   display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;   /* 👈 clave */
+  gap: 12px;
 }
 
 .filtros{
   display: flex;
   flex-direction: row;
   gap: 10px;
+  margin: 0px 0px 17px 0;
 }
 
 .btn-filtro {
@@ -54,4 +56,52 @@
 .hist-dir {
   color: #64748b;
   font-size: 14px;
+  word-break: break-word;
+}
+
+@media (max-width: 600px) {
+
+  /* Header vertical */
+  .filtro-h2 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Botones ocupan todo el ancho */
+  .filtros {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .btn-filtro {
+    flex: 1 1 30%;
+    text-align: center;
+  }
+
+  /* Cards más compactas */
+  .historial-card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .historial-card b {
+    font-size: 15px;
+  }
+
+  .hist-dir {
+    font-size: 13px;
+  }
+
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+
+  .filtros {
+    flex-wrap: wrap;
+  }
+
+  .btn-filtro {
+    flex: 1 1 auto;
+  }
+
 }

@@ -2,9 +2,8 @@
 <!-- LISTA DE TAREAS -->
 <!-- ============================= -->
 
-<div *ngIf="!tareaSeleccionada" class="tareas-grid">
   <!-- FILTROS -->
-  <div class="filtros">
+  <div class="filtros"  *ngIf="!tareaSeleccionada">
     <button 
       (click)="filtro = 'PENDIENTES'"
       [ngClass]="{ activo: filtro === 'PENDIENTES' }">
@@ -23,6 +22,9 @@
       Todas
     </button>
   </div>
+
+<div *ngIf="!tareaSeleccionada" class="tareas-grid">
+
 
   <!-- TARJETAS -->
   <div class="tarea-card" *ngFor="let t of tareasFiltradas" (click)="abrir(t)">
@@ -48,9 +50,11 @@
 <!-- DETALLE DE TAREA -->
 <!-- ============================= -->
 
+  <button class="btn-volver" *ngIf="tareaSeleccionada" (click)="cerrar()">← Volver</button>
+
 <div *ngIf="tareaSeleccionada" class="padre">
   <!-- VOLVER -->
-  <button class="btn-volver" (click)="cerrar()">← Volver</button>
+
 
   <div
     class="card detalle-card"

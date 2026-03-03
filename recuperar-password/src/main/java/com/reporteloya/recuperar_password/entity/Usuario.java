@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -39,6 +41,20 @@ public class Usuario implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+        // ===== Relación con reportes =====
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    @JsonIgnore // Evita bucles infinitos al serializar
+    private List<Reporte> reportes;
+
+    // Getter y Setter para reportes (Lombok @Data genera setters/getters, pero se puede definir explícito)
+    public List<Reporte> getReportes() {
+        return reportes;
+    }
+
+    public void setReportes(List<Reporte> reportes) {
+        this.reportes = reportes;
+    }
 
     // ===== UserDestails =====
     @Override

@@ -19,28 +19,23 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   // ================= GET perfil =================
+  // Usa la cookie HttpOnly para autenticar
   getProfile(): Observable<Usuario> {
-    const token = localStorage.getItem('token');
-    return this.http.get<Usuario>(`${this.apiUrl}/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true
-    });
+    return this.http.get<Usuario>(`${this.apiUrl}/profile`, { withCredentials: true });
   }
 
   // ================= GET total de reportes =================
+  // Ya no necesitamos token en headers, solo la cookie
   getTotalReportes(): Observable<{ total_reportes: number }> {
-    const token = localStorage.getItem('token');
     return this.http.get<{ total_reportes: number }>(`${this.apiUrl}/reportes/total`, {
-      headers: { Authorization: `Bearer ${token}` },
       withCredentials: true
     });
   }
 
   // ================= PUT actualizar perfil =================
+  // Actualiza perfil usando la cookie HttpOnly
   updateProfile(data: Usuario): Observable<Usuario> {
-    const token = localStorage.getItem('token');
     return this.http.put<Usuario>(`${this.apiUrl}/profile`, data, {
-      headers: { Authorization: `Bearer ${token}` },
       withCredentials: true
     });
   }

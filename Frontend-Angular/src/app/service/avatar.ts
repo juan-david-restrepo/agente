@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -8,16 +9,15 @@ export class Avatar {
   private avatarSubject: BehaviorSubject<string>;
   public avatar$;
 
-  constructor() {
+  constructor(private authService: AuthService) {
     // Inicializa con avatar por defecto
     this.avatarSubject = new BehaviorSubject<string>('assets/images/images (3).png');
     this.avatar$ = this.avatarSubject.asObservable();
 
-    // 🔹 Persistencia automática: si ya hay userId en localStorage, carga su avatar
-    const userId = localStorage.getItem('userId');
+    // 🔹 Intentar cargar avatar al iniciar la app si hay usuario logueado
+    const userId = this.authService.getUserId();
     if (userId) {
-      const savedAvatar = localStorage.getItem(`avatar_${userId}`);
-      this.avatarSubject.next(savedAvatar || 'assets/images/images (3).png');
+      this.loadAvatarForUser(userId);
     }
   }
 

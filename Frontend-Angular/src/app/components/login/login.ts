@@ -3,13 +3,8 @@ import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Nav } from '../../shared/nav/nav';
 import { Avatar } from '../../service/avatar';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { AuthService } from '../../service/auth.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AuthService, AuthUser } from '../../service/auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,9 +23,7 @@ export class Login {
     private authService: AuthService,
     private avatarService: Avatar
   ) {
-    // ✅ REACTIVAMOS ROL
     this.formLogin = this.fb.group({
-      rol: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
     });
@@ -46,29 +39,25 @@ export class Login {
       return;
     }
 
-    const { rol, email, password } = this.formLogin.value;
+    const { email, password } = this.formLogin.value;
 
+    // 🔹 Login usando cookies HttpOnly
     this.authService.login(email, password).subscribe({
-      next: (resp) => {
-        console.log('Respuesta del backend:', resp);
-
-        if (resp.token) {
-          localStorage.setItem('token', resp.token);
-          this.authService.setSession(resp.token);
+      next: (user: AuthUser | null) => {
+        if (!user) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Usuario o contraseña incorrectos',
+          });
+          return;
         }
 
-        if (resp.userId) {
-          localStorage.setItem('userId', resp.userId);
-          this.avatarService.loadAvatarForUser(resp.userId);
-        }
+        // 🔹 Usuario ya actualizado en authService.currentUser$
+        // Cargar avatar desde AvatarService
+        this.avatarService.loadAvatarForUser(user.userId);
 
-
-        // Guardar sesión
-       // localStorage.setItem('token', resp.token);
-        localStorage.setItem('userId', resp.userId);
-        localStorage.setItem('email', resp.email);
-        localStorage.setItem('role', resp.role);
-
+        // 🔹 Mensaje de éxito
         Swal.fire({
           icon: 'success',
           title: 'Bienvenido!',
@@ -77,19 +66,14 @@ export class Login {
           showConfirmButton: false,
         });
 
-        // 👉 REDIRECCIÓN SEGÚN ROL
-        if (rol === 'ciudadano') {
-          this.router.navigate(['/home']);
-        } else if (rol === 'agente') {
-          this.router.navigate(['/agente']);
-        } else if (rol === 'administrador') {
-          this.router.navigate(['/admin']);
-        }
+        // 🔹 Redirección según rol
+        const role = user.role.toUpperCase();
+        if (role === 'CIUDADANO') this.router.navigate(['/home']);
+        else if (role === 'AGENTE') this.router.navigate(['/agente']);
+        else if (role === 'ADMIN') this.router.navigate(['/admin']);
       },
-
       error: (err) => {
-        console.error(err);
-
+        console.error('Error login:', err);
         Swal.fire({
           icon: 'error',
           title: 'Error al iniciar sesión',

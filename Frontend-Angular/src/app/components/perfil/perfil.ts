@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'; 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Nav } from '../../shared/nav/nav';
@@ -7,7 +7,7 @@ import { Avatar } from '../../service/avatar';
 import { UserService, Usuario } from '../../service/user.service';
 import { ModalComponent } from '../../components/modal/modal.component';
 import Swal from 'sweetalert2';
-import { AuthService } from '../../service/auth.service'; // Necesario para obtener userId
+import { AuthService, AuthUser } from '../../service/auth.service';
 
 @Component({
   selector: 'app-perfil',
@@ -22,44 +22,10 @@ export class Perfil implements OnInit {
   selectedBackground = '#1e3a8a';
   isEditing = false;
 
-  // Control del modal de avatar
   isModalOpen = false;
   private userId: string | null = null; // ID del usuario logueado
+  isLoggedIn = false;
 
-  constructor(
-    private avatarService: Avatar,
-    private userService: UserService,
-    private authService: AuthService // Para obtener userId
-  ) {}
-
-  // Abrir modal de avatar
-  openAvatarModal() { 
-    this.isModalOpen = true; 
-  }
-
-  // Recibir avatar seleccionado desde el modal
-  onAvatarSelected(newAvatar: string) {
-    if (this.userId) {
-      // Guardar avatar para el usuario específico en localStorage
-      this.avatarService.setAvatarForUser(this.userId, newAvatar);
-    }
-    this.isModalOpen = false; // Cierra modal
-  }
-
-  // Cambiar avatar desde input tipo file (opcional)
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if(file && this.userId) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        // Guardar avatar para el usuario específico en localStorage
-        this.avatarService.setAvatarForUser(this.userId!, e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  // Datos del usuario
   user = {
     name: '',
     lastname: '',
@@ -68,24 +34,48 @@ export class Perfil implements OnInit {
     password2: ''
   };
 
+  constructor(
+    private avatarService: Avatar,
+    private userService: UserService,
+    private authService: AuthService
+  ) {}
+
   ngOnInit() {
-    // Obtener userId del usuario logueado desde localStorage
-    this.userId = localStorage.getItem('userId');
+    // 🔹 Refrescar usuario desde cookie y sincronizar estado
+    this.authService.refreshUser().subscribe({
+      next: (currentUser: AuthUser | null) => {
+        if (!currentUser || !currentUser.userId) {
+          this.isLoggedIn = false;
+          console.warn('Usuario no logueado: perfil no cargado.');
+          return;
+        }
 
-    // Cargar avatar del usuario desde localStorage
-    if (this.userId) {
-      this.avatarService.loadAvatarForUser(this.userId);
-    }
+        this.userId = currentUser.userId;
+        this.isLoggedIn = true;
 
-    // Suscribirse a cambios de avatar global
-    this.avatarService.avatar$.subscribe(avatar => this.avatar = avatar);
+        // 🔹 Cargar avatar sincronizado
+        this.avatarService.loadAvatarForUser(this.userId);
+        this.avatarService.avatar$.subscribe(avatar => {
+          if (avatar) this.avatar = avatar;
+        });
 
-    this.userService.getTotalReportes().subscribe({
-      next: (res) => this.totalReportes = res.total_reportes,
-      error: (err) => console.error('Error al obtener reportes:', err)
+        // 🔹 Cargar datos de perfil desde backend con cookies
+        this.loadProfile();
+
+        // 🔹 Cargar total de reportes
+        this.userService.getTotalReportes().subscribe({
+          next: (res) => this.totalReportes = res.total_reportes,
+          error: (err) => console.error('Error al obtener reportes:', err)
+        });
+      },
+      error: (err) => {
+        console.error('Error al refrescar usuario:', err);
+        this.isLoggedIn = false;
+      }
     });
+  }
 
-    // Cargar datos del backend con JWT
+  private loadProfile() {
     this.userService.getProfile().subscribe({
       next: (user: Usuario) => {
         const parts = user.nombreCompleto.split(' ');
@@ -104,12 +94,32 @@ export class Perfil implements OnInit {
     });
   }
 
-  // Toggle edición de perfil
+  openAvatarModal() {
+    this.isModalOpen = true;
+  }
+
+  onAvatarSelected(newAvatar: string) {
+    if (this.userId) {
+      this.avatarService.setAvatarForUser(this.userId, newAvatar);
+    }
+    this.isModalOpen = false;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file && this.userId) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.avatarService.setAvatarForUser(this.userId!, e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   toggleEdit() {
     this.isEditing = !this.isEditing;
   }
 
-  // Guardar cambios de perfil
   saveProfile() {
     if (this.user.password && this.user.password !== this.user.password2) {
       Swal.fire({
