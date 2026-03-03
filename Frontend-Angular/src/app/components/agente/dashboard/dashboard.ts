@@ -67,25 +67,11 @@ statsSemana=[
 ];
 
 statsAnio=[
- {label:'Ene',valor:120},
- {label:'Feb',valor:90},
- {label:'Mar',valor:150},
- {label:'Abr',valor:70},
- {label:'May',valor:180},
- {label:'Jun',valor:140},
- {label:'Jul',valor:200},
- {label:'Ago',valor:160},
- {label:'Sep',valor:130},
- {label:'Oct',valor:170},
- {label:'Nov',valor:110},
- {label:'Dic',valor:190}
+ 
 ];
 
 statsDia=[
- {label:'00',valor:5},
- {label:'06',valor:15},
- {label:'12',valor:25},
- {label:'18',valor:10}
+ 
 ];
  get statsActual(){
   if(this.modoGrafica==='SEMANA') return this.statsSemana;

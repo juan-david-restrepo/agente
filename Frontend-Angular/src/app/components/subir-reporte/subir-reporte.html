@@ -57,17 +57,27 @@
             </div>
 
             <div class="preview-container" *ngIf="fileList.length > 0">
-             <div class="preview-item" *ngFor="let file of fileList; let i = index">
+        <div class="preview-item" *ngFor="let file of fileList; let i = index">
+    
     <button type="button" class="remove-btn" (click)="removeFile(i)">
         <i class="fas fa-times"></i>
     </button>
-    
-    <img *ngIf="file.type.startsWith('image')" 
-         [src]="getPreviewUrl(file)" 
-         (click)="abrirModal(file)" 
-         class="img-clickable" />
-    
-    <video *ngIf="file.type.startsWith('video')" [src]="getPreviewUrl(file)" controls></video>
+
+    <!-- IMAGEN -->
+    <img 
+        *ngIf="file.type.startsWith('image')" 
+        [src]="previewUrls[i]" 
+        (click)="abrirModal(file)" 
+        class="img-clickable" 
+    />
+
+    <!-- VIDEO -->
+    <video 
+        *ngIf="file.type.startsWith('video')" 
+        [src]="previewUrls[i]" 
+        controls>
+    </video>
+
 </div>
             </div>
           </div>

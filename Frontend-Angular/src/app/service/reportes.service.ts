@@ -3,10 +3,9 @@ import { Reporte } from '../models/reporte.model';
 import { Observable, of } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReportesService {
-
   // 🔹 Datos simulados (como si vinieran de la BD)
   private reportesMock: Reporte[] = [
     {
@@ -17,7 +16,7 @@ export class ReportesService {
       ubicacion: 'Carrera 14 con Calle 21',
       tipoIncidente: 'Accidente vehicular',
       descripcion: 'Atendió colisión entre motocicleta y automóvil',
-      resenaCiudadano: 'Atención rápida y profesional'
+      resenaCiudadano: 'Atención rápida y profesional',
     },
     {
       id: 2,
@@ -27,8 +26,8 @@ export class ReportesService {
       ubicacion: 'Avenida Bolívar con Calle 10',
       tipoIncidente: 'Infracción de tránsito',
       descripcion: 'Control de documentos',
-      resenaCiudadano: 'Correcto y respetuoso'
-    }
+      resenaCiudadano: 'Correcto y respetuoso',
+    },
   ];
 
   constructor() {}
@@ -38,7 +37,7 @@ export class ReportesService {
    */
   obtenerReportesPorAgente(placa: string): Observable<Reporte[]> {
     const reportesFiltrados = this.reportesMock.filter(
-      r => r.placaAgente === placa
+      (r) => r.placaAgente === placa,
     );
 
     return of(reportesFiltrados);

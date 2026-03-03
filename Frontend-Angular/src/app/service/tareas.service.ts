@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, pipe, shareReplay } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
@@ -12,8 +13,11 @@ export class TareasService {
 
   // Este nombre debe coincidir con el de la imagen 8
   obtenerTareasPorAgente(placa: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${placa}`);
-  }
+    return this.http.get(`${this.apiUrl}/${placa}`,
+      { withCredentials: true }
+    ).pipe(
+    shareReplay(1)
+  );};
 
   asignarTarea(placa: string, tarea: any): Observable<any> {
     return this.http.post(

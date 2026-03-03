@@ -7,8 +7,11 @@ import java.time.LocalTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.Getter;
@@ -33,16 +36,21 @@ public class Reporte {
     @Column(name = "id_usuario")
     private Long idUsuario;
 
+    @ManyToOne
+    @JoinColumn(name = "id_agente")
+    private Agentes agente;
+
+    @Enumerated(EnumType.STRING)
+    private Prioridad prioridad;
+
     private String tipoInfraccion;
     private String descripcion;
     private String direccion;
     private Double latitud;
     private Double longitud;
-
-  
-
-    private String estado;
     private String placa;
+
+    private String estado; // PENDIENTE, ASIGNADO, EN_PROCESO, FINALIZADO
     private LocalDate fechaIncidente;
     private LocalTime horaIncidente;
 

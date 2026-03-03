@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, switchMap } from 'rxjs';
 
 // Servicios
 import { AdminService } from '../../../service/admin-agente.service';
@@ -113,9 +113,15 @@ export class GestionAgentes implements OnDestroy {
         this.cargarReportes();
         this.cargarTareas();
 
-        this.pollingSubscription = interval(10000).subscribe(() => {
-          this.cargarTareasSilent(); 
-        });
+       this.pollingSubscription = interval(10000)
+         .pipe(
+           switchMap(() =>
+             this.tareasService.obtenerTareasPorAgente(this.agente!.placa),
+           ),
+         )
+         .subscribe((data) => {
+           this.tareas = data?.listaTareas ?? [];
+         });
       },
       error: () => {
         this.error = 'No se encontró ningún agente con esa placa';
@@ -139,6 +145,9 @@ export class GestionAgentes implements OnDestroy {
   }
 
   private fetchTareas(silent = false): void {
+
+
+    
     this.tareasService.obtenerTareasPorAgente(this.agente!.placa).subscribe({
       next: (data) => {
         if (data && data.listaTareas) {

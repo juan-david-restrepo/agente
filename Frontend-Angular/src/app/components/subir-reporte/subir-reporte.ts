@@ -21,7 +21,6 @@ interface Incidente {
   encapsulation: ViewEncapsulation.None,
 })
 export class SubirReporteComponent implements OnInit, OnDestroy {
-
   // =============================
   // CONFIGURACIÓN CONSTANTE
   // =============================
@@ -34,9 +33,9 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
   // ESTADO DEL FORMULARIO
   // =============================
   fileList: File[] = [];
-  private previewUrls: string[] = [];
+  previewUrls: string[] = [];
 
-  placa = '';
+  placa: string = '';
   descripcion = '';
   fecha = '';
   hora = '';
@@ -63,10 +62,14 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
   // =============================
   incidentes: Incidente[] = [
     { nombre: 'Accidente de tránsito', prioridad: 'ALTA', requierePlaca: true },
-    { nombre: 'Vehículo mal estacionado', prioridad: 'MEDIA', requierePlaca: true },
+    {
+      nombre: 'Vehículo mal estacionado',
+      prioridad: 'MEDIA',
+      requierePlaca: true,
+    },
     { nombre: 'Semáforo dañado', prioridad: 'ALTA', requierePlaca: false },
     { nombre: 'Conducción peligrosa', prioridad: 'ALTA', requierePlaca: true },
-    { nombre: 'Otros', prioridad: 'BAJA', requierePlaca: false }
+    { nombre: 'Otros', prioridad: 'BAJA', requierePlaca: false },
   ];
 
   private map: any;
@@ -82,14 +85,22 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
   // LÓGICA DE INCIDENTES
   // =============================
   seleccionarIncidente(incidente: Incidente) {
+    // Guardamos solo el nombre (lo único que irá al backend)
     this.tipoSeleccionado = incidente.nombre;
-    this.prioridadInterna = incidente.prioridad;
+
+    // UI únicamente
     this.mostrarCampoOtros = incidente.nombre === 'Otros';
     this.requierePlacaActual = incidente.requierePlaca;
     this.placaOpcional = incidente.nombre === 'Otros';
 
-    if (!this.requierePlacaActual && !this.placaOpcional) this.placa = '';
-    if (!this.mostrarCampoOtros) this.detalleOtroIncidente = '';
+    // Limpieza automática de campos
+    if (!this.requierePlacaActual && !this.placaOpcional) {
+      this.placa = '';
+    }
+
+    if (!this.mostrarCampoOtros) {
+      this.detalleOtroIncidente = '';
+    }
   }
 
   // =============================
@@ -106,32 +117,35 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
         Swal.fire('Archivo no permitido', 'Solo JPG, PNG o MP4.', 'error');
         continue;
       }
+
       if (file.size > this.MAX_SIZE_MB * 1024 * 1024) {
         Swal.fire('Archivo muy grande', 'Máximo 5MB por archivo.', 'error');
         continue;
       }
+
       if (this.fileList.length >= this.MAX_FILES) {
         Swal.fire('Límite alcanzado', 'Máximo 5 archivos.', 'warning');
         break;
       }
+
       this.fileList.push(file);
+
+      // 🔥 GENERAR PREVIEW UNA SOLA VEZ
+      const url = URL.createObjectURL(file);
+      this.previewUrls.push(url);
     }
 
     if (this.requierePlacaActual) this.detectarPlaca();
   }
 
   removeFile(index: number) {
+    URL.revokeObjectURL(this.previewUrls[index]);
+    this.previewUrls.splice(index, 1);
     this.fileList.splice(index, 1);
   }
 
-  getPreviewUrl(file: File): string {
-    const url = URL.createObjectURL(file);
-    this.previewUrls.push(url);
-    return url;
-  }
-
   private limpiarPreviewUrls() {
-    this.previewUrls.forEach(url => URL.revokeObjectURL(url));
+    this.previewUrls.forEach((url) => URL.revokeObjectURL(url));
     this.previewUrls = [];
     if (this.urlImagenModal) URL.revokeObjectURL(this.urlImagenModal);
   }
@@ -157,7 +171,7 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
   // OCR Y UBICACIÓN
   // =============================
   private detectarPlaca() {
-    const imagen = this.fileList.find(f => f.type.startsWith('image'));
+    const imagen = this.fileList.find((f) => f.type.startsWith('image'));
     if (!imagen) return;
 
     const imageUrl = URL.createObjectURL(imagen);
@@ -186,7 +200,9 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
 
         if (!this.map) {
           this.map = L.map('map').setView([lat, lng], 16);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+          L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          ).addTo(this.map);
         }
 
         if (this.marker) this.marker.setLatLng([lat, lng]);
@@ -198,7 +214,7 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
         const data = await res.json();
         this.direccion = data.display_name || '';
       },
-      () => Swal.fire('Error', 'No se pudo obtener la ubicación.', 'error')
+      () => Swal.fire('Error', 'No se pudo obtener la ubicación.', 'error'),
     );
   }
 
@@ -219,23 +235,68 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
   }
 
   formularioValido(): boolean {
-    const tipoFinal = this.tipoSeleccionado === 'Otros' ? this.detalleOtroIncidente?.trim() : this.tipoSeleccionado;
-    return !!(tipoFinal && this.descripcion?.trim().length >= 10 && this.validarFechaHora() && this.validarPlaca());
+    const tipoFinal =
+      this.tipoSeleccionado === 'Otros'
+        ? this.detalleOtroIncidente?.trim()
+        : this.tipoSeleccionado;
+    return !!(
+      tipoFinal &&
+      this.descripcion?.trim().length >= 10 &&
+      this.validarFechaHora() &&
+      this.validarPlaca()
+    );
   }
 
   async enviarReporte() {
     if (!this.formularioValido()) {
-      await Swal.fire('Formulario incompleto', 'Revisa los campos obligatorios.', 'warning');
+      await Swal.fire(
+        'Formulario incompleto',
+        'Revisa los campos obligatorios.',
+        'warning',
+      );
       return;
     }
 
     this.isSubmitting = true;
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      await Swal.fire({ icon: 'success', title: 'Reporte enviado correctamente' });
+      const formData = new FormData();
+
+      formData.append('descripcion', this.descripcion);
+      formData.append('direccion', this.direccion);
+      formData.append('latitud', this.coordenadas.split(',')[0]);
+      formData.append('longitud', this.coordenadas.split(',')[1]);
+      formData.append('placa', this.placa);
+       formData.append(
+         'tipoInfraccion',
+         this.tipoSeleccionado === 'Otros'
+           ? this.detalleOtroIncidente
+           : this.tipoSeleccionado,
+       );
+      formData.append('fechaIncidente', this.fecha);
+      formData.append('horaIncidente', this.hora);
+
+     
+
+      for (let file of this.fileList) {
+        formData.append('archivos', file);
+      }
+
+      const response = await fetch('http://localhost:8080/api/reportes/crear', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!response.ok) throw new Error('Error en servidor');
+
+      await Swal.fire({
+        icon: 'success',
+        title: 'Reporte enviado correctamente',
+      });
       this.resetFormulario();
     } catch (error) {
-      await Swal.fire({ icon: 'error', title: 'Error inesperado' });
+      await Swal.fire({ icon: 'error', title: 'Error al enviar reporte' });
     } finally {
       this.isSubmitting = false;
     }

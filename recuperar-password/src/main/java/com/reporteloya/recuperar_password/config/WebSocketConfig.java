@@ -16,7 +16,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // /topic para broadcast, /user para mensajes privados
-        config.enableSimpleBroker("/topic", "/queue");
+        config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
         config.setUserDestinationPrefix("/user");
     }
@@ -26,8 +26,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Endpoint WebSocket puro
 
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://127.0.0.1:5500"); 
-                // .withSockJS();// tu Live Server
+                .setAllowedOrigins("http://localhost:4200")
+                .withSockJS(); // importante para Angular //tu Live Server//
         // importante para cookies
         // para pruebas; en producción usa solo tus dominios
     }
