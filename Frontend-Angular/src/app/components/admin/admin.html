@@ -4,34 +4,64 @@
   <app-sidebar-admin [class.active]="menuAbierto"></app-sidebar-admin>
 
   <main class="main-content">
+
+
     <div class="header">
       <h2>Dashboard General</h2>
     </div>
 
-    <!-- ============================= -->
-    <!-- GRÁFICOS -->
-    <!-- ============================= -->
 
-    <div class="charts-grid">
-      <!-- 🔥 GRÁFICO DONA -->
-      <div class="chart-card">
-        <h4 class="clickable" (click)="abrirModalDona()">
-          Tipos de Infracciones
-        </h4>
-        <div class="canvas-container clickable" (click)="abrirModalDona()">
-          <canvas id="donaChart"></canvas>
+
+
+
+
+    <div class="charts-grid container-fluid mt-4">
+      <div class="card shadow-sm border-0 chart-card">
+        <div class="card-body">
+          <h4 class="card-title mb-4 clickable text-primary fw-bold" (click)="abrirModalBarras()">
+            <i class="bi bi-bar-chart-fill me-2"></i>Distribución de Infracciones
+          </h4>
+          <div class="canvas-container" style="position: relative; height:250px; width:100%;">
+            <canvas id="barChart"></canvas>
+          </div>
         </div>
       </div>
-
     </div>
 
-    <!-- ============================= -->
-    <!-- TABLA -->
-    <!-- ============================= -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <div class="table-section">
-      <div class="table-header"
-        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div class="table-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h3>Infracciones Recientes</h3>
         <select (change)="aplicarFiltro($event)" style="padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
           <option value="">Todos los estados</option>
@@ -60,9 +90,7 @@
               <td>{{ inf.tipo }}</td>
               <td>{{ inf.agente }}</td>
               <td>
-                <span class="status" [ngClass]="getClaseEstado(inf.estado)">
-                  {{ inf.estado }}
-                </span>
+                <span class="status" [ngClass]="getClaseEstado(inf.estado)">{{ inf.estado }}</span>
               </td>
             </tr>
           </tbody>
@@ -72,83 +100,44 @@
   </main>
 </div>
 
-<!-- ============================= -->
-<!-- 🔥 MODAL DINÁMICO -->
-<!-- ============================= -->
-
 <div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
-
   <div class="modal-container" (click)="$event.stopPropagation()">
-
     <div class="modal-header">
       <h5>{{ tituloModal }}</h5>
       <button class="btn-close-circle" (click)="cerrarModal()"></button>
     </div>
-
     <div class="modal-body">
-
-      <!-- ============================= -->
-      <!-- 🔥 MODAL DONA -->
-      <!-- ============================= -->
-
-      <div *ngIf="tipoModalActivo === 'dona'">
+      <div *ngIf="tipoModalActivo === 'barras'">
         <table class="modal-table">
           <thead>
             <tr>
               <th>Tipo</th>
               <th>Descripción</th>
+              <th>Total</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of itemsFiltrados">
               <td>{{ item.ref }}</td>
               <td>{{ item.descripcion }}</td>
+              <td><strong>{{ item.cantidad }}</strong></td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <!-- ============================= -->
-      <!-- 🔥 DETALLE DE INFRACCIÓN -->
-      <!-- ============================= -->
-
       <div *ngIf="tipoModalActivo === 'infraccion' && infraccionSeleccionada" class="detalle-infraccion-container">
-
         <div class="detalle-grid">
-          <div class="detalle-item">
-            <label>Referencia</label>
-            <p>{{ infraccionSeleccionada.ref }}</p>
-          </div>
-
-          <div class="detalle-item">
-            <label>Tipo</label>
-            <p>{{ infraccionSeleccionada.tipo }}</p>
-          </div>
-
-          <div class="detalle-item">
-            <label>Agente</label>
-            <p>{{ infraccionSeleccionada.agente }}</p>
-          </div>
-
-          <div class="detalle-item">
-            <label>Estado</label>
-            <p>
-              <span class="status-badge" [ngClass]="getClaseEstado(infraccionSeleccionada.estado)">
-                {{ infraccionSeleccionada.estado }}
-              </span>
-            </p>
+          <div class="detalle-item"><label>Referencia</label><p>{{ infraccionSeleccionada.ref }}</p></div>
+          <div class="detalle-item"><label>Tipo</label><p>{{ infraccionSeleccionada.tipo }}</p></div>
+          <div class="detalle-item"><label>Agente</label><p>{{ infraccionSeleccionada.agente }}</p></div>
+          <div class="detalle-item"><label>Estado</label>
+            <p><span class="status-badge" [ngClass]="getClaseEstado(infraccionSeleccionada.estado)">{{ infraccionSeleccionada.estado }}</span></p>
           </div>
         </div>
-
       </div>
-
     </div>
-
     <div class="modal-footer-centered">
-      <button class="btn-action-blue" (click)="cerrarModal()">
-        Cerrar
-      </button>
+      <button class="btn-action-blue" (click)="cerrarModal()">Cerrar</button>
     </div>
-
   </div>
 </div>
