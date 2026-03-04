@@ -17,14 +17,12 @@ import com.reporteloya.recuperar_password.entity.Reporte;
 import com.reporteloya.recuperar_password.repository.EvidenciaRepository;
 import com.reporteloya.recuperar_password.repository.ReporteRepository;
 import com.reporteloya.recuperar_password.service.FileStorageService;
-import com.reporteloya.recuperar_password.service.ImageValidationService;
+
 
 @RestController
 @RequestMapping("/api/reportes")
 public class ReporteController {
 
-    @Autowired
-    private ImageValidationService imageValidationService;
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -56,30 +54,6 @@ public class ReporteController {
 
         try {
 
-            // ================================
-            // 🔎 VALIDACIÓN CON GOOGLE VISION
-            // ================================
-            boolean imagenValida = false;
-
-            for (MultipartFile archivo : archivos) {
-
-                if (archivo.getContentType() != null &&
-                        archivo.getContentType().startsWith("image")) {
-
-                    boolean valida = imageValidationService.esImagenDeTransito(archivo);
-
-                    if (valida) {
-                        imagenValida = true;
-                        break; // con una válida basta
-                    }
-                }
-            }
-
-            if (!imagenValida) {
-                return ResponseEntity
-                        .badRequest()
-                        .body("La imagen no parece estar relacionada con tránsito.");
-            }
 
             // ================================
             // 📝 CREAR REPORTE

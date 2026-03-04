@@ -50,36 +50,46 @@
     *ngFor="let r of reportesFiltrados"
     (click)="seleccionar(r)"
   >
-    <b>{{ r.tipo }}</b>
-    <p>{{ r.direccion }}</p>
+    <div class="informacion-card">
+      <b>{{ r.tipoInfraccion }}</b>
+      <p>{{ r.direccion }}</p>
 
-    <!-- Prioridad -->
-    <span class="tag prioridad" [ngClass]="getClasePrioridad(r.etiqueta)">
-      {{ r.etiqueta }}
-    </span>
+      <div  class="prioridad-estado">
+        <span class="tag prioridad" [ngClass]="getClasePrioridad(r.etiqueta)">
+          {{ r.etiqueta }}
+        </span>
 
-    <!-- Estado -->
-    <span
-      class="tag estado"
-      [ngClass]="{
-        'tag-pendiente': r.estado === EstadoReporte.PENDIENTE,
-        'tag-proceso': r.estado === EstadoReporte.EN_PROCESO,
-        'tag-rechazado': r.estado === EstadoReporte.RECHAZADO,
-        'tag-finalizado': r.estado === EstadoReporte.FINALIZADO,
-      }"
-    >
-      {{
-        r.estado === EstadoReporte.PENDIENTE
-          ? "PENDIENTE"
-          : r.estado === EstadoReporte.EN_PROCESO
-            ? "EN PROCESO"
-            : r.estado === EstadoReporte.RECHAZADO
-              ? "RECHAZADO"
-              : r.estado === EstadoReporte.FINALIZADO
-                ? "FINALIZADO"
-                : ""
-      }}
-    </span>
+        <span
+          class="tag estado"
+          [ngClass]="{
+            'tag-pendiente': r.estado === EstadoReporte.PENDIENTE,
+            'tag-proceso': r.estado === EstadoReporte.EN_PROCESO,
+            'tag-rechazado': r.estado === EstadoReporte.RECHAZADO,
+            'tag-finalizado': r.estado === EstadoReporte.FINALIZADO,
+          }"
+        >
+          {{
+            r.estado === EstadoReporte.PENDIENTE
+              ? "PENDIENTE"
+              : r.estado === EstadoReporte.EN_PROCESO
+                ? "EN PROCESO"
+                : r.estado === EstadoReporte.RECHAZADO
+                  ? "RECHAZADO"
+                  : r.estado === EstadoReporte.FINALIZADO
+                    ? "FINALIZADO"
+                    : ""
+          }}
+        </span>
+      </div>
+
+
+    </div>
+    <div class="hora-fecha">
+      <i class="fa-solid fa-clock"></i>
+      <p>{{r.horaIncidente}}</p>
+      <p class="guion">-</p>
+      <p>{{r.fechaIncidente | date: "dd/MM/yyyy"}}</p>
+    </div>
   </div>
 </div>
 
@@ -87,7 +97,7 @@
 <!-- DETALLE REPORTE -->
 <!-- ========================= -->
 
-<div *ngIf="reporteSeleccionado" class="detalle-reporte-full" @fadeInOut>
+<div *ngIf="reporteSeleccionado as r" class="detalle-reporte-full" @fadeInOut>
   <button class="btn-volver" (click)="volverClick()">
     <i class="fa-solid fa-arrow-left"></i>
     Volver
@@ -98,47 +108,39 @@
     <div class="detalle-foto">
       <img
         class="evidencia"
-        [src]="reporteSeleccionado?.foto"
-        (click)="abrirZoom(reporteSeleccionado?.foto!)"
+        [src]="r.foto"
+        (click)="abrirZoom(r.foto)"
         alt="Evidencia del reporte"
       />
     </div>
 
     <!-- Información -->
     <div class="detalle-info">
-      <!-- Header -->
       <div class="detalle-header">
-        <h2>{{ reporteSeleccionado.tipo }}</h2>
+        <h2>{{ r.tipoInfraccion }}</h2>
 
         <div>
-          <span
-            class="tag prioridad"
-            [ngClass]="getClasePrioridad(reporteSeleccionado?.etiqueta || '')"
-          >
-            {{ reporteSeleccionado?.etiqueta }}
+          <span class="tag prioridad" [ngClass]="getClasePrioridad(r.etiqueta)">
+            {{ r.etiqueta }}
           </span>
 
           <span
             class="tag estado"
             [ngClass]="{
-              'tag-pendiente':
-                reporteSeleccionado?.estado === EstadoReporte.PENDIENTE,
-              'tag-proceso':
-                reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO,
-              'tag-rechazado':
-                reporteSeleccionado?.estado === EstadoReporte.RECHAZADO,
-              'tag-finalizado':
-                reporteSeleccionado?.estado === EstadoReporte.FINALIZADO,
+              'tag-pendiente': r.estado === EstadoReporte.PENDIENTE,
+              'tag-proceso': r.estado === EstadoReporte.EN_PROCESO,
+              'tag-rechazado': r.estado === EstadoReporte.RECHAZADO,
+              'tag-finalizado': r.estado === EstadoReporte.FINALIZADO,
             }"
           >
             {{
-              reporteSeleccionado?.estado === EstadoReporte.PENDIENTE
+              r.estado === EstadoReporte.PENDIENTE
                 ? "PENDIENTE"
-                : reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO
+                : r.estado === EstadoReporte.EN_PROCESO
                   ? "EN PROCESO"
-                  : reporteSeleccionado?.estado === EstadoReporte.RECHAZADO
+                  : r.estado === EstadoReporte.RECHAZADO
                     ? "RECHAZADO"
-                    : reporteSeleccionado?.estado === EstadoReporte.FINALIZADO
+                    : r.estado === EstadoReporte.FINALIZADO
                       ? "FINALIZADO"
                       : ""
             }}
@@ -146,13 +148,12 @@
         </div>
       </div>
 
-      <!-- Datos -->
       <div class="detalle-datos">
         <div class="dato">
           <i class="fa-solid fa-location-dot"></i>
           <div class="label-datos">
             <span class="info-label">Dirección</span>
-            {{ reporteSeleccionado.direccion }}
+            {{ r.direccion }}
           </div>
         </div>
 
@@ -160,7 +161,7 @@
           <i class="fa-solid fa-clock"></i>
           <div class="label-datos">
             <span class="info-label">Hora</span>
-            {{ reporteSeleccionado.hora }}
+            {{ r.horaIncidente }}
           </div>
         </div>
 
@@ -168,52 +169,69 @@
           <i class="fa-solid fa-map-pin"></i>
           <div class="label-datos">
             <span class="info-label">Coordenadas</span>
-            {{ reporteSeleccionado.coordenadas }}
+            {{ r.latitud }}, {{ r.longitud }}
           </div>
         </div>
 
-        <div class="dato" *ngIf="reporteSeleccionado?.acompanado">
+        <div class="dato" *ngIf="r.acompanado">
           <i class="fa-solid fa-user-group"></i>
           <div class="label-datos">
             <span class="info-label">Acompañado:</span>
-            {{ reporteSeleccionado?.placaCompanero }}
+            {{ r.placaCompanero }}
           </div>
         </div>
       </div>
 
       <!-- Fechas -->
-      <div *ngIf="reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO">
+
+      <div *ngIf="r.estado === EstadoReporte.EN_PROCESO">
         <p class="fecha-info">
           <i class="fa-solid fa-stopwatch"></i>
           <span class="info-label">Iniciado:</span>
-          {{ reporteSeleccionado.fechaAceptado | date: "dd/MM/yyyy - HH:mm" }}
+          {{
+            r.fechaAceptado
+              ? (r.fechaAceptado | date: "dd/MM/yyyy - HH:mm")
+              : ""
+          }}
         </p>
       </div>
 
-      <div *ngIf="reporteSeleccionado?.estado === EstadoReporte.FINALIZADO">
+      <div *ngIf="r.estado === EstadoReporte.FINALIZADO">
         <p class="fecha-info">
           <i class="fa-solid fa-clock"></i>
           <span class="info-label">Inicio:</span>
-          {{ reporteSeleccionado.fechaAceptado | date: "dd/MM/yyyy - HH:mm" }}
+          {{
+            r.fechaAceptado
+              ? (r.fechaAceptado | date: "dd/MM/yyyy - HH:mm")
+              : ""
+          }}
         </p>
 
         <p class="fecha-info">
           <i class="fa-solid fa-check"></i>
           <span class="info-label">Finalizado:</span>
-          {{ reporteSeleccionado.fechaFinalizado | date: "dd/MM/yyyy - HH:mm" }}
+          {{
+            r.fechaFinalizado
+              ? (r.fechaFinalizado | date: "dd/MM/yyyy - HH:mm")
+              : ""
+          }}
         </p>
 
         <p class="fecha-info">
           <i class="fa-solid fa-hourglass-half"></i>
           <span class="info-label">Duración:</span>
-          {{ getDuracion(reporteSeleccionado!) }}
+          {{ getDuracion(r) }}
         </p>
       </div>
 
-      <div *ngIf="reporteSeleccionado?.estado === EstadoReporte.RECHAZADO">
+      <div *ngIf="r.estado === EstadoReporte.RECHAZADO">
         <p class="fecha-info">
           Rechazado:
-          {{ reporteSeleccionado.fechaRechazado | date: "dd/MM/yyyy - HH:mm" }}
+          {{
+            r.fechaRechazado
+              ? (r.fechaRechazado | date: "dd/MM/yyyy - HH:mm")
+              : ""
+          }}
         </p>
       </div>
 
@@ -221,19 +239,17 @@
       <div class="desc-wrapper">
         <h4 class="descripcion">Descripción</h4>
         <div class="desc-box">
-          {{ reporteSeleccionado.descripcion }}
+          {{ r.descripcion }}
         </div>
       </div>
 
       <!-- Acciones -->
-      <div
-        class="acciones"
-        *ngIf="reporteSeleccionado?.estado === EstadoReporte.PENDIENTE"
-      >
+
+      <div class="acciones" *ngIf="r.estado === EstadoReporte.PENDIENTE">
         <button
           class="btn-ok"
           [disabled]="hayEnProceso"
-          (click)="aceptarClick(reporteSeleccionado)"
+          (click)="aceptarClick(r)"
         >
           Aceptar
         </button>
@@ -241,25 +257,19 @@
         <button
           class="btn-no"
           [disabled]="hayEnProceso"
-          (click)="rechazarClick(reporteSeleccionado)"
+          (click)="rechazarClick(r)"
         >
           Rechazar
         </button>
       </div>
 
-      <div
-        class="en-proceso"
-        *ngIf="reporteSeleccionado?.estado === EstadoReporte.EN_PROCESO"
-      >
+      <div class="en-proceso" *ngIf="r.estado === EstadoReporte.EN_PROCESO">
         <button class="btn-finalizar" (click)="abrirModalFinalizar()">
           Finalizar Operativo
         </button>
       </div>
 
-      <div
-        class="estado-final"
-        *ngIf="reporteSeleccionado?.estado === EstadoReporte.FINALIZADO"
-      >
+      <div class="estado-final" *ngIf="r.estado === EstadoReporte.FINALIZADO">
         <button class="btn-resumen" (click)="abrirModalResumen()">
           Ver resumen del operativo
         </button>
@@ -269,10 +279,9 @@
 
   <!-- Mapa -->
   <div class="detalle-mapa">
-    <iframe *ngIf="mapaUrl" [src]="mapaUrl" loading="lazy"> </iframe>
+    <iframe *ngIf="mapaUrl" [src]="mapaUrl" loading="lazy"></iframe>
   </div>
 </div>
-
 <!-- ========================= -->
 <!-- MODALES -->
 <!-- ========================= -->

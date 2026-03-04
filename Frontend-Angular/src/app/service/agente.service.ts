@@ -10,7 +10,7 @@ export interface Usuario {
   numeroDocumento: string;
   tipoDocumento: string;
   role: string;
-  celular: string;
+  telefono: string;
   placa?: string;
 }
 

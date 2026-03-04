@@ -208,6 +208,7 @@ h4{
   padding: 12px;
   border-radius: 10px;
   transition: background 0.2s ease;
+  cursor: pointer;
 }
 
 .actividad-item:hover {

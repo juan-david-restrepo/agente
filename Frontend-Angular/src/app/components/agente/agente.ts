@@ -13,9 +13,6 @@ import { AgenteServiceTs } from '../../service/agente.service';
 import { OnInit } from '@angular/core';
 
 
-
-
-
     export enum EstadoReporte {
       PENDIENTE = 'pendiente',
       EN_PROCESO = 'en_proceso',
@@ -26,41 +23,36 @@ import { OnInit } from '@angular/core';
 
     export interface Reporte {
     id:number;
-    tipo:string;
+    tipoInfraccion:string;
     direccion:string;
-    hora:string;
+    horaIncidente:string;
+    fechaIncidente: Date;
     descripcion:string;
     foto:string ;
-    coordenadas:string;
+    latitud:number;
+    longitud:number;
     etiqueta:string;
     lat?:number;
     lng?:number;
     estado?: EstadoReporte;
-
-
     fechaAceptado?: Date; 
     fechaFinalizado?: Date;
     resumenOperativo?: string;
     fechaRechazado?: Date;
-
     acompanado?: boolean;
     placaCompanero?: string;
-
     }
 
     export interface Tarea {
       id:number;
       titulo:string;
       admin:string;
-      descripcionTarea:string;
+      descripcion:string;
       zona:string;
-
       estado:'PENDIENTE'|'EN_PROCESO'|'FINALIZADA';
-
       hora:string;
       fecha: string;
       prioridad: 'BAJA'|'MEDIA'|'ALTA';
-
       fechaInicio?: Date;
       fechaFin?: Date;
       resumen?: string;
@@ -144,12 +136,14 @@ export class Agente implements OnInit {
       reportesEntrantes:Reporte[]=[
         {
           id:1,
-          tipo:'Mal parqueo',
+          tipoInfraccion:'Mal parqueo',
           direccion:'Carrera 15 #23-40',
-          hora:'13:05',
+          horaIncidente:'13:05',
+          fechaIncidente: new Date(),
           descripcion:'Vehículo bloqueando entrada',
           foto:'https://images.unsplash.com/photo-1590483734724-38817405119c?w=500',
-          coordenadas:'4.653,-74.083',
+          latitud:4.653,
+          longitud:-74.083,
           etiqueta:'Alta',
           lat:4.653,
           lng:-74.083,
@@ -157,12 +151,14 @@ export class Agente implements OnInit {
         },
         {
           id:2,
-          tipo:'Accidente leve',
+          tipoInfraccion:'Accidente leve',
           direccion:'Calle 80 #45-20',
-          hora:'14:20',
+          horaIncidente:'14:20',
+          fechaIncidente: new Date(),
           descripcion:'Choque entre dos motos',
           foto:'https://images.unsplash.com/photo-1519583272095-6433daf26b6e?w=500',
-          coordenadas:'4.670,-74.080',
+          latitud:4.670,
+          longitud:-74.080,
           etiqueta:'Alta',
           lat:4.670,
           lng:-74.080,
@@ -175,7 +171,7 @@ export class Agente implements OnInit {
           id:1,
           titulo:'Operativo alcoholemia',
           admin:'Admin Central',
-          descripcionTarea:'Apoyar retén zona norte',
+          descripcion:'Apoyar retén zona norte',
           zona:'Zona Norte',
           estado:'PENDIENTE',
           hora:'10:00 AM',
@@ -186,7 +182,7 @@ export class Agente implements OnInit {
           id:2,
           titulo:'Control vehicular',
           admin:'Supervisor',
-          descripcionTarea:'Revisión documentos vehículos pesados',
+          descripcion:'Revisión documentos vehículos pesados',
           zona:'Autopista Sur',
           estado:'FINALIZADA',
           hora:'02:00 PM',
@@ -213,14 +209,11 @@ export class Agente implements OnInit {
 
       perfilAgente = {
         nombre:'Julian Toro',
-        rango:'Brigadista Nivel II',
         placa:'ANT-9021',
-        cedula:'1.094.882.112',
-        celular:'+57 312 456 7890',
+        documento:'1.094.882.112',
+        telefono:'+57 312 456 7890',
         correo:'j.toro@transito.gov.co',
-        numeroDocumento:'1094882112',
         foto:'https://randomuser.me/api/portraits/men/32.jpg',
-        ciudad:'Armenia'
       };
 
     comenzarTarea(t:Tarea){
@@ -327,14 +320,11 @@ export class Agente implements OnInit {
         next: (data) => {
           this.perfilAgente = {
             nombre: data.nombreCompleto,
-            cedula: data.numeroDocumento,
+            documento: data.numeroDocumento,
             correo: data.email,
             placa: data.placa || 'N/A',
-            celular: data.celular,
-            numeroDocumento: data.numeroDocumento,
-            rango: data.role,
+            telefono: data.telefono || 'N/A',
             foto: 'https://randomuser.me/api/portraits/men/32.jpg',
-            ciudad: 'N/A'
           };
         },
         error: (err) => {

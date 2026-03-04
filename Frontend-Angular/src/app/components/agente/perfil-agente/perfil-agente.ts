@@ -11,16 +11,13 @@ import { CommonModule } from '@angular/common';
 })
 export class PerfilAgente {
 
-  @Input() agente!: {
+@Input() agente!: {
  nombre:string;
  placa:string;
  foto:string;
- cedula:string;
- celular:string;
+ documento:string;
+ telefono:string;
  correo:string;
- numeroDocumento:string;
- rango:string;
- ciudad:string; 
 };
 
   @Input() estadoAgente!: 'LIBRE'|'OCUPADO'|'FUERA_SERVICIO';

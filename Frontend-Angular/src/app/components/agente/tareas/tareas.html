@@ -28,21 +28,30 @@
 
   <!-- TARJETAS -->
   <div class="tarea-card" *ngFor="let t of tareasFiltradas" (click)="abrir(t)">
-    <h3>{{ t.titulo }}</h3>
 
-    <p class="preview-msg">{{ t.descripcionTarea | slice: 0 : 60 }}...</p>
+    <div class="info-card">
+      <h3>{{ t.titulo }}</h3>
 
-    <!-- ESTADO DINÁMICO -->
-    <span
-      class="estado"
-      [ngClass]="{
-        pendiente: t.estado === 'PENDIENTE',
-        proceso: t.estado === 'EN_PROCESO',
-        ok: t.estado === 'FINALIZADA',
-      }"
-    >
-      {{ t.estado }}
-    </span>
+      <p class="preview-msg">{{ t.descripcion | slice: 0 : 60 }}...</p>
+
+      <!-- ESTADO DINÁMICO -->
+      <span
+        class="estado"
+        [ngClass]="{
+          pendiente: t.estado === 'PENDIENTE',
+          proceso: t.estado === 'EN_PROCESO',
+          ok: t.estado === 'FINALIZADA',
+        }"
+      >
+        {{ t.estado }}
+      </span>
+    </div>
+    <div class="hora">
+      <i class="fa-solid fa-clock"></i>
+      <span>{{ t.hora }}</span>
+
+    </div>
+
   </div>
 </div>
 
@@ -134,7 +143,7 @@
       <div class="orden-header">Instrucción del administrador</div>
 
       <div class="mensaje-completo mensaje-admin">
-        {{ tareaSeleccionada.descripcionTarea }}
+        {{ tareaSeleccionada.descripcion }}
       </div>
     </div>
 

@@ -15,7 +15,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
  standalone: true,
  imports: [CommonModule, FormsModule],
  templateUrl: './reportes.html',
- styleUrl: './reportes.css',
+ styleUrls: ['./reportes.css'],
  animations: [
   trigger('fadeInOut', [
     transition(':enter', [
