@@ -13,17 +13,6 @@
     <!-- ============================= -->
 
     <div class="charts-grid">
-
-      <!-- 🔥 GRÁFICO DE BARRAS -->
-      <div class="chart-card">
-        <h4 class="clickable" (click)="abrirModalBarras()">
-          Análisis por Estado
-        </h4>
-        <div class="canvas-container clickable" (click)="abrirModalBarras()">
-          <canvas id="lineChart"></canvas>
-        </div>
-      </div>
-
       <!-- 🔥 GRÁFICO DONA -->
       <div class="chart-card">
         <h4 class="clickable" (click)="abrirModalDona()">
@@ -42,10 +31,9 @@
 
     <div class="table-section">
       <div class="table-header"
-           style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h3>Infracciones Recientes</h3>
-        <select (change)="aplicarFiltro($event)"
-                style="padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
+        <select (change)="aplicarFiltro($event)" style="padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
           <option value="">Todos los estados</option>
           <option value="PENDIENTE">PENDIENTE</option>
           <option value="EN PROCESO">EN PROCESO</option>
@@ -66,16 +54,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let inf of infraccionesAMostrar"
-                (click)="abrirDetalleInfraccion(inf)"
-                class="clickable-row">
+            <tr *ngFor="let inf of infraccionesAMostrar" (click)="abrirDetalleInfraccion(inf)" class="clickable-row">
               <td><strong>{{ inf.id }}</strong></td>
               <td>{{ inf.fecha }}</td>
               <td>{{ inf.tipo }}</td>
               <td>{{ inf.agente }}</td>
               <td>
-                <span class="status"
-                      [ngClass]="getClaseEstado(inf.estado)">
+                <span class="status" [ngClass]="getClaseEstado(inf.estado)">
                   {{ inf.estado }}
                 </span>
               </td>
@@ -84,7 +69,6 @@
         </table>
       </div>
     </div>
-
   </main>
 </div>
 
@@ -92,46 +76,16 @@
 <!-- 🔥 MODAL DINÁMICO -->
 <!-- ============================= -->
 
-<div class="modal-overlay"
-     *ngIf="modalAbierto"
-     (click)="cerrarModal()">
+<div class="modal-overlay" *ngIf="modalAbierto" (click)="cerrarModal()">
 
-  <div class="modal-container"
-       (click)="$event.stopPropagation()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
 
     <div class="modal-header">
       <h5>{{ tituloModal }}</h5>
-      <button class="btn-close-circle"
-              (click)="cerrarModal()"></button>
+      <button class="btn-close-circle" (click)="cerrarModal()"></button>
     </div>
 
     <div class="modal-body">
-
-      <!-- ============================= -->
-      <!-- 🔥 MODAL BARRAS -->
-      <!-- ============================= -->
-
-      <div *ngIf="tipoModalActivo === 'barras'">
-        <table class="modal-table">
-          <thead>
-            <tr>
-              <th>Estado</th>
-              <th>Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of itemsFiltrados">
-              <td>
-                <span class="status-badge"
-                      [ngClass]="getClaseEstado(item.estado)">
-                  {{ item.ref }}
-                </span>
-              </td>
-              <td>{{ item.descripcion }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
 
       <!-- ============================= -->
       <!-- 🔥 MODAL DONA -->
@@ -158,8 +112,7 @@
       <!-- 🔥 DETALLE DE INFRACCIÓN -->
       <!-- ============================= -->
 
-      <div *ngIf="tipoModalActivo === 'infraccion' && infraccionSeleccionada"
-           class="detalle-infraccion-container">
+      <div *ngIf="tipoModalActivo === 'infraccion' && infraccionSeleccionada" class="detalle-infraccion-container">
 
         <div class="detalle-grid">
           <div class="detalle-item">
@@ -180,8 +133,7 @@
           <div class="detalle-item">
             <label>Estado</label>
             <p>
-              <span class="status-badge"
-                    [ngClass]="getClaseEstado(infraccionSeleccionada.estado)">
+              <span class="status-badge" [ngClass]="getClaseEstado(infraccionSeleccionada.estado)">
                 {{ infraccionSeleccionada.estado }}
               </span>
             </p>
@@ -193,8 +145,7 @@
     </div>
 
     <div class="modal-footer-centered">
-      <button class="btn-action-blue"
-              (click)="cerrarModal()">
+      <button class="btn-action-blue" (click)="cerrarModal()">
         Cerrar
       </button>
     </div>

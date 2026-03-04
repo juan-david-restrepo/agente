@@ -61,20 +61,17 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       this.infraccionesAMostrar = data;
 
       if (this.vistaLista) {
-        this.actualizarGraficoBarras();
         this.actualizarGraficoDona();
       }
     });
   }
 
   ngAfterViewInit(): void {
-    this.crearGraficoBarras();
     this.crearGraficoDona();
 
     this.vistaLista = true;
 
     if (this.infracciones.length > 0) {
-      this.actualizarGraficoBarras();
       this.actualizarGraficoDona();
     }
   }
@@ -99,7 +96,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       );
     }
 
-    this.actualizarGraficoBarras();
     this.actualizarGraficoDona();
   }
 
@@ -111,35 +107,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       case 'EN PROCESO': return 'estado-proceso';
       default: return '';
     }
-  }
-
-  // =========================
-  // 🔥 MODAL BARRAS
-  // =========================
-
-  abrirModalBarras(): void {
-    this.tipoModalActivo = 'barras';
-    this.tituloModal = 'Análisis por Estado';
-
-    const conteo = {
-      PENDIENTE: 0,
-      RECHAZADO: 0,
-      'EN PROCESO': 0,
-      FINALIZADO: 0
-    };
-
-    this.infracciones.forEach(inf => {
-      conteo[inf.estado]++;
-    });
-
-    this.itemsFiltrados = Object.keys(conteo).map(estado => ({
-      ref: estado,
-      descripcion: 'Cantidad de infracciones',
-      estado: estado as EstadoInfraccion
-    }));
-
-    this.modalAbierto = true;
-    document.body.classList.add('modal-open');
   }
 
   // =========================
@@ -185,54 +152,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     document.body.classList.remove('modal-open');
   }
 
-  // =========================
-  // GRÁFICO BARRAS
-  // =========================
-
-  private crearGraficoBarras(): void {
-    const canvas = document.getElementById('lineChart') as HTMLCanvasElement;
-    if (!canvas) return;
-
-    this.chartBarras = new Chart(canvas, {
-      type: 'bar',
-      data: {
-        labels: ['PENDIENTE', 'RECHAZADO', 'EN PROCESO', 'FINALIZADO'],
-        datasets: [{
-          label: 'Cantidad',
-          data: [0, 0, 0, 0],
-          backgroundColor: ['#FFCC00', '#FF4D4D', '#33B5E5', '#4CAF50']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-  }
-
-  private actualizarGraficoBarras(): void {
-    if (!this.chartBarras) return;
-
-    const conteo = {
-      PENDIENTE: 0,
-      RECHAZADO: 0,
-      'EN PROCESO': 0,
-      FINALIZADO: 0
-    };
-
-    this.infracciones.forEach(inf => {
-      conteo[inf.estado]++;
-    });
-
-    this.chartBarras.data.datasets[0].data = [
-      conteo.PENDIENTE,
-      conteo.RECHAZADO,
-      conteo['EN PROCESO'],
-      conteo.FINALIZADO
-    ];
-
-    this.chartBarras.update();
-  }
 
   // =========================
   // GRÁFICO DONA
