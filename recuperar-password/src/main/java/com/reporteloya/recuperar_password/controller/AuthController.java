@@ -92,6 +92,7 @@ public class AuthController {
                 .secure(false) // true solo en HTTPS
                 .path("/")
                 .maxAge(0)
+                .sameSite("Lax")
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

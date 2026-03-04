@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,357 +9,354 @@ import { Historial } from './historial/historial';
 import { Reportes } from './reportes/reportes';
 import { Dashboard } from './dashboard/dashboard';
 import { Tareas } from './tareas/tareas';
+
 import { AgenteServiceTs } from '../../service/agente.service';
-import { OnInit } from '@angular/core';
+import { WebsocketService } from '../../service/websocket.service';
 
+// ===================== ENUMS =====================
 
+export enum EstadoReporte {
+  PENDIENTE = 'pendiente',
+  EN_PROCESO = 'en_proceso',
+  RECHAZADO = 'rechazado',
+  FINALIZADO = 'finalizado',
+}
 
+// ===================== INTERFACES =====================
 
+export interface Reporte {
+  prioridad: 'BAJA' | 'MEDIA' | 'ALTA';
+  placa :string;
+  id: number;
+  tipo: string;
+  direccion: string;
+  hora: string;
+  fechaIncidente?: Date;
+  horaIncidente?: Date;
+  descripcion: string;
+  foto?: string;
+  coordenadas: string;
+  etiqueta: string;
+evidencias?: string[];
+  latitud?: number;
+  longitud?: number;
+  tipoInfraccion: string;
 
-    export enum EstadoReporte {
-      PENDIENTE = 'pendiente',
-      EN_PROCESO = 'en_proceso',
-      RECHAZADO = 'rechazado',
-      FINALIZADO = 'finalizado'
-    }
+  estado?: EstadoReporte;
 
+  fechaAceptado?: Date;
+  fechaFinalizado?: Date;
+  fechaRechazado?: Date;
 
-    export interface Reporte {
-    id:number;
-    tipo:string;
-    direccion:string;
-    hora:string;
-    descripcion:string;
-    foto:string ;
-    coordenadas:string;
-    etiqueta:string;
-    lat?:number;
-    lng?:number;
-    estado?: EstadoReporte;
+  resumenOperativo?: string;
 
+  acompanado?: boolean;
+  placaCompanero?: string;
+}
 
-    fechaAceptado?: Date; 
-    fechaFinalizado?: Date;
-    resumenOperativo?: string;
-    fechaRechazado?: Date;
+export interface Tarea {
+  id: number;
+  titulo: string;
+  admin: string;
+  descripcion: string;
+  zona: string;
 
-    acompanado?: boolean;
-    placaCompanero?: string;
+  estado: 'PENDIENTE' | 'EN_PROCESO' | 'FINALIZADA';
 
-    }
+  hora: string;
+  fecha: string;
+  prioridad: 'BAJA' | 'MEDIA' | 'ALTA';
 
-    export interface Tarea {
-      id:number;
-      titulo:string;
-      admin:string;
-      descripcionTarea:string;
-      zona:string;
+  fechaInicio?: Date;
+  fechaFin?: Date;
+  resumen?: string;
+}
 
-      estado:'PENDIENTE'|'EN_PROCESO'|'FINALIZADA';
+export interface Notificacion {
+  tipo: 'REPORTE' | 'TAREA';
+  texto: string;
+  hora: string;
+  data?: any;
+}
 
-      hora:string;
-      fecha: string;
-      prioridad: 'BAJA'|'MEDIA'|'ALTA';
+type VistaAgente =
+  | 'dashboard'
+  | 'reportes'
+  | 'tareas'
+  | 'historial'
+  | 'perfil'
+  | 'configuracion';
 
-      fechaInicio?: Date;
-      fechaFin?: Date;
-      resumen?: string;
-    }
+// ===================== COMPONENTE =====================
 
-    export interface Notificacion {
-    tipo:'REPORTE'|'TAREA';
-    texto:string;
-    hora:string;
-    data?:any;
-    }
+@Component({
+  selector: 'app-agente',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    SidebarAgente,
+    Dashboard,
+    Reportes,
+    Historial,
+    Tareas,
+    PerfilAgente,
+    Configuracion,
+  ],
+  templateUrl: 'agente.html',
+  styleUrls: ['agente.css'],
+})
+export class Agente implements OnInit {
+  // ===================== VARIABLES BASE =====================
 
-    type VistaAgente =
-    | 'dashboard'
-    | 'reportes'
-    | 'tareas'
-    | 'historial'
-    | 'perfil'
-    | 'configuracion';
+  EstadoReporte = EstadoReporte;
 
-    @Component({
-      selector: 'app-agente',
-      standalone: true,
-      imports: [
-        CommonModule,
-        FormsModule,
-        SidebarAgente,
-        Dashboard,
-        Reportes,
-        Historial,
-        Tareas,
-        PerfilAgente,
-        Configuracion,
-      ],
-      templateUrl: 'agente.html',
-      styleUrls: ['agente.css'],
-    })
-    export class Agente implements OnInit {
-      EstadoReporte = EstadoReporte;
-      reporteDesdeHistorial: Reporte | null = null;
+  vistaActual: VistaAgente = 'dashboard';
 
-      origenDetalle: 'historial' | 'reportes' = 'reportes';
+  estadoAgente: 'LIBRE' | 'OCUPADO' | 'FUERA_SERVICIO' = 'LIBRE';
 
-      constructor(private agenteService: AgenteServiceTs) {}
+  origenDetalle: 'historial' | 'reportes' = 'reportes';
+  reporteDesdeHistorial: Reporte | null = null;
 
-      vistaActual: VistaAgente = 'dashboard';
+  mostrarNotificaciones = false;
 
-      estadoAgente: 'LIBRE' | 'OCUPADO' | 'FUERA_SERVICIO' = 'LIBRE';
+  reportesEntrantes: Reporte[] = [];
+  historialReportes: Reporte[] = [];
+  tareasAdmin: Tarea[] = [];
+  notificaciones: Notificacion[] = [];
+  perfilAgente: any = {};
+  
 
-      toggleServicio(event: any) {
-        const activo = event.target.checked;
+  constructor(
+    private agenteService: AgenteServiceTs,
+    private websocketService: WebsocketService,
+  ) {}
 
-        if (activo) {
-          // Si está activado → está en servicio
-          this.estadoAgente = 'LIBRE';
-        } else {
-          // Si está desactivado → fuera de servicio
-          this.estadoAgente = 'FUERA_SERVICIO';
-        }
+  // ===================== CARGA DESDE BD =====================
+
+  async cargarReportesDesdeBD() {
+    try {
+      const response = await fetch(
+        'http://localhost:8080/api/reportes/agente',
+        { credentials: 'include' },
+      );
+
+      if (!response.ok) {
+        throw new Error('Error HTTP ' + response.status);
       }
 
-      config = {
-        modoNoche: false,
-        daltonismo: false,
-        fontSize: 16,
+      const data = await response.json();
+
+      this.reportesEntrantes = data.map(
+        (r: any): Reporte => ({
+          prioridad: r.prioridad as 'BAJA' | 'MEDIA' | 'ALTA',
+          id: r.id,
+          tipo: r.tipoInfraccion,
+          direccion: r.direccion,
+          hora: r.horaIncidente || '',
+          descripcion: r.descripcion,
+          tipoInfraccion: r.tipoInfraccion,
+          placa: r.placa || '',
+          foto: r.urlFoto || '',
+          coordenadas: `${r.latitud},${r.longitud}`,
+          latitud: r.latitud,
+          longitud: r.longitud,
+          etiqueta: r.prioridad,
+          estado: r.estado?.toLowerCase() as EstadoReporte,
+        }),
+      );
+    } catch (error) {
+      console.error('Error cargando reportes:', error);
+    }
+  }
+
+  // ===================== ACCIONES REPORTES =====================
+
+  async aceptarReporte(r: Reporte) {
+    const yaHayEnProceso = this.reportesEntrantes.some(
+      (rep) => rep.estado === EstadoReporte.EN_PROCESO,
+    );
+
+    if (yaHayEnProceso) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/reportes/tomar/${r.id}`,
+        { method: 'POST', credentials: 'include' },
+      );
+
+      if (!response.ok) throw new Error();
+
+      const actualizado = await response.json();
+
+      r.estado = actualizado.estado;
+      r.fechaAceptado = new Date();
+
+      this.estadoAgente = 'OCUPADO';
+    } catch (error) {
+      console.error('Error al aceptar reporte');
+    }
+  }
+
+  async rechazarReporte(r: Reporte) {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/reportes/rechazar/${r.id}`,
+        { method: 'POST', credentials: 'include' },
+      );
+
+      if (!response.ok) throw new Error();
+
+      r.estado = EstadoReporte.RECHAZADO;
+      r.fechaRechazado = new Date();
+
+      this.historialReportes.unshift({ ...r });
+
+      this.reportesEntrantes = this.reportesEntrantes.filter(
+        (x) => x.id !== r.id,
+      );
+    } catch (error) {
+      console.error('Error al rechazar reporte');
+    }
+  }
+
+  async finalizarReporte(r: Reporte) {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/reportes/finalizar/${r.id}`,
+        { method: 'POST', credentials: 'include' },
+      );
+
+      if (!response.ok) throw new Error();
+
+      r.estado = EstadoReporte.FINALIZADO;
+      r.fechaFinalizado = new Date();
+
+      this.historialReportes.unshift({ ...r });
+
+      this.reportesEntrantes = this.reportesEntrantes.filter(
+        (x) => x.id !== r.id,
+      );
+
+      this.estadoAgente = 'LIBRE';
+    } catch (error) {
+      console.error('Error al finalizar reporte');
+    }
+  }
+
+  // ===================== NAVEGACIÓN =====================
+
+  cambiarVista(v: VistaAgente) {
+    this.vistaActual = v;
+    this.reporteDesdeHistorial = null;
+    this.origenDetalle = 'reportes';
+  }
+
+  verDetalleHist(r: Reporte) {
+    this.origenDetalle = 'historial';
+    this.reporteDesdeHistorial = r;
+    this.vistaActual = 'reportes';
+  }
+
+  volverDesdeDetalle(origen: 'historial' | 'reportes') {
+    this.reporteDesdeHistorial = null;
+    this.vistaActual = origen;
+  }
+
+  // ===================== WEBSOCKET =====================
+
+  ngOnInit() {
+    this.cargarReportesDesdeBD();
+
+    this.websocketService.connect();
+
+    this.websocketService.reportes$.subscribe((reporteBackend: any) => {
+      const nuevoReporte: Reporte = {
+        tipoInfraccion: reporteBackend.tipoInfraccion,
+        prioridad: reporteBackend.prioridad as 'BAJA' | 'MEDIA' | 'ALTA',
+        id: reporteBackend.id,
+        tipo: reporteBackend.tipoInfraccion,
+        direccion: reporteBackend.direccion,
+        placa: reporteBackend.placa || '',
+        hora: '',
+        descripcion: reporteBackend.descripcion,
+        foto: reporteBackend.urlFoto || '',
+        evidencias: reporteBackend.evidencias || [],
+        coordenadas: `${reporteBackend.latitud},${reporteBackend.longitud}`,
+        latitud: reporteBackend.latitud,
+        longitud: reporteBackend.longitud,
+        etiqueta: reporteBackend.prioridad,
+        estado: reporteBackend.estado?.toLowerCase() as EstadoReporte,
       };
 
-      mostrarNotificaciones = false;
+      const existe = this.reportesEntrantes.some(
+        (r) => r.id === nuevoReporte.id,
+      );
 
-      reporteHistDetalle: Reporte | null = null;
+      if (!existe) {
+        this.reportesEntrantes.unshift(nuevoReporte);
 
-      historialReportes: Reporte[] = [];
-
-      reportesEntrantes: Reporte[] = [];
-
-      tareasAdmin: Tarea[] = [ ];
-
-      notificaciones: Notificacion[] = [ ];
-
-      perfilAgente = {
-        nombre: 'Julian Toro',
-        rango: 'Brigadista Nivel II',
-        placa: 'ANT-9021',
-        cedula: '1.094.882.112',
-        celular: '+57 312 456 7890',
-        correo: 'j.toro@transito.gov.co',
-        numeroDocumento: '1094882112',
-        foto: 'https://randomuser.me/api/portraits/men/32.jpg',
-        ciudad: 'Armenia',
-      };
-
-      comenzarTarea(t: Tarea) {
-        const yaOcupado = this.tareasAdmin.some(
-          (tarea) => tarea.estado === 'EN_PROCESO',
-        );
-
-        if (yaOcupado) return;
-
-        t.estado = 'EN_PROCESO';
-        t.fechaInicio = new Date();
-
-        this.estadoAgente = 'OCUPADO';
-      }
-
-      finalizarTarea(t: Tarea) {
-        t.estado = 'FINALIZADA';
-        t.fechaFin = new Date();
-
-        this.estadoAgente = 'LIBRE';
-      }
-
-      async aceptarReporte(r: Reporte) {
-        const yaHayEnProceso = this.reportesEntrantes.some(
-          (rep) => rep.estado === EstadoReporte.EN_PROCESO,
-        );
-
-        if (yaHayEnProceso) return;
-
-        try {
-          const response = await fetch(
-            `http://localhost:8080/api/reportes/tomar/${r.id}`,
-            {
-              method: 'POST',
-              credentials: 'include',
-            },
-          );
-
-          if (!response.ok) throw new Error();
-
-          const actualizado = await response.json();
-
-          // 🔥 Actualizamos localmente con lo que manda el backend
-          r.estado = actualizado.estado;
-          r.fechaAceptado = new Date();
-
-          this.estadoAgente = 'OCUPADO';
-        } catch (error) {
-          console.error('Error al aceptar reporte');
-        }
-      }
-
-      async rechazarReporte(r: Reporte) {
-        try {
-          const response = await fetch(
-            `http://localhost:8080/api/reportes/rechazar/${r.id}`,
-            {
-              method: 'POST',
-              credentials: 'include',
-            },
-          );
-
-          if (!response.ok) throw new Error();
-
-          const actualizado = await response.json();
-
-          r.estado = actualizado.estado;
-          r.fechaRechazado = new Date();
-
-          this.historialReportes.push({ ...r });
-
-          this.reportesEntrantes = this.reportesEntrantes.filter(
-            (x) => x.id !== r.id,
-          );
-
-          this.reporteDesdeHistorial = null;
-        } catch (error) {
-          console.error('Error al rechazar reporte');
-        }
-      }
-
-      async finalizarReporte(r: Reporte) {
-        try {
-          const response = await fetch(
-            `http://localhost:8080/api/reportes/finalizar/${r.id}`,
-            {
-              method: 'POST',
-              credentials: 'include',
-            },
-          );
-
-          if (!response.ok) throw new Error();
-
-          const actualizado = await response.json();
-
-          this.historialReportes.push({ ...actualizado });
-
-          this.reportesEntrantes = this.reportesEntrantes.filter(
-            (x) => x.id !== r.id,
-          );
-
-          this.estadoAgente = 'LIBRE';
-        } catch (error) {
-          console.error('Error al finalizar reporte');
-        }
-      }
-
-      verDetalleHist(r: Reporte) {
-        this.origenDetalle = 'historial';
-        this.reporteDesdeHistorial = r;
-        this.vistaActual = 'reportes';
-      }
-
-      cambiarVista(v: VistaAgente) {
-        this.vistaActual = v;
-        this.reporteDesdeHistorial = null;
-        this.origenDetalle = 'reportes'; // importante si estamos usando el sistema de origen
-      }
-
-      volverDesdeDetalle(origen: 'historial' | 'reportes') {
-        this.reporteDesdeHistorial = null;
-        this.vistaActual = origen;
-      }
-
-      toggleNotificaciones() {
-        this.mostrarNotificaciones = !this.mostrarNotificaciones;
-      }
-
-      abrirNotif(n: any) {
-        if (n.tipo === 'REPORTE') {
-          this.vistaActual = 'reportes';
-        }
-
-        if (n.tipo === 'TAREA') {
-          this.vistaActual = 'tareas';
-        }
-
-        this.mostrarNotificaciones = false;
-      }
-
-      ngOnInit() {
-        this.agenteService.getPerfil().subscribe({
-          next: (data) => {
-            this.perfilAgente = {
-              nombre: data.nombreCompleto,
-              cedula: data.numeroDocumento,
-              correo: data.email,
-              placa: data.placa || 'N/A',
-              celular: data.celular,
-              numeroDocumento: data.numeroDocumento,
-              rango: data.role,
-              foto: 'https://randomuser.me/api/portraits/men/32.jpg',
-              ciudad: 'N/A',
-            };
-          },
-          error: (err) => {
-            console.error('Error cargando perfil', err);
-          },
+        this.notificaciones.unshift({
+          tipo: 'REPORTE',
+          texto: `Nuevo reporte en ${nuevoReporte.direccion}`,
+          hora: new Date().toLocaleTimeString(),
+          data: nuevoReporte,
         });
       }
+    });
 
-      get hayEnProceso(): boolean {
-        return this.reportesEntrantes.some(
-          (r) => r.estado === EstadoReporte.EN_PROCESO,
-        );
-      }
+    this.cargarPerfil();
+  }
 
-      updateConfig(config: any) {
-        document.body.classList.toggle('dark-mode', config.modoNoche);
-        document.documentElement.style.setProperty(
-          '--font-size-base',
-          config.fontSize + 'px',
-        );
-      }
+  // ===================== PERFIL =====================
 
-      asignarReporteACompanero(reporte: Reporte) {
-        // esto va en el backend solo es prueba
-        console.log(
-          `Asignando reporte ${reporte.id} al agente ${reporte.placaCompanero}`,
-        );
+  cargarPerfil() {
+    this.agenteService.getPerfil().subscribe({
+      next: (data) => {
+        this.perfilAgente = data; // 🔥 FALTABA ESTO
+      },
+      error: (err) => {
+        console.error('Error cargando perfil', err);
+      },
+    });
+  }
+  // ================== CONFIG ==================
+  config = {
+    modoNoche: false,
+    daltonismo: false,
+    fontSize: 14,
+  };
 
-        // Aquí deberías llamar al backend
-        // agenteService.asignarACompanero(...)
-      }
-      async cargarReportesDesdeBD() {
-        try {
-          const response = await fetch(
-            'http://localhost:8080/api/reportes/agente',
-            { credentials: 'include' },
-          );
 
-          if (!response.ok) throw new Error();
+ 
 
-          const data = await response.json();
+  // ================== NOTIFICACIONES ==================
 
-          // 🔥 Mapear datos del backend a tu modelo frontend
-          this.reportesEntrantes = data.map((r: any) => ({
-            id: r.id,
-            tipo: r.tipoInfraccion,
-            direccion: r.direccion,
-            hora: r.horaIncidente,
-            descripcion: r.descripcion,
-            coordenadas: `${r.latitud},${r.longitud}`,
-            lat: r.latitud,
-            lng: r.longitud,
-            etiqueta: r.prioridad,
-            estado: r.estado,
-          }));
-        } catch (error) {
-          console.error('Error cargando reportes');
-        }
-      }
-    }
+  toggleNotificaciones() {
+    this.mostrarNotificaciones = !this.mostrarNotificaciones;
+  }
+
+  abrirNotif(n: any) {
+    console.log('Notificación abierta', n);
+  }
+
+  // ================== TAREAS ==================
+
+  comenzarTarea(tarea: any) {
+    console.log('Comenzar tarea', tarea);
+  }
+
+  finalizarTarea(tarea: any) {
+    console.log('Finalizar tarea', tarea);
+  }
+
+  // ================== ESTADO SERVICIO ==================
+  toggleServicio(nuevoEstado: any) {
+    this.estadoAgente = nuevoEstado;
+  }
+
+  // ================== CONFIG UPDATE ==================
+  updateConfig(nuevaConfig: any) {
+    this.config = nuevaConfig;
+  }
+}

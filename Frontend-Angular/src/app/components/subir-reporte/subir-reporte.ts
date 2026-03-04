@@ -67,7 +67,7 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
       prioridad: 'MEDIA',
       requierePlaca: true,
     },
-    { nombre: 'Semáforo dañado', prioridad: 'ALTA', requierePlaca: false },
+    { nombre: 'Semáforo dañado', prioridad: 'ALTA', requierePlaca: true },
     { nombre: 'Conducción peligrosa', prioridad: 'ALTA', requierePlaca: true },
     { nombre: 'Otros', prioridad: 'BAJA', requierePlaca: false },
   ];
@@ -268,11 +268,11 @@ export class SubirReporteComponent implements OnInit, OnDestroy {
       formData.append('longitud', this.coordenadas.split(',')[1]);
       formData.append('placa', this.placa);
        formData.append(
-         'tipoInfraccion',
-         this.tipoSeleccionado === 'Otros'
-           ? this.detalleOtroIncidente
-           : this.tipoSeleccionado,
-       );
+        'tipoInfraccion',
+        this.tipoSeleccionado === 'Otros'
+          ? this.detalleOtroIncidente
+          : this.tipoSeleccionado,
+      );
       formData.append('fechaIncidente', this.fecha);
       formData.append('horaIncidente', this.hora);
 

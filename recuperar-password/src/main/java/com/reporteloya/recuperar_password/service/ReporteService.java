@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.reporteloya.recuperar_password.entity.Reporte;
+import com.reporteloya.recuperar_password.dto.ReporteSocketDTO;
 import com.reporteloya.recuperar_password.entity.Agentes;
 import com.reporteloya.recuperar_password.entity.Evidencia;
 import com.reporteloya.recuperar_password.entity.Prioridad;
@@ -12,6 +13,7 @@ import com.reporteloya.recuperar_password.entity.Prioridad;
 import com.reporteloya.recuperar_password.repository.ReporteRepository;
 import com.reporteloya.recuperar_password.repository.AgenteRepository;
 import com.reporteloya.recuperar_password.repository.EvidenciaRepository;
+import com.reporteloya.recuperar_password.dto.ReporteSocketDTO;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,6 +23,8 @@ import java.io.IOException;
 @Service
 public class ReporteService {
 
+
+    private final ImageValidationService imageValidationService;
     private final AgenteRepository agenteRepository;
     private final ReporteRepository reporteRepository;
     private final EvidenciaRepository evidenciaRepository;
@@ -32,12 +36,14 @@ public class ReporteService {
             AgenteRepository agenteRepository,
             EvidenciaRepository evidenciaRepository,
             FileStorageService fileStorageService,
+            ImageValidationService imageValidationService,
             SimpMessagingTemplate messagingTemplate) {
 
         this.reporteRepository = reporteRepository;
         this.agenteRepository = agenteRepository;
         this.evidenciaRepository = evidenciaRepository;
         this.fileStorageService = fileStorageService;
+        this.imageValidationService = imageValidationService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -54,6 +60,38 @@ public class ReporteService {
             String horaIncidente,
             String tipoInfraccion,
             List<MultipartFile> archivos) {
+
+
+
+                // ================================
+        // 🔥 VALIDACIÓN IA (ANTES DE GUARDAR)
+        // ================================
+        if (archivos == null || archivos.isEmpty()) {
+            throw new RuntimeException("Debe subir al menos una imagen");
+        }
+
+        boolean imagenValida = false;
+
+        for (MultipartFile archivo : archivos) {
+
+            if (archivo.getContentType() == null ||
+                    !archivo.getContentType().startsWith("image")) {
+                continue;
+            }
+
+            try {
+                if (imageValidationService.esImagenDeTransito(archivo)) {
+                    imagenValida = true;
+                    break;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Error validando imagen con IA: " + e.getMessage());
+            }
+        }
+
+        if (!imagenValida) {
+            throw new RuntimeException("La imagen no parece estar relacionada con tránsito");
+        }
 
         Reporte reporte = new Reporte();
 
@@ -98,8 +136,10 @@ public class ReporteService {
         guardarEvidencias(archivos, guardado);
 
         // 🔥 Notificaciones en tiempo real
-        messagingTemplate.convertAndSend("/topic/admins", guardado);
-        messagingTemplate.convertAndSend("/topic/agents", guardado);
+        ReporteSocketDTO dto = convertirADTO(reporte);
+
+        messagingTemplate.convertAndSend("/topic/admin", guardado);
+        messagingTemplate.convertAndSend("/topic/agente", guardado);
 
         return guardado;
     }
@@ -151,6 +191,29 @@ public class ReporteService {
             default -> Prioridad.BAJA;
         };
     }
+
+    private ReporteSocketDTO convertirADTO(Reporte reporte) {
+
+    ReporteSocketDTO dto = new ReporteSocketDTO();
+
+    dto.setId(reporte.getId());
+    dto.setTipoInfraccion(reporte.getTipoInfraccion());
+    dto.setDescripcion(reporte.getDescripcion());
+    dto.setDireccion(reporte.getDireccion());
+    dto.setLatitud(reporte.getLatitud());
+    dto.setLongitud(reporte.getLongitud());
+    dto.setEstado(reporte.getEstado());
+    dto.setPrioridad(reporte.getPrioridad().name());
+
+    // 🔥 Aquí obtenemos la primera evidencia si existe
+    if (reporte.getEvidencias() != null && !reporte.getEvidencias().isEmpty()) {
+        dto.setUrlFoto(
+            reporte.getEvidencias().get(0).getArchivo()
+        );
+    }
+
+    return dto;
+}
 
     // ================================
     // OBTENER PENDIENTES

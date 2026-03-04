@@ -2,13 +2,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { Reporte, EstadoReporte } from '../agente';
-
-import { trigger, transition, style, animate } from '@angular/animations';
-
-
-
-
+import { Reporte } from '../agente';
+import { EstadoReporte } from '../agente';
 
 @Component({
   selector: 'app-reportes',
@@ -16,96 +11,97 @@ import { trigger, transition, style, animate } from '@angular/animations';
   imports: [CommonModule, FormsModule],
   templateUrl: './reportes.html',
   styleUrl: './reportes.css',
-  animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(10px)' }),
-        animate(
-          '200ms ease-out',
-          style({ opacity: 1, transform: 'translateY(0)' }),
-        ),
-      ]),
-      transition(':leave', [
-        animate(
-          '150ms ease-in',
-          style({ opacity: 0, transform: 'translateY(10px)' }),
-        ),
-      ]),
-    ]),
-  ],
 })
 export class Reportes {
-  mostrarModalAceptar = false;
-  modoAceptacion: 'solo' | 'acompanado' | null = null;
-  placaBusqueda = '';
-  companeroEncontrado: any = null;
-  reporteTemporal: Reporte | null = null;
-  reportesEntrantes: any[] = [];
-    historialReportes: any[] = [];
-
-  @Input() hayEnProceso: boolean = false;
-
-  EstadoReporte = EstadoReporte;
-
-  mostrarImagenZoom = false;
-  imagenZoomUrl: string | null = null;
-  zoomScale = 1;
-
-  mostrarModalResumen = false;
-
-  abrirModalResumen() {
-    this.mostrarModalResumen = true;
-  }
-
-  fechaRechazado?: Date;
-
-  @Input() origen: 'historial' | 'reportes' = 'reportes';
-  @Output() volver = new EventEmitter<'historial' | 'reportes'>();
-
-  @Input() modoLectura: boolean = false;
-
-  @Input() reporteInicial: Reporte | null = null;
-
   constructor(private sanitizer: DomSanitizer) {}
-  mapaUrl: SafeResourceUrl | null = null;
 
-  @Input() reportes!: Reporte[];
-  @Input() historial!: Reporte[];
+  /* =========================
+     INPUTS / OUTPUTS
+  ========================= */
+
+  @Input() reportes: Reporte[] = [];
+  @Input() modoLectura: boolean = false;
+  @Input() hayEnProceso: boolean = false;
+  @Input() reporteInicial: Reporte | null = null;
 
   @Output() aceptar = new EventEmitter<Reporte>();
   @Output() rechazar = new EventEmitter<Reporte>();
   @Output() finalizar = new EventEmitter<Reporte>();
 
-  volverClick() {
-    if (this.origen === 'historial') {
-      this.volver.emit('historial');
-    } else {
-      // Si venimos desde reportes normales
-      this.reporteSeleccionado = null;
-    }
-  }
-  reporte: any[] = [];
-  cargando = false;
-
-  async ngOnInit() {
-    
-  }
- 
-
-
+  /* =========================
+     VARIABLES
+  ========================= */
 
   reporteSeleccionado: Reporte | null = null;
+  mapaUrl: SafeResourceUrl | null = null;
+  cargando = false;
+  
+  /* =========================
+     CICLO VIDA
+  ========================= */
+
+  ngOnInit() {
+    this.cargando = false;
+  }
+
+  ngOnChanges() {
+    if (this.reporteInicial) {
+      this.seleccionar(this.reporteInicial);
+    }
+  }
+
+  /* =========================
+     SELECCIONAR REPORTE
+  ========================= */
 
   seleccionar(r: Reporte) {
     this.reporteSeleccionado = r;
 
-    if (r.lat && r.lng) {
-      const url = `https://www.google.com/maps?q=${r.lat},${r.lng}&hl=es&z=16&output=embed`;
+    if (r.latitud && r.longitud) {
+      const url = `https://www.google.com/maps?q=${r.latitud},${r.longitud}&hl=es&z=16&output=embed`;
       this.mapaUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     } else {
       this.mapaUrl = null;
     }
   }
+
+  /* =========================
+     ORDENAMIENTO
+  ========================= */
+
+  get reportesOrdenados() {
+    if (!this.reportes) return [];
+
+    return [...this.reportes].sort((a, b) => {
+      if (a.estado === 'en_proceso') return -1;
+      if (b.estado === 'en_proceso') return 1;
+      return 0;
+    });
+  }
+
+  /* =========================
+     FILTROS
+  ========================= */
+
+  filtroActivo: 'TODOS' | 'BAJA' | 'MEDIA' | 'ALTA' = 'TODOS';
+
+  cambiarFiltro(filtro: 'TODOS' | 'BAJA' | 'MEDIA' | 'ALTA') {
+    this.filtroActivo = filtro;
+  }
+
+  get reportesFiltrados() {
+    if (this.filtroActivo === 'TODOS') {
+      return this.reportesOrdenados;
+    }
+
+    return this.reportesOrdenados.filter(
+      (r) => r.prioridad?.toUpperCase() === this.filtroActivo,
+    );
+  }
+
+  /* =========================
+     ACCIONES
+  ========================= */
 
   aceptarClick(r: Reporte) {
     if (this.hayEnProceso) {
@@ -113,8 +109,7 @@ export class Reportes {
       return;
     }
 
-    this.reporteTemporal = r;
-    this.mostrarModalAceptar = true;
+    this.aceptar.emit(r);
   }
 
   rechazarClick(r: Reporte) {
@@ -127,40 +122,9 @@ export class Reportes {
     this.reporteSeleccionado = null;
   }
 
-  getMapaUrl(r: Reporte): SafeResourceUrl {
-    if (!r.lat || !r.lng) return '';
-    const url = `https://www.google.com/maps?q=${r.lat},${r.lng}&hl=es&z=16&output=embed`;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
-
-  getDuracion(r: Reporte) {
-    if (!r.fechaAceptado || !r.fechaFinalizado) return '';
-
-    const diff = r.fechaFinalizado.getTime() - r.fechaAceptado.getTime();
-
-    const horas = Math.floor(diff / 3600000);
-    const minutos = Math.floor((diff % 3600000) / 60000);
-
-    if (horas > 0) {
-      return `${horas}h ${minutos}min`;
-    }
-
-    return `${minutos} minutos`;
-  }
-
-  ngOnChanges() {
-    if (this.reporteInicial) {
-      this.seleccionar(this.reporteInicial);
-    }
-  }
-
-  get reportesOrdenados() {
-    return [...this.reportes].sort((a, b) => {
-      if (a.estado === EstadoReporte.EN_PROCESO) return -1;
-      if (b.estado === EstadoReporte.EN_PROCESO) return 1;
-      return 0;
-    });
-  }
+  /* =========================
+     FINALIZAR
+  ========================= */
 
   mostrarModal = false;
   resumenTexto = '';
@@ -172,14 +136,12 @@ export class Reportes {
   confirmarFinalizar() {
     if (!this.reporteSeleccionado) return;
 
-    //  Validación
     if (!this.resumenTexto || this.resumenTexto.trim().length < 10) {
-      this.mostrarAlerta('Debes escribir un resumen mínimo de 10 caracteres');
+      this.mostrarAlerta('Debes escribir mínimo 10 caracteres');
       return;
     }
 
-    this.reporteSeleccionado.estado = EstadoReporte.FINALIZADO;
-    this.reporteSeleccionado.fechaFinalizado = new Date();
+    this.reporteSeleccionado.estado = EstadoReporte.PENDIENTE;
     this.reporteSeleccionado.resumenOperativo = this.resumenTexto.trim();
 
     this.finalizar.emit(this.reporteSeleccionado);
@@ -188,6 +150,14 @@ export class Reportes {
     this.resumenTexto = '';
     this.reporteSeleccionado = null;
   }
+
+  /* =========================
+     ZOOM IMAGEN
+  ========================= */
+
+  mostrarImagenZoom = false;
+  imagenZoomUrl: string | null = null;
+  zoomScale = 1;
 
   abrirZoom(url: string) {
     this.imagenZoomUrl = url;
@@ -213,29 +183,14 @@ export class Reportes {
     if (this.zoomScale > 3) this.zoomScale = 3;
   }
 
-  /*Filtros*/
+  /* =========================
+     PRIORIDAD CSS
+  ========================= */
 
-  filtroActivo: 'TODOS' | 'BAJA' | 'MEDIA' | 'ALTA' = 'TODOS';
+  getClasePrioridad(prioridad: string) {
+    if (!prioridad) return '';
 
-  cambiarFiltro(filtro: 'TODOS' | 'BAJA' | 'MEDIA' | 'ALTA') {
-    this.filtroActivo = filtro;
-  }
-
-  get reportesFiltrados() {
-    if (this.filtroActivo === 'TODOS') {
-      return this.reportesOrdenados;
-    }
-
-    return this.reportesOrdenados.filter(
-      (r) => r.etiqueta.toUpperCase() === this.filtroActivo,
-    );
-  }
-  
-
-  /*Prioridad dinamico*/
-
-  getClasePrioridad(etiqueta: string) {
-    switch (etiqueta.toLowerCase()) {
+    switch (prioridad.toLowerCase()) {
       case 'alta':
         return 'prioridad-alta';
       case 'media':
@@ -247,7 +202,9 @@ export class Reportes {
     }
   }
 
-  /*Confirmacion*/
+  /* =========================
+     ALERTAS
+  ========================= */
 
   mensajeAlerta: string | null = null;
 
@@ -257,52 +214,5 @@ export class Reportes {
     setTimeout(() => {
       this.mensajeAlerta = null;
     }, 3000);
-  }
-
-  buscarCompanero() {
-    // Simulación (luego lo haces con servicio real)
-    if (this.placaBusqueda === 'ANT-9022') {
-      this.companeroEncontrado = {
-        nombre: 'Carlos Pérez',
-        placa: 'ANT-9022',
-      };
-    } else {
-      this.companeroEncontrado = null;
-      this.mostrarAlerta('No se encontró agente con esa placa');
-    }
-  }
-
-  confirmarAceptar() {
-    if (!this.reporteTemporal) return;
-
-    if (!this.modoAceptacion) {
-      this.mostrarAlerta('Selecciona una opción');
-      return;
-    }
-
-    if (this.modoAceptacion === 'acompanado' && !this.companeroEncontrado) {
-      this.mostrarAlerta('Debes seleccionar un compañero');
-      return;
-    }
-
-    const reporte = this.reporteTemporal;
-
-    reporte.acompanado = this.modoAceptacion === 'acompanado';
-
-    if (reporte.acompanado) {
-      reporte.placaCompanero = this.companeroEncontrado.placa;
-    }
-
-    this.aceptar.emit(reporte);
-
-    this.cerrarModalAceptar();
-  }
-
-  cerrarModalAceptar() {
-    this.mostrarModalAceptar = false;
-    this.modoAceptacion = null;
-    this.placaBusqueda = '';
-    this.companeroEncontrado = null;
-    this.reporteTemporal = null;
   }
 }

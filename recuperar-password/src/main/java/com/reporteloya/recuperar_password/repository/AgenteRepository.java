@@ -11,4 +11,7 @@ public interface AgenteRepository extends JpaRepository<Agentes, Long> {
 
     Optional<Agentes> findByPlacaIgnoreCase(String placa);
 
+    boolean existsByDocumento(String documento);
+
+    boolean existsByEmail(String email);
 }

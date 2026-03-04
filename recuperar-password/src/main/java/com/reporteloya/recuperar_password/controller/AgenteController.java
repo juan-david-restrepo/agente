@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/agentes")
+@RequestMapping("/agente")
 @CrossOrigin(origins = {"http://localhost:4200"})
 public class AgenteController {
 
@@ -59,6 +59,7 @@ public class AgenteController {
     // ELIMINAR TAREA (CORRECCIÓN DEFINITIVA)
     // ==========================================
     @DeleteMapping("/tareas/{id}")
+
     @Transactional // Garantiza que los cambios se apliquen en la BD
     public ResponseEntity<Void> eliminarTarea(@PathVariable Long id) {
         return tareaRepository.findById(id).map(tarea -> {

@@ -23,7 +23,7 @@ public class Tarea {
     private String prioridad;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agente_id")
+    @JoinColumn(name = "id_agente")
     @JsonIgnore // Evita que al consultar una tarea se traiga a todo el agente (bucle)
     private Agentes agente;
 }

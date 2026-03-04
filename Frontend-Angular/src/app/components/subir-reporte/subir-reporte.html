@@ -8,7 +8,7 @@
       <div class="form-grid">
         <div class="columna-izq">
           <div class="seccion">
-            <label>Tipo de incidente *</label>
+            <label>Tipo de incidente </label>
             <div class="grid-incidentes">
               <div *ngFor="let incidente of incidentes" class="card-incidente"
                 [class.selected]="tipoSeleccionado === incidente.nombre" (click)="seleccionarIncidente(incidente)">

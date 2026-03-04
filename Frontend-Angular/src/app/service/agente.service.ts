@@ -25,7 +25,7 @@ export class AgenteServiceTs {
   constructor(private http: HttpClient) {}
 
   getPerfil(): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.apiUrl}/me`);
+    return this.http.get<Usuario>(`${this.apiUrl}/me`, { withCredentials: true });
   }
 
  

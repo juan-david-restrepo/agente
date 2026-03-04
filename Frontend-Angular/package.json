@@ -49,6 +49,8 @@
     "@types/aos": "^3.0.7",
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.21",
+    "@types/sockjs-client": "^1.5.4",
+    "@types/stompjs": "^2.3.10",
     "@types/tesseract.js": "^0.0.2",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",

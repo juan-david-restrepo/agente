@@ -30,7 +30,9 @@ export class ReportesService {
     },
   ];
 
-  constructor() {}
+  constructor(
+    
+  ) {}
 
   /**
    * Obtiene el historial de reportes de un agente por placa

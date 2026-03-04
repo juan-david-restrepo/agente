@@ -11,9 +11,7 @@
     </parent>
 
 
-<compilerArgs>
-    <arg>-parameters</arg>
-</compilerArgs>
+
     <groupId>com.reporteloya</groupId>
     <artifactId>recuperar-password</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -116,6 +114,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-vision</artifactId>
+            <version>3.36.0</version>
+        </dependency>
+
    <dependency>
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
@@ -131,6 +135,9 @@
     <version>3.13.0</version>
     <configuration>
         <release>17</release>
+        <compilerArgs>
+    <arg>-parameters</arg>
+</compilerArgs>
         <annotationProcessorPaths>
             <path>
                 <groupId>org.projectlombok</groupId>

@@ -8,23 +8,18 @@ import java.util.List;
 @Entity
 @Table(name = "agentes")
 @Data
-public class Agentes {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Agentes extends Usuario {
 
     private String placa;
     private String nombre;
     private String documento;
     private String telefono;
-    private String estado; // DISPONIBLE, OCUPADO
-   
+    private String estado;
     private String foto;
 
-    // Relación para permitir múltiples tareas
     @OneToMany(mappedBy = "agente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarea> listaTareas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "agentes", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reporte> reportes; 
+    @OneToMany(mappedBy = "agente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reporte> reportes;
 }

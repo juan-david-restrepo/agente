@@ -28,10 +28,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    
-
-
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -84,15 +80,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
-                        userDetails.getAuthorities());
+                        userDetails.getAuthorities()
+                                .stream()
+                                .map(authority -> {
+                                    String role = authority.getAuthority();
+                                    if (!role.startsWith("ROLE_")) {
+                                        role = "ROLE_" + role;
+                                    }
+                                    return new org.springframework.security.core.authority.SimpleGrantedAuthority(role);
+                                })
+                                .toList());
 
                 authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
+                        new WebAuthenticationDetailsSource().buildDetails(request));
 
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
 
         }

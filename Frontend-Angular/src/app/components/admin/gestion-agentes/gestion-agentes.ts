@@ -113,15 +113,7 @@ export class GestionAgentes implements OnDestroy {
         this.cargarReportes();
         this.cargarTareas();
 
-       this.pollingSubscription = interval(10000)
-         .pipe(
-           switchMap(() =>
-             this.tareasService.obtenerTareasPorAgente(this.agente!.placa),
-           ),
-         )
-         .subscribe((data) => {
-           this.tareas = data?.listaTareas ?? [];
-         });
+      this.cargarTareas();
       },
       error: () => {
         this.error = 'No se encontró ningún agente con esa placa';

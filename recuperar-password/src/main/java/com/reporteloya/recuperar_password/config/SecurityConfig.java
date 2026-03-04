@@ -3,12 +3,12 @@ package com.reporteloya.recuperar_password.config;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -25,14 +25,11 @@ public class SecurityConfig {
         private final JwtAuthenticationFilter jwtAuthFilter;
         private final AuthenticationProvider authenticationProvider;
 
-      
-
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
                 http
 
-                
                                 // =========================
                                 // CORS (listo para multi-dominio)
                                 // =========================
@@ -50,22 +47,20 @@ public class SecurityConfig {
 
                                                 // SOLO login y register públicos
 
-                                                
                                                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                                                 .requestMatchers("/api/password/**").permitAll()
-                                                
 
                                                 // 👇 ESTE DEBE REQUERIR AUTH
                                                 .requestMatchers("/api/auth/me").authenticated()
 
                                                 // Roles
-                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                                .requestMatchers("/api/agente/**").hasRole("AGENTE")
-                                                .requestMatchers("/api/ciudadano/**").hasRole("CIUDADANO")
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/agente/**").hasAnyRole("AGENTE", "ADMIN")                                                .requestMatchers("/api/ciudadano/**").hasRole("CIUDADANO")
                                                 .requestMatchers("/api/reportes/agente/**").hasRole("AGENTE")
                                                 .requestMatchers("/api/reportes/ciudadano/**").hasRole("CIUDADANO")
-                                               
-
+                                                .requestMatchers("/ws/**").permitAll()
+                                                .requestMatchers("/error").permitAll()
+                                                .requestMatchers("/agente").permitAll()
                                                 .anyRequest().authenticated())
 
                                 // =========================
@@ -111,9 +106,9 @@ public class SecurityConfig {
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", configuration);
 
-                
-
                 return source;
         }
+
+     
 
 }
