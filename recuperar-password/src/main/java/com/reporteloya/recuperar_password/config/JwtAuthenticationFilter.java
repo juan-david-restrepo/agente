@@ -38,14 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = null;
 
         // =========================
-        // 1️⃣ Intentar obtener token desde Authorization header
-        // =========================
-        final String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-        }
-
-        // =========================
         // 2️⃣ Si no viene por header, buscar en Cookie
         // =========================
         if (jwt == null && request.getCookies() != null) {

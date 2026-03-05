@@ -7,5 +7,11 @@ import java.util.Optional;
 
 @Repository
 public interface AgenteRepository extends JpaRepository<Agentes, Long> {
+    Optional<Agentes> findByPlaca(String placa);
+
     Optional<Agentes> findByPlacaIgnoreCase(String placa);
+
+    boolean existsByDocumento(String documento);
+
+    boolean existsByEmail(String email);
 }

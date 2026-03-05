@@ -1,5 +1,7 @@
 package com.reporteloya.recuperar_password.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +21,7 @@ public class Evidencia {
     private String archivo;
 
     @ManyToOne
-    @JoinColumn(name = "id_reporte")
+    @JoinColumn(name = "reporte_id")
     private Reporte reporte;
 
     public void setTipo(String tipo) {

@@ -1,8 +1,10 @@
 package com.reporteloya.recuperar_password.config;
 
+import com.reporteloya.recuperar_password.entity.Agentes;
 import com.reporteloya.recuperar_password.entity.Role;
 import com.reporteloya.recuperar_password.entity.Usuario;
 import com.reporteloya.recuperar_password.repository.UsuarioRepository;
+import com.reporteloya.recuperar_password.repository.AgenteRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -25,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationConfig {
 
     private final UsuarioRepository usuarioRepository;
+    private final AgenteRepository AgenteRepository;
 
     /**
      * Define cómo Spring Security debe cargar los detalles de un usuario.
@@ -85,19 +88,29 @@ public class ApplicationConfig {
                 System.out.println(">>> Usuario ADMIN creado (admin@admin.com / admin123) <<<");
             }
           
-            if (!usuarioRepository.existsByEmail("agente@transito.com")) {
-                Usuario agenteUser = Usuario.builder()
-                        .tipoDocumento("CC")
-                        .numeroDocumento("123456789")
-                        .nombreCompleto("Agente de Tránsito")
-                        .email("agente@transito.com")
-                        .password(passwordEncoder.encode("agente123"))
-                        .role(Role.AGENTE)
-                        .build();
+            if (!AgenteRepository.existsByEmail("agente@transito.com")) {
 
-                usuarioRepository.save(agenteUser);
-                System.out.println(">>> Usuario AGENTE creado (agente@transito.com / agente123) <<<");
+                Agentes agente = new Agentes();
+
+                agente.setTipoDocumento("CC");
+                agente.setNumeroDocumento("123456789");
+                agente.setNombreCompleto("Agente de Tránsito");
+                agente.setEmail("agente@transito.com");
+                agente.setPassword(passwordEncoder.encode("agente123"));
+                agente.setRole(Role.AGENTE);
+
+                agente.setPlaca("AT-125");
+                agente.setTelefono("3001234567");
+                agente.setEstado("DISPONIBLE");
+                agente.setFoto(null);
+
+                AgenteRepository.save(agente);
+
+                System.out.println(">>> Agente completo creado correctamente <<<");
             }
+            
+
+            
         };
     }
 
